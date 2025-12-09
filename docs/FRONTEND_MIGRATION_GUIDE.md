@@ -1,11 +1,13 @@
 # Frontend Migration Guide
 
 ## Overview
+
 This guide covers migrating frontend components from direct `fetch()` calls to the `api-wrapper` with feature flags.
 
 ## What's Been Done ✅
 
 ### Updated Components
+
 - ✅ **Profile Page** (`app/(dashboard)/profile/page.tsx`)
   - GET `/api/profile` - Uses `api.get()`
   - PUT `/api/profile` - Uses `api.put()` for profile updates
@@ -18,11 +20,13 @@ This guide covers migrating frontend components from direct `fetch()` calls to t
 ### 1. Import the API Wrapper
 
 **Before:**
+
 ```typescript
 // No import or using direct fetch
 ```
 
 **After:**
+
 ```typescript
 import { api } from "@/lib/api-wrapper";
 ```
@@ -30,6 +34,7 @@ import { api } from "@/lib/api-wrapper";
 ### 2. Replace GET Requests
 
 **Before:**
+
 ```typescript
 const response = await fetch("/api/profile", {
   method: "GET",
@@ -47,6 +52,7 @@ const data = await response.json();
 ```
 
 **After:**
+
 ```typescript
 const response = await api.get("/api/profile");
 const data = response.data.data; // Access nested data
@@ -55,6 +61,7 @@ const data = response.data.data; // Access nested data
 ### 3. Replace POST Requests
 
 **Before:**
+
 ```typescript
 const response = await fetch("/api/course", {
   method: "POST",
@@ -73,6 +80,7 @@ const result = await response.json();
 ```
 
 **After:**
+
 ```typescript
 const response = await api.post("/api/course", courseData);
 const result = response.data;
@@ -81,6 +89,7 @@ const result = response.data;
 ### 4. Replace PUT Requests
 
 **Before:**
+
 ```typescript
 const response = await fetch(`/api/profile`, {
   method: "PUT",
@@ -100,6 +109,7 @@ const updatedData = await response.json();
 ```
 
 **After:**
+
 ```typescript
 const response = await api.put("/api/profile", payload);
 // response.data already contains the parsed data
@@ -109,6 +119,7 @@ toast.success(response.data.message || "Profile updated successfully");
 ### 5. Replace DELETE Requests
 
 **Before:**
+
 ```typescript
 const response = await fetch(`/api/course/${courseId}`, {
   method: "DELETE",
@@ -121,6 +132,7 @@ if (!response.ok) {
 ```
 
 **After:**
+
 ```typescript
 await api.delete(`/api/course/${courseId}`);
 ```
@@ -128,6 +140,7 @@ await api.delete(`/api/course/${courseId}`);
 ### 6. Handle Query Parameters
 
 **Before:**
+
 ```typescript
 const response = await fetch(
   `/api/course?page=${page}&limit=${limit}&search=${searchTerm}`,
@@ -136,6 +149,7 @@ const response = await fetch(
 ```
 
 **After:**
+
 ```typescript
 const response = await api.get("/api/course", {
   params: {
@@ -151,16 +165,19 @@ const response = await api.get("/api/course", {
 ### Priority 1: High Usage Components
 
 1. **Course Management**
+
    - `app/(dashboard)/course-viewer/components/AdminToolbar.tsx`
    - `app/(dashboard)/course-viewer/components/TestSection.tsx`
    - Uses: `/api/courselesson`, `/api/coursetest`, `/api/coursequestion`
 
 2. **Immersive Test**
+
    - `app/(dashboard)/immersive-test/components/AssignmentManager.tsx`
    - `app/(dashboard)/immersive-test/components/AssignmentSubmission.tsx`
    - Uses: `/api/coursetest`, `/api/coursequestion`, `/api/studenttest`
 
 3. **Student Management**
+
    - `app/(dashboard)/students/page.jsx`
    - Uses: Dashboard data endpoints
 
@@ -171,6 +188,7 @@ const response = await api.get("/api/course", {
 ### Priority 2: Additional Components
 
 Search for components using these patterns:
+
 ```bash
 # Find direct fetch usage
 grep -r "fetch(" app/(dashboard)
@@ -185,6 +203,7 @@ grep -r "FetchWrapper" app/(dashboard)
 ## Response Structure
 
 ### Old Fastify Response
+
 ```json
 {
   "status": "success",
@@ -193,6 +212,7 @@ grep -r "FetchWrapper" app/(dashboard)
 ```
 
 ### New Next.js Response (via api-wrapper)
+
 ```json
 {
   "success": true,
@@ -202,6 +222,7 @@ grep -r "FetchWrapper" app/(dashboard)
 ```
 
 ### Accessing Data
+
 ```typescript
 // api-wrapper returns: {data, status, statusText, headers}
 const response = await api.get("/api/profile");
@@ -214,15 +235,16 @@ const user = response.data.user;
 ## Error Handling
 
 ### Old Pattern
+
 ```typescript
 try {
   const response = await fetch("/api/course");
-  
+
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message);
   }
-  
+
   const data = await response.json();
 } catch (error) {
   console.error(error);
@@ -230,6 +252,7 @@ try {
 ```
 
 ### New Pattern
+
 ```typescript
 try {
   const response = await api.get("/api/course");
@@ -237,7 +260,7 @@ try {
 } catch (error: any) {
   // error contains: {data, status, statusText, message}
   console.error(error.message);
-  
+
   // Handle specific status codes
   if (error.status === 403) {
     toast.error("You don't have permission");
@@ -250,6 +273,7 @@ try {
 ## Common Patterns
 
 ### Pattern 1: List with Pagination
+
 ```typescript
 const fetchCourses = async (page: number, limit: number = 10) => {
   try {
@@ -265,6 +289,7 @@ const fetchCourses = async (page: number, limit: number = 10) => {
 ```
 
 ### Pattern 2: Create with Form Data
+
 ```typescript
 const handleCreateCourse = async (formData: CourseFormData) => {
   try {
@@ -281,14 +306,15 @@ const handleCreateCourse = async (formData: CourseFormData) => {
 ```
 
 ### Pattern 3: Update with Optimistic UI
+
 ```typescript
 const handleUpdateCourse = async (courseId: number, updates: any) => {
   // Optimistic update
   const previousCourses = [...courses];
-  setCourses(courses.map(c => 
-    c.id === courseId ? { ...c, ...updates } : c
-  ));
-  
+  setCourses(
+    courses.map((c) => (c.id === courseId ? { ...c, ...updates } : c))
+  );
+
   try {
     await api.put(`/api/course/${courseId}`, updates);
     toast.success("Course updated");
@@ -301,15 +327,16 @@ const handleUpdateCourse = async (courseId: number, updates: any) => {
 ```
 
 ### Pattern 4: Delete with Confirmation
+
 ```typescript
 const handleDeleteCourse = async (courseId: number) => {
   if (!confirm("Are you sure you want to delete this course?")) {
     return;
   }
-  
+
   try {
     await api.delete(`/api/course/${courseId}`);
-    setCourses(courses.filter(c => c.id !== courseId));
+    setCourses(courses.filter((c) => c.id !== courseId));
     toast.success("Course deleted");
   } catch (error: any) {
     toast.error(error.message || "Failed to delete");
@@ -318,19 +345,20 @@ const handleDeleteCourse = async (courseId: number) => {
 ```
 
 ### Pattern 5: Search with Debounce
+
 ```typescript
 import { useDebounce } from "@/hooks/useDebounce";
 
 const SearchComponent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 500);
-  
+
   useEffect(() => {
     if (debouncedSearch) {
       searchAnnouncements(debouncedSearch);
     }
   }, [debouncedSearch]);
-  
+
   const searchAnnouncements = async (query: string) => {
     const response = await api.get("/api/announcements/search", {
       params: { q: query },
@@ -343,7 +371,9 @@ const SearchComponent = () => {
 ## Testing Feature Flags
 
 ### Local Development
+
 Set environment variables in `.env.local`:
+
 ```bash
 # Enable specific APIs
 USE_NEXTJS_PROFILE=true
@@ -358,6 +388,7 @@ DEBUG_API_ROUTING=true
 ```
 
 ### Testing Strategy
+
 1. Enable one feature flag at a time
 2. Test all CRUD operations for that endpoint
 3. Verify role-based permissions work
@@ -365,7 +396,9 @@ DEBUG_API_ROUTING=true
 5. Move to next feature flag
 
 ### Debugging
+
 When `DEBUG_API_ROUTING=true`, console shows:
+
 ```
 [API] GET /api/profile -> nextjs
 [API] POST /api/course -> nextjs
@@ -388,21 +421,25 @@ When `DEBUG_API_ROUTING=true`, console shows:
 ## Migration Priorities
 
 ### Week 1: Core Features
+
 - [x] Profile management
 - [ ] Course listing and details
 - [ ] Course module/lesson viewing
 
-### Week 2: Content Management  
+### Week 2: Content Management
+
 - [ ] Test/quiz management
 - [ ] Assignment creation
 - [ ] Question management
 
 ### Week 3: Student Features
+
 - [ ] Course registration
 - [ ] Test submission
 - [ ] Results viewing
 
 ### Week 4: Additional Features
+
 - [ ] Announcements
 - [ ] Forum/discussions
 - [ ] Search functionality
@@ -410,17 +447,21 @@ When `DEBUG_API_ROUTING=true`, console shows:
 ## Common Issues & Solutions
 
 ### Issue 1: Response Structure Mismatch
+
 **Problem:** Accessing `response.data` returns undefined
 
 **Solution:** Next.js APIs return `{success, data, user}`, so use:
+
 ```typescript
 const actualData = response.data.data;
 ```
 
 ### Issue 2: Error Not Caught
+
 **Problem:** Errors not showing in UI
 
 **Solution:** api-wrapper throws on error, ensure try-catch:
+
 ```typescript
 try {
   await api.post("/api/course", data);
@@ -430,21 +471,25 @@ try {
 ```
 
 ### Issue 3: Query Params Not Working
+
 **Problem:** URL shows `/api/course?[object Object]`
 
 **Solution:** Use params option:
+
 ```typescript
 // Wrong
-api.get(`/api/course?page=${page}`)
+api.get(`/api/course?page=${page}`);
 
 // Correct
-api.get("/api/course", { params: { page } })
+api.get("/api/course", { params: { page } });
 ```
 
 ### Issue 4: Feature Flag Not Applied
+
 **Problem:** Still using Fastify even with flag enabled
 
-**Solution:** 
+**Solution:**
+
 1. Check `.env.local` has the flag
 2. Restart dev server
 3. Clear browser cache

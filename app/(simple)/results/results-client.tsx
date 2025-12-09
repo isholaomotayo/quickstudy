@@ -2,21 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
   BookOpen,
-  GraduationCap,
-  TrendingUp,
-  Award,
-  Calendar,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  ExternalLink,
+  GraduationCap, AlertCircle
 } from "lucide-react";
 import { CourseResults } from "./components/course-results";
 import { LearningResults } from "./components/learning-results";
@@ -68,6 +58,16 @@ interface LearningResult {
 }
 
 export function ResultsClient() {
+  // Map API response to LearningResult interface
+  const mapLearningResults = (results: any[]): LearningResult[] => {
+    if (!Array.isArray(results)) return [];
+    return results.map((item) => ({
+      id: typeof item.id === 'string' ? parseInt(item.id) : item.id,
+      course_test_id: item.course_test_id || 0,
+      name: item.name || "",
+      test_name: item.test_name || "",
+    }));
+  };
   const { userData } = useUserData();
   const [activeTab, setActiveTab] = useState("course");
   const [courseResults, setCourseResults] = useState<StudentResult[]>([]);
@@ -143,7 +143,7 @@ export function ResultsClient() {
 
       if (learningResultsResponse.ok) {
         const learningData = await learningResultsResponse.json();
-        setLearningResults(learningData || []);
+        setLearningResults(mapLearningResults(learningData));
       } else {
         console.error(
           "Learning results response not ok:",

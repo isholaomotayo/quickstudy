@@ -32,7 +32,7 @@ const AUTH_SECRET = process.env.JWTSECRET || "fallback-secret-key";
  * Create HMAC signature for data integrity
  */
 function createSignature(data: string): string {
-  return crypto.createHmac('sha256', AUTH_SECRET).update(data).digest('hex');
+  return crypto.createHmac("sha256", AUTH_SECRET).update(data).digest("hex");
 }
 
 /**
@@ -40,7 +40,10 @@ function createSignature(data: string): string {
  */
 function verifySignature(data: string, signature: string): boolean {
   const expectedSignature = createSignature(data);
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  );
 }
 
 /**
@@ -56,9 +59,9 @@ export function createSecureCookieData(userData: AuthenticatedUser) {
     last_name: userData.last_name,
     programme_id: userData.programme_id,
   });
-  
+
   const roleString = userData.role;
-  
+
   return {
     userData: userDataString,
     userSignature: createSignature(userDataString),
@@ -83,8 +86,13 @@ export async function getUserFromSecureCookies(): Promise<AuthenticatedUser | nu
     }
 
     // Verify signatures to ensure data hasn't been tampered with
-    if (!verifySignature(userData, userSignature) || !verifySignature(role, roleSignature)) {
-      console.warn("Cookie signature verification failed - possible tampering detected");
+    if (
+      !verifySignature(userData, userSignature) ||
+      !verifySignature(role, roleSignature)
+    ) {
+      console.warn(
+        "Cookie signature verification failed - possible tampering detected"
+      );
       return null;
     }
 
@@ -300,21 +308,45 @@ export function createAuthErrorResponse(
 
 /**
  * Convert BigInt values to strings for JSON serialization
+ * Also converts Date objects to ISO strings
  */
 function serializeBigInt(obj: any): any {
   if (obj === null || obj === undefined) {
     return obj;
   }
-  
-  if (typeof obj === 'bigint') {
+
+  if (typeof obj === "bigint") {
     return obj.toString();
   }
-  
+
+  // Handle Date objects - convert to ISO string
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
+
+  // Handle Prisma Decimal objects - they have toNumber() method
+  if (obj && typeof obj === "object" && typeof obj.toNumber === "function") {
+    return obj.toNumber();
+  }
+
+  // Handle Prisma Decimal objects - alternative check for {s, e, d} structure
+  if (
+    obj &&
+    typeof obj === "object" &&
+    "s" in obj &&
+    "e" in obj &&
+    "d" in obj &&
+    !Array.isArray(obj)
+  ) {
+    // This is a Prisma Decimal - convert to number or string
+    return Number(obj.toString?.() || obj);
+  }
+
   if (Array.isArray(obj)) {
     return obj.map(serializeBigInt);
   }
-  
-  if (typeof obj === 'object') {
+
+  if (typeof obj === "object") {
     const serialized: any = {};
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
@@ -323,8 +355,17 @@ function serializeBigInt(obj: any): any {
     }
     return serialized;
   }
-  
+
   return obj;
+}
+
+/**
+ * Create a JSON response with BigInt serialization (returns data directly without wrapper)
+ * Use this for endpoints that should return data directly to match Fastify behavior
+ */
+export function createJsonResponse(data: any): NextResponse {
+  const serializedData = serializeBigInt(data);
+  return NextResponse.json(serializedData);
 }
 
 /**
@@ -336,7 +377,7 @@ export function createSuccessResponse(
 ): NextResponse {
   // Serialize BigInt values before creating response
   const serializedData = serializeBigInt(data);
-  
+
   return NextResponse.json({
     success: true,
     data: serializedData,
@@ -368,14 +409,14 @@ export async function protectApiRouteAuto(
         username: "dev",
         first_name: "Development",
         last_name: "User",
-      }
+      },
     };
   }
 
   const method = request.method;
   const url = new URL(request.url);
   const path = url.pathname;
-  
+
   // Get user with signature validation (secure without DB)
   const user = await getUserWithValidation();
   if (!user) {

@@ -16,7 +16,7 @@ interface RouteParams {
  * POST /api/announcements/[id]/read
  * Mark a single announcement as read for the current user
  */
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -25,7 +25,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const announcementId = parseInt(params.id);
+    const { id } = await context.params;
+    const announcementId = parseInt(id);
 
     // Check if announcement exists
     const announcement = await prisma.announcements.findUnique({

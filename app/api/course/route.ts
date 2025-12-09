@@ -1,216 +1,189 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { NextRequest } from "next/server";
 import {
-  authenticateUser,
+  createJsonResponse,
   createAuthErrorResponse,
-  createSuccessResponse,
-  hasInstitutionAccess,
+  authenticateUserWithPermissions,
 } from "@/lib/api-auth";
-import { hasPermission } from "@/lib/permissions-config";
+import { prisma } from "@/lib/db";
 
-/**
- * GET /api/course
- * Get all courses (filtered by user role and institution)
- */
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
+  const authResult = await authenticateUserWithPermissions();
+
+  if (!authResult.success || !authResult.user) {
+    return createAuthErrorResponse(
+      authResult.error || "Unauthorized",
+      authResult.statusCode || 401
+    );
+  }
+
+  const user = authResult.user;
+
   try {
-    const authResult = await authenticateUser();
-
-    if (!authResult.success) {
-      return createAuthErrorResponse(authResult.error!, authResult.statusCode!);
-    }
-
-    const user = authResult.user!;
-    const { searchParams } = new URL(request.url);
-    
+    const searchParams = req.nextUrl.searchParams;
     const pgsize = parseInt(searchParams.get("pgsize") || "100");
     const pg = parseInt(searchParams.get("pg") || "1");
-    const search = searchParams.get("search") || "";
-    const programme_id = searchParams.get("programme_id");
-    const level_id = searchParams.get("level_id");
-    const department_id = searchParams.get("department_id");
+    const search = searchParams.get("search");
+
+    const skip = (pg - 1) * pgsize;
 
     // Build where clause based on role
-    const where: any = {};
+    let whereClause: any = {};
+    let includeCourses = true;
 
-    // Filter by institution (staff/students see their institution's courses)
     if (user.role === "STUDENT") {
-      // Students see courses they're enrolled in
-      const studentRecord = await prisma.student.findFirst({
-        where: { user_id: parseInt(user.id) },
+      // Get student record
+      const student = await prisma.student.findFirst({
+        where: {
+          user_id: BigInt(user.id),
+        },
       });
 
-      if (studentRecord) {
-        const enrolledCourses = await prisma.student_course.findMany({
-          where: { student_id: studentRecord.id },
-          select: { course_id: true },
-        });
-
-        where.id = {
-          in: enrolledCourses.map((sc) => sc.course_id),
-        };
+      if (!student) {
+        return createJsonResponse([]);
       }
-    } else if (user.role === "LECTURER") {
-      // Lecturers see courses they teach
-      const staffRecord = await prisma.staff.findFirst({
-        where: { user_id: parseInt(user.id) },
+
+      // Students see only their enrolled courses
+      const studentCourses = await prisma.student_course.findMany({
+        where: {
+          student_id: student.id,
+        },
+        include: {
+          course: true,
+        },
+        skip,
+        take: pgsize,
       });
 
-      if (staffRecord) {
-        const taughtCourses = await prisma.staff_course.findMany({
-          where: { staff_id: staffRecord.id },
-          select: { course_id: true },
-        });
+      // Filter to only published courses and handle null courses
+      const publishedCourses = studentCourses
+        .filter((sc) => sc.course && sc.course.published)
+        .map((sc) => sc.course!);
 
-        where.id = {
-          in: taughtCourses.map((sc) => sc.course_id),
+      // Get progress data for student
+      const courseProgresses = await prisma.course_progress.findMany({
+        where: {
+          student_id: student.id,
+        },
+      });
+
+      // Create progress map
+      const progressMap = new Map();
+      courseProgresses.forEach((progress) => {
+        progressMap.set(Number(progress.course_id), {
+          completion_percentage: progress.completion_percentage || 0,
+          total_lessons: progress.total_lessons || 0,
+          completed_lessons: progress.completed_lessons || 0,
+          status: progress.status,
+          total_time_minutes: progress.total_time_minutes || 0,
+          last_accessed_at: progress.last_accessed_at,
+        });
+      });
+
+      // Add progress data to courses
+      const coursesWithProgress = publishedCourses.map((course) => {
+        const progress = progressMap.get(Number(course.id)) || {
+          completion_percentage: 0,
+          total_lessons: 0,
+          completed_lessons: 0,
+          status: "not_started",
+          total_time_minutes: 0,
+          last_accessed_at: null,
         };
+
+        return {
+          ...course,
+          completion_percentage: progress.completion_percentage,
+          total_lessons: progress.total_lessons,
+          completed_lessons: progress.completed_lessons,
+          student_enrolled: progress.status !== "not_started",
+          student_completed: progress.status === "completed",
+          has_result: progress.status === "completed",
+          enrollment_status:
+            progress.status === "completed"
+              ? "completed"
+              : progress.status === "not_started"
+              ? "not_enrolled"
+              : "enrolled",
+        };
+      });
+
+      return createJsonResponse(coursesWithProgress);
+    } else if (user.role === "STAFF") {
+      // Get staff record
+      const staff = await prisma.staff.findFirst({
+        where: {
+          user_id: BigInt(user.id),
+        },
+      });
+
+      if (!staff) {
+        return createJsonResponse([]);
       }
+
+      // Staff see courses they're assigned to
+      const staffCourses = await prisma.staff_course.findMany({
+        where: {
+          staff_id: staff.id,
+        },
+        include: {
+          course: true,
+        },
+        skip,
+        take: pgsize,
+        orderBy: {
+          id: "desc",
+        },
+      });
+
+      return createJsonResponse(staffCourses.map((sc) => sc.course));
     } else if (user.role === "HOD") {
-      // HODs see courses in their department
-      const staffRecord = await prisma.staff.findFirst({
-        where: { user_id: parseInt(user.id) },
+      // Get staff record for HOD
+      const staff = await prisma.staff.findFirst({
+        where: {
+          user_id: BigInt(user.id),
+        },
       });
 
-      if (staffRecord?.department_id) {
-        where.department_id = staffRecord.department_id;
-      }
-    } else if (user.role === "PROGRAMME_COORDINATOR" && user.programme_id) {
-      where.programme_id = user.programme_id;
+      // HOD sees courses in their department
+      whereClause = {
+        department_id: staff?.department_id || 0,
+      };
+    } else if (user.role === "ADMIN") {
+      // Admin sees all courses in their institution
+      whereClause = {
+        institution_id: user.institution_id,
+      };
     }
-    // ADMIN and SUPERADMIN can see all courses (no additional filter)
+    // SUPERADMIN sees all courses (no filter)
 
-    // Apply search filter
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { code: { contains: search, mode: "insensitive" } },
+    // Apply search if provided
+    if (search && includeCourses) {
+      whereClause.OR = [
+        { name: { contains: search, mode: "insensitive" as any } },
+        { code: { contains: search, mode: "insensitive" as any } },
       ];
     }
 
-    // Apply additional filters
-    if (programme_id) where.programme_id = parseInt(programme_id);
-    if (level_id) where.level_id = parseInt(level_id);
-    if (department_id) where.department_id = parseInt(department_id);
-
-    // Fetch courses with pagination
-    const [courses, total] = await Promise.all([
-      prisma.course.findMany({
-        where,
-        include: {
-          programme: true,
-          level: true,
-          department: true,
-          course_module: {
-            orderBy: { order: "asc" },
-          },
-        },
-        orderBy: { created_at: "desc" },
+    // Fetch courses for non-STUDENT roles
+    if (includeCourses) {
+      const courses = await prisma.course.findMany({
+        where: whereClause,
+        skip,
         take: pgsize,
-        skip: (pg - 1) * pgsize,
-      }),
-      prisma.course.count({ where }),
-    ]);
-
-    return createSuccessResponse(
-      {
-        courses,
-        pagination: {
-          total,
-          page: pg,
-          pageSize: pgsize,
-          totalPages: Math.ceil(total / pgsize),
+        orderBy: {
+          code: "desc",
         },
-      },
-      user
-    );
+      });
+
+      const total = await prisma.course.count({ where: whereClause });
+      const pageCount = Math.ceil(total / pgsize);
+
+      return createJsonResponse(courses);
+    }
+
+    return createJsonResponse([]);
   } catch (error) {
     console.error("Error fetching courses:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to fetch courses",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * POST /api/course
- * Create a new course
- */
-export async function POST(request: NextRequest) {
-  try {
-    const authResult = await authenticateUser();
-
-    if (!authResult.success) {
-      return createAuthErrorResponse(authResult.error!, authResult.statusCode!);
-    }
-
-    const user = authResult.user!;
-
-    // Check permissions
-    if (!hasPermission(user.role, "courses.create")) {
-      return createAuthErrorResponse("Insufficient permissions to create courses", 403);
-    }
-
-    const body = await request.json();
-
-    const {
-      code,
-      name,
-      units,
-      description,
-      programme_id,
-      level_id,
-      department_id,
-      semester_position,
-      published = true,
-    } = body;
-
-    // Validate required fields
-    if (!code || !name || !units) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Missing required fields: code, name, units",
-        },
-        { status: 400 }
-      );
-    }
-
-    // Create course
-    const course = await prisma.course.create({
-      data: {
-        code,
-        name,
-        units: parseInt(units),
-        description,
-        programme_id: programme_id ? parseInt(programme_id) : null,
-        level_id: level_id ? parseInt(level_id) : null,
-        department_id: department_id ? parseInt(department_id) : null,
-        semester_position: semester_position ? parseInt(semester_position) : null,
-        published,
-      },
-      include: {
-        programme: true,
-        level: true,
-        department: true,
-      },
-    });
-
-    return createSuccessResponse(course, user);
-  } catch (error) {
-    console.error("Error creating course:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Failed to create course",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return createAuthErrorResponse("Failed to fetch courses", 500);
   }
 }

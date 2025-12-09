@@ -18,7 +18,7 @@ interface RouteParams {
  * GET /api/announcements/[id]
  * Get a specific announcement by ID
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -27,7 +27,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const announcementId = parseInt(params.id);
+    const { id } = await context.params;
+    const announcementId = parseInt(id);
 
     const announcement = await prisma.announcements.findUnique({
       where: { id: announcementId },
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/announcements/[id]
  * Update an announcement
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -93,7 +94,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const announcementId = parseInt(params.id);
+    const { id } = await context.params;
+    const announcementId = parseInt(id);
     const body = await request.json();
 
     // Check announcement exists and user has access
@@ -149,7 +151,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/announcements/[id]
  * Delete an announcement
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -167,7 +169,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const announcementId = parseInt(params.id);
+    const { id } = await context.params;
+    const announcementId = parseInt(id);
 
     // Check announcement exists and user has access
     const existingAnnouncement = await prisma.announcements.findUnique({

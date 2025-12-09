@@ -17,7 +17,7 @@ interface RouteParams {
  * GET /api/studentcourse/[id]
  * Get a specific student course registration
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const registrationId = parseInt(params.id);
+    const { id } = await context.params;
+    const registrationId = parseInt(id);
 
     const registration = await prisma.student_course.findUnique({
       where: { id: registrationId },
@@ -98,7 +99,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/studentcourse/[id]
  * Update a student course registration
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -116,16 +117,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const registrationId = parseInt(params.id);
+    const { id } = await context.params;
+    const registrationId = parseInt(id);
     const body = await request.json();
 
-    const {
-      semester_id,
-      level_id,
-      units,
-      cleared,
-      approval_status,
-    } = body;
+    const { semester_id, level_id, units, cleared, approval_status } = body;
 
     // Update registration
     const registration = await prisma.student_course.update({
@@ -179,7 +175,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/studentcourse/[id]
  * Delete a student course registration
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -189,15 +185,64 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const user = authResult.user!;
 
-    // Check permissions
-    if (!hasPermission(user.role, "courses.enroll")) {
+    const { id } = await context.params;
+    const registrationId = parseInt(id);
+
+    // Get the registration to check ownership
+    const registration = await prisma.student_course.findUnique({
+      where: { id: registrationId },
+      select: {
+        id: true,
+        student_id: true,
+        approval_status: true,
+      },
+    });
+
+    if (!registration) {
       return createAuthErrorResponse(
-        "Insufficient permissions to delete student course registrations",
-        403
+        "Student course registration not found",
+        404
       );
     }
 
-    const registrationId = parseInt(params.id);
+    // If user is a student, verify they can only delete their own registrations
+    if (user.role === "STUDENT") {
+      // Get student record for the authenticated user
+      const studentRecord = await prisma.student.findFirst({
+        where: { user_id: BigInt(user.id) },
+      });
+
+      if (!studentRecord) {
+        return createAuthErrorResponse(
+          "Student record not found",
+          404
+        );
+      }
+
+      // Verify this registration belongs to this student
+      if (Number(registration.student_id) !== Number(studentRecord.id)) {
+        return createAuthErrorResponse(
+          "You can only delete your own course registrations",
+          403
+        );
+      }
+
+      // Students can only delete pending (non-approved) registrations
+      if (registration.approval_status) {
+        return createAuthErrorResponse(
+          "Cannot delete approved course registrations. Please contact administration.",
+          403
+        );
+      }
+    } else {
+      // For non-students, check if they have permission to unenroll others
+      if (!hasPermission(user.role, "courses.enroll")) {
+        return createAuthErrorResponse(
+          "Insufficient permissions to delete student course registrations",
+          403
+        );
+      }
+    }
 
     // Delete registration
     await prisma.student_course.delete({

@@ -17,7 +17,7 @@ interface RouteParams {
  * GET /api/courseannouncements/[id]
  * Get a specific course announcement by ID
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const announcementId = parseInt(params.id);
+    const { id } = await context.params;
+    const announcementId = parseInt(id);
 
     const announcement = await prisma.course_announcement.findUnique({
       where: { id: announcementId },
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/courseannouncements/[id]
  * Update a course announcement
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -89,7 +90,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const announcementId = parseInt(params.id);
+    const { id } = await context.params;
+    const announcementId = parseInt(id);
     const body = await request.json();
 
     const { title, body: announcementBody } = body;
@@ -139,7 +141,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/courseannouncements/[id]
  * Delete a course announcement
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -157,7 +159,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const announcementId = parseInt(params.id);
+    const { id } = await context.params;
+    const announcementId = parseInt(id);
 
     // Delete course announcement
     await prisma.course_announcement.delete({

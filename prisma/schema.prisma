@@ -441,6 +441,8 @@ model level {
   institution      institution?       @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "level_institution_id_foreign")
   programme_course programme_course[]
   student          student[]
+  student_course   student_course[]
+  student_gpa      student_gpa[]
 
   @@index([institution_id], map: "level_institution_id_index")
 }
@@ -702,6 +704,7 @@ model student_course {
   created_by                           BigInt?
   updated_by                           BigInt?
   course                               course?          @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  level                                level?           @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_student_course_created_byTouser user?            @relation("student_course_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   semester                             semester?        @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student                              student?         @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -729,6 +732,7 @@ model student_gpa {
   created_by                        BigInt?
   updated_by                        BigInt?
   class_degree                      class_degree? @relation(fields: [class_degree_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  level                             level?        @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_student_gpa_created_byTouser user?         @relation("student_gpa_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   semester                          semester?     @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student                           student?      @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

@@ -1,22 +1,22 @@
 "use client";
 
 import {
-  BookOpen,
-  Calendar,
-  Camera,
-  CreditCard,
-  Download,
-  Edit3,
-  Eye,
-  EyeOff,
-  Mail,
-  MapPin,
-  Phone,
-  Save,
-  Shield,
-  TrendingUp,
-  User,
-  X,
+    BookOpen,
+    Calendar,
+    Camera,
+    CreditCard,
+    Download,
+    Edit3,
+    Eye,
+    EyeOff,
+    Mail,
+    MapPin,
+    Phone,
+    Save,
+    Shield,
+    TrendingUp,
+    User,
+    X,
 } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -106,7 +106,7 @@ export default function UserProfile() {
 
       // Use the new unified profile endpoint with api-wrapper
       const response = await api.get("/api/profile");
-      const data = response.data.data;
+      const data = response.data; // API wrapper returns {data: profileObject}
 
       // Set institution data for ID card
       setInstitutionData(data.institution || null);

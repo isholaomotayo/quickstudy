@@ -37,12 +37,18 @@ interface RouteConfig {
 const routeMapping: RouteConfig[] = [
   // Phase 1: Core APIs
   { pattern: /^\/api\/profile/, flag: "USE_NEXTJS_PROFILE" },
-  { pattern: /^\/api\/course(?!module|lesson|announcement|test|question)/, flag: "USE_NEXTJS_COURSES" },
+  {
+    pattern: /^\/api\/course(?!module|lesson|announcement|test|question)/,
+    flag: "USE_NEXTJS_COURSES",
+  },
   { pattern: /^\/api\/coursemodule/, flag: "USE_NEXTJS_COURSE_MODULES" },
   { pattern: /^\/api\/courselesson/, flag: "USE_NEXTJS_COURSE_LESSONS" },
 
   // Phase 2: Announcements
-  { pattern: /^\/api\/(school)?announcement/, flag: "USE_NEXTJS_ANNOUNCEMENTS" },
+  {
+    pattern: /^\/api\/(school)?announcement/,
+    flag: "USE_NEXTJS_ANNOUNCEMENTS",
+  },
   { pattern: /^\/api\/courseannouncement/, flag: "USE_NEXTJS_ANNOUNCEMENTS" },
 
   // Phase 3: Forum & Connect
@@ -50,6 +56,7 @@ const routeMapping: RouteConfig[] = [
   { pattern: /^\/api\/discussion/, flag: "USE_NEXTJS_DISCUSSION" },
 
   // Phase 4: Student Course & Assessments
+  { pattern: /^\/api\/course-register/, flag: "USE_NEXTJS_STUDENT_COURSE" },
   { pattern: /^\/api\/studentcourse/, flag: "USE_NEXTJS_STUDENT_COURSE" },
   { pattern: /^\/api\/coursetest/, flag: "USE_NEXTJS_TESTS" },
   { pattern: /^\/api\/coursequestion/, flag: "USE_NEXTJS_TESTS" },
@@ -77,7 +84,7 @@ function shouldUseNextJS(endpoint: string): boolean {
 function buildURL(endpoint: string, params?: Record<string, any>): string {
   const useNextJS = shouldUseNextJS(endpoint);
   const baseURL = useNextJS ? "" : process.env.API_URL || "";
-  
+
   let url = `${baseURL}${endpoint}`;
 
   if (params) {
@@ -123,7 +130,7 @@ async function request<T = any>(
 
   let data: T;
   const contentType = response.headers.get("content-type");
-  
+
   if (contentType?.includes("application/json")) {
     data = await response.json();
   } else {
@@ -136,7 +143,8 @@ async function request<T = any>(
       status: response.status,
       statusText: response.statusText,
       headers: response.headers,
-      message: (data as any)?.message || (data as any)?.error || response.statusText,
+      message:
+        (data as any)?.message || (data as any)?.error || response.statusText,
     };
   }
 
@@ -210,7 +218,10 @@ export function getAPIBackend(endpoint: string): "nextjs" | "fastify" {
 /**
  * Development helper to log API routing decisions
  */
-if (process.env.NODE_ENV === "development" && process.env.DEBUG_API_ROUTING === "true") {
+if (
+  process.env.NODE_ENV === "development" &&
+  process.env.DEBUG_API_ROUTING === "true"
+) {
   const originalRequest = api.request;
   api.request = async (endpoint: string, options?: ApiRequestOptions) => {
     const backend = getAPIBackend(endpoint);

@@ -1,28 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { processPaystack } from "@/helpers/paymentProcessors";
-import { getNewTransactionAmount } from "@/helpers/FetchWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import {
-  Plus,
-  Receipt,
-  Calendar,
-  User,
-  CheckCircle,
-  Clock,
-  Trash2,
-  ShoppingCart,
+    Plus,
+    Receipt,
+    Calendar, CheckCircle,
+    Clock,
+    Trash2,
+    ShoppingCart
 } from "lucide-react";
 
 interface PaymentItem {
@@ -105,8 +102,8 @@ const clearCartFromStorage = () => {
 };
 
 export default function PaymentClientWrapper({
-  fixedDues,
-  flexibleDues,
+  fixedDues = [],
+  flexibleDues = {},
   userData,
   paymentDetails,
   payment_plan_options,
@@ -460,7 +457,7 @@ export default function PaymentClientWrapper({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {fixedDues.length === 0 ? (
+            {!fixedDues || fixedDues.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <Receipt className="w-12 h-12 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">No fixed fees available</p>

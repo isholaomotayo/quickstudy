@@ -53,7 +53,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const existingReadIds = new Set(existingReads.map((r) => r.announcement_id));
+    const existingReadIds = new Set(
+      existingReads.map((r) => r.announcement_id)
+    );
 
     // Filter to only unread announcements
     const unreadIds = announcementIds.filter((id) => !existingReadIds.has(id));

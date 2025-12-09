@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import {
-  authenticateUser,
-  createAuthErrorResponse,
-} from "@/lib/api-auth";
+import { authenticateUser, createAuthErrorResponse } from "@/lib/api-auth";
 import { hasPermission } from "@/lib/permissions-config";
 
 interface RouteParams {
@@ -16,7 +13,7 @@ interface RouteParams {
  * PUT /api/discussion/comments/[id]
  * Update a discussion comment
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -34,7 +31,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const commentId = parseInt(params.id);
+    const { id } = await context.params;
+    const commentId = parseInt(id);
     const requestBody = await request.json();
     const { body: commentBody } = requestBody;
 
@@ -98,7 +96,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/discussion/comments/[id]
  * Delete a discussion comment
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -116,7 +114,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const commentId = parseInt(params.id);
+    const { id } = await context.params;
+    const commentId = parseInt(id);
 
     // Delete comment
     await prisma.course_discussion_comment.delete({

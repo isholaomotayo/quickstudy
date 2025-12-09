@@ -1,14 +1,11 @@
 import {
-  ChevronDown,
-  CreditCardIcon,
-  History,
+  ChevronDown, History,
   User,
-  Wallet,
+  Wallet
 } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,14 +14,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PaymentClientWrapper from "./payment-client-wrapper";
 import StudentPaymentRecords from "@/components/StudentPaymentRecords";
@@ -166,15 +155,28 @@ async function getPaymentServerData(searchParams: {
       const payablesUrl = `${API_URL}/api/payment2/payables`;
       console.log("Fetching payables from:", payablesUrl);
 
-      const payablesResponse = await fetch(payablesUrl, {
-        method: "GET",
-        headers,
-        credentials: "include",
-      });
+      try {
+        const payablesResponse = await fetch(payablesUrl, {
+          method: "GET",
+          headers,
+          credentials: "include",
+        });
 
-      if (payablesResponse.ok) {
-        const payablesData = await payablesResponse.json();
-        myPayables = payablesData || { fixedDues: [], flexibleDues: {} };
+        if (payablesResponse.ok) {
+          const payablesData = await payablesResponse.json();
+          console.log("Payables data received:", payablesData);
+          // Handle both direct response and wrapped response formats
+          const actualData = payablesData?.data || payablesData;
+          myPayables = {
+            fixedDues: actualData?.fixedDues || [],
+            flexibleDues: actualData?.flexibleDues || {},
+          };
+        } else {
+          const errorText = await payablesResponse.text();
+          console.error("Error fetching payables:", payablesResponse.status, errorText);
+        }
+      } catch (error) {
+        console.error("Exception fetching payables:", error);
       }
     }
 
@@ -253,10 +255,17 @@ export default async function PaymentsPage({
   const {
     paymentsHistory,
     paymentDetails,
-    myPayables,
+    myPayables: rawPayables,
     userData,
     isHigherAccess,
   } = paymentData;
+  
+  // Ensure myPayables has proper structure
+  const myPayables = {
+    fixedDues: rawPayables?.fixedDues || [],
+    flexibleDues: rawPayables?.flexibleDues || {},
+  };
+  
   const iCanPay = userData?.role === "STUDENT";
   const payment_plan_options = {
     full: { title: "Full Payment" },
@@ -267,10 +276,7 @@ export default async function PaymentsPage({
 
   return (
     <>
-      {/* Simple Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 pointer-events-none">
-      </div>
-      <div className="relative z-10">
+      <div>
         <Tabs
           defaultValue={iCanPay ? "payments" : "history"}
           className="space-y-6"

@@ -24,12 +24,13 @@ export async function GET(request: NextRequest) {
     const student_id = searchParams.get("student_id");
     const course_id = searchParams.get("course_id");
     const semester_id = searchParams.get("semester_id");
+    const fields = searchParams.get("fields");
 
     // Build where clause
     const whereClause: any = {};
 
     if (student_id) {
-      whereClause.student_id = parseInt(student_id);
+      whereClause.student_id = BigInt(student_id);
     }
 
     if (course_id) {
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
     // If user is a student, only show their own registrations
     if (user.role === "STUDENT") {
       const studentRecord = await prisma.student.findFirst({
-        where: { user_id: parseInt(user.id) },
+        where: { user_id: BigInt(user.id) },
       });
 
       if (studentRecord) {
@@ -51,41 +52,51 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Check if minimal fields requested
+    const isMinimal = fields === "minimal";
+
     const registrations = await prisma.student_course.findMany({
       where: whereClause,
-      include: {
-        course: {
-          select: {
-            id: true,
-            name: true,
-            code: true,
-            description: true,
+      include: isMinimal
+        ? {
+            course: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+              },
+            },
+          }
+        : {
+            course: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+                units: true,
+              },
+            },
+            student: {
+              select: {
+                id: true,
+                user_id: true,
+                reg_no: true,
+              },
+            },
+            level: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            semester: {
+              select: {
+                id: true,
+                name: true,
+                position: true,
+              },
+            },
           },
-        },
-        student: {
-          select: {
-            id: true,
-            user_id: true,
-            reg_no: true,
-          },
-        },
-        semester: {
-          select: {
-            id: true,
-            name: true,
-            start_date: true,
-            end_date: true,
-          },
-        },
-        user_student_course_created_byTouser: {
-          select: {
-            id: true,
-            first_name: true,
-            last_name: true,
-            email: true,
-          },
-        },
-      },
       orderBy: { created_at: "desc" },
     });
 
@@ -117,18 +128,45 @@ export async function POST(request: NextRequest) {
 
     const user = authResult.user!;
 
-    // Check permissions
-    if (!hasPermission(user.role, "courses.enroll")) {
-      return createAuthErrorResponse(
-        "Insufficient permissions to register students for courses",
-        403
-      );
-    }
-
     const body = await request.json();
 
     // Support both single and bulk registration
     const registrations = Array.isArray(body) ? body : [body];
+
+    // If user is a student, verify they can only register themselves
+    if (user.role === "STUDENT") {
+      // Get student record for the authenticated user
+      const studentRecord = await prisma.student.findFirst({
+        where: { user_id: BigInt(user.id) },
+      });
+
+      if (!studentRecord) {
+        return createAuthErrorResponse(
+          "Student record not found",
+          404
+        );
+      }
+
+      // Verify all registrations are for this student only
+      const allForSelf = registrations.every(
+        (reg) => parseInt(reg.student_id) === Number(studentRecord.id)
+      );
+
+      if (!allForSelf) {
+        return createAuthErrorResponse(
+          "Students can only register themselves for courses",
+          403
+        );
+      }
+    } else {
+      // For non-students, check if they have permission to enroll others
+      if (!hasPermission(user.role, "courses.enroll")) {
+        return createAuthErrorResponse(
+          "Insufficient permissions to register students for courses",
+          403
+        );
+      }
+    }
 
     // Validate required fields
     for (const reg of registrations) {
@@ -203,6 +241,12 @@ export async function POST(request: NextRequest) {
                 id: true,
                 user_id: true,
                 reg_no: true,
+              },
+            },
+            level: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },

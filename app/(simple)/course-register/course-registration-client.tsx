@@ -1,42 +1,41 @@
 "use client";
 
 import {
-  AlertCircle,
-  BookOpen,
-  CheckCircle,
-  Clock,
-  Loader2,
-  Trash2,
-  Users,
-  XCircle,
+    AlertCircle,
+    BookOpen,
+    CheckCircle,
+    Clock,
+    Loader2,
+    Trash2,
+    Users
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardAction,
+    CardContent,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUser } from "@/contexts/AppContext";
@@ -77,7 +76,7 @@ interface StudentCourse {
 }
 
 interface Student {
-  id: number;
+  id: string;
   programme_id: number;
   semester_admitted_id: number;
   entry_level_id: number;
@@ -87,9 +86,9 @@ interface CourseRegistrationData {
   student: Student;
   studentCourses: StudentCourse[];
   courseList: ProgrammeCourse[];
-  currentSemesterId: number;
+  currentSemesterId: number | null;
   semesterPosition: number;
-  currentLevelId: number;
+  currentLevelId: number | null;
 }
 
 export function CourseRegistrationClient() {
@@ -137,47 +136,21 @@ export function CourseRegistrationClient() {
         return;
       }
 
-      const studentId = userData.student_id;
+      // Fetch all registration data in a single request
+      const response = await api.get("/api/course-register");
 
-      if (!studentId) {
-        throw new Error(
-          "Student information not found. Please contact support."
-        );
-      }
-
-      // Fetch student courses and current semester in parallel
-      const [studentCourses, semesterArray] = await Promise.all([
-        api.get(`/api/studentcourse/studentid/${studentId}`),
-        api.get(`/api/semester?is_active=true`),
-      ]);
-
-      const semesterData = { semester: semesterArray[0] }; // Current semester is the first in the array
-
-      // Get student details to fetch programme courses
-      const studentData = await api.get(`/api/student/${studentId}`);
-
-      const programmeId = studentData.programme_id;
-
-      if (!programmeId) {
-        throw new Error(
-          "Programme information not found. Please contact support."
-        );
-      }
-
-      // Fetch available courses for the programme
-      const courseList = await api.get(
-        `/api/programmecourse/search?programme_id=${programmeId}`
-      );
+      // Extract data from response (api-wrapper returns { data: {...} }, and the API returns { success, data: {...} })
+      const apiResponse = response.data || response;
+      const registrationData = apiResponse.data || apiResponse;
 
       // Structure the data
       setData({
-        student: studentData,
-        studentCourses: studentCourses || [],
-        courseList: courseList || [],
-        currentSemesterId: semesterData?.semester?.id || 1,
-        semesterPosition: semesterData?.semester?.position || 1,
-        currentLevelId:
-          studentData.current_level_id || studentData.entry_level_id || 1,
+        student: registrationData.student,
+        studentCourses: registrationData.studentCourses || [],
+        courseList: registrationData.courseList || [],
+        currentSemesterId: registrationData.currentSemesterId || 1,
+        semesterPosition: registrationData.semesterPosition || 1,
+        currentLevelId: registrationData.currentLevelId || 1,
       });
     } catch (err) {
       const errorMessage =
@@ -205,7 +178,10 @@ export function CourseRegistrationClient() {
   }, [data?.courseList]);
 
   const registeredCourseIds = useMemo(() => {
-    return new Set(data?.studentCourses?.map((sc) => sc.course_id) || []);
+    const ids = new Set(data?.studentCourses?.map((sc) => sc.course_id) || []);
+    // This recalculates whenever studentCourses changes (including after deletion)
+    // ensuring courses become selectable again when unregistered
+    return ids;
   }, [data?.studentCourses]);
 
   const handleCourseSelection = (courseId: number, checked: boolean) => {
@@ -249,10 +225,10 @@ export function CourseRegistrationClient() {
           );
 
           return api.post("/api/studentcourse", {
-            student_id: data.student.id,
+            student_id: parseInt(data.student.id),
             course_id: courseId,
             semester_id: data.currentSemesterId,
-            level_id: data.currentLevelId,
+            level_id: data.currentLevelId || data.student.entry_level_id,
             units: course?.course.units || 3,
           });
         }
@@ -260,23 +236,52 @@ export function CourseRegistrationClient() {
 
       const results = await Promise.allSettled(registrationPromises);
 
-      const successful = results.filter(
-        (result) => result.status === "fulfilled" && result.value.ok
-      ).length;
+      // Extract successful registrations
+      const successfulRegistrations = results
+        .filter((result) => result.status === "fulfilled")
+        .map((result) => {
+          if (result.status === "fulfilled") {
+            const response = result.value;
+            // api-wrapper returns { data: { success, data, user } }
+            const apiResponse = response.data || response;
+            return apiResponse.data || apiResponse;
+          }
+          return null;
+        })
+        .filter(Boolean);
 
-      const failed = results.length - successful;
+      const failed = results.length - successfulRegistrations.length;
 
-      if (successful > 0) {
-        toast.success(`Successfully registered for ${successful} course(s)!`);
+      if (successfulRegistrations.length > 0) {
+        toast.success(
+          `Successfully registered for ${successfulRegistrations.length} course(s)!`
+        );
         setSelectedCourses(new Set());
 
-        // Refresh data to show new registrations
-        await fetchData();
+        // Update local state with new registrations instead of fetching all data
+        if (data) {
+          const newCourses = successfulRegistrations.map((reg: any) => {
+            // Find the course from courseList to get additional info
+            const courseFromList = data.courseList.find(
+              (pc) => pc.course.id === (reg.course_id || reg.course?.id)
+            );
 
-        // Redirect after a delay
-        setTimeout(() => {
-          router.push("/student/student-courses");
-        }, 2000);
+            return {
+              id: reg.id,
+              course_id: reg.course_id || reg.course?.id,
+              course: reg.course,
+              level: reg.level || courseFromList?.level || null,
+              approval_status: reg.approval_status || false,
+              cleared: reg.cleared || false,
+              created_at: reg.created_at || new Date().toISOString(),
+            };
+          });
+
+          setData({
+            ...data,
+            studentCourses: [...newCourses, ...data.studentCourses],
+          });
+        }
       }
 
       if (failed > 0) {
@@ -317,6 +322,20 @@ export function CourseRegistrationClient() {
         `Successfully removed "${deleteDialog.courseCode}" from your registrations`
       );
 
+      // Update local state by removing the deleted course
+      // This will also update registeredCourseIds automatically via useMemo
+      // making the course selectable again in the available courses list
+      if (data) {
+        const updatedStudentCourses = data.studentCourses.filter(
+          (sc) => sc.id !== deleteDialog.courseId
+        );
+
+        setData({
+          ...data,
+          studentCourses: updatedStudentCourses,
+        });
+      }
+
       // Close dialog
       setDeleteDialog({
         isOpen: false,
@@ -324,9 +343,6 @@ export function CourseRegistrationClient() {
         courseName: "",
         courseCode: "",
       });
-
-      // Refresh data to show updated registrations
-      await fetchData();
     } catch (err) {
       console.error("Delete course error:", err);
       toast.error("Failed to delete course registration. Please try again.");
@@ -671,11 +687,13 @@ export function CourseRegistrationClient() {
                             {studentCourse.course.name}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-gray-500">
-                            {studentCourse.level.name}
-                          </span>
-                        </div>
+                        {studentCourse.level && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-gray-500">
+                              {studentCourse.level.name}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {studentCourse.approval_status ? (

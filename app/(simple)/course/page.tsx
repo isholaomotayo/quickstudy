@@ -5,9 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCourseData } from "@/lib/hooks/useCourseData";
 import { Suspense } from "react";
 import {
-  ArrowLeftIcon,
-  BookOpenIcon,
-  UserIcon,
   PlayIcon,
   MessageSquareIcon,
   UsersIcon,
@@ -15,14 +12,12 @@ import {
   PlusIcon,
   EditIcon,
   TrashIcon,
-  SettingsIcon,
+  SettingsIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UserProfile } from "@/components/ui/user-profile";
 import { ModuleCreator } from "./components/ModuleCreator";
 import { useState } from "react";
-import { toast } from "react-hot-toast";
 import {
   handleApiResponse,
   handleApiError,
@@ -114,7 +109,7 @@ interface CourseData {
     created_at: string;
     updated_at: string;
   };
-  course_modules?: CourseModule[];
+  course_module?: CourseModule[]; // Changed from course_modules to match API response
   // Progress fields (now coming from API for students)
   completion_percentage?: number;
   total_lessons?: number;
@@ -323,7 +318,7 @@ function CoursePageContent() {
     );
   }
 
-  const courseModules = courseData?.course_modules || [];
+  const courseModules = courseData?.course_module || []; // Changed from course_modules to match API response
 
   // TODO: Implement proper role checking with client-side auth
   // For now, assuming admin access for development

@@ -17,7 +17,7 @@ interface RouteParams {
  * GET /api/coursetest/[id]
  * Get a specific course test with its questions
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const testId = parseInt(params.id);
+    const { id } = await context.params;
+    const testId = parseInt(id);
 
     const test = await prisma.course_test.findUnique({
       where: { id: testId },
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/coursetest/[id]
  * Update a course test
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -96,7 +97,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const testId = parseInt(params.id);
+    const { id } = await context.params;
+    const testId = parseInt(id);
     const body = await request.json();
 
     const {
@@ -173,7 +175,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/coursetest/[id]
  * Delete a course test
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -191,7 +193,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const testId = parseInt(params.id);
+    const { id } = await context.params;
+    const testId = parseInt(id);
 
     // Check if there are student submissions
     const submissions = await prisma.student_test.count({

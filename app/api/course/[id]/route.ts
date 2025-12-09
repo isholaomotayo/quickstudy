@@ -17,10 +17,7 @@ interface RouteParams {
  * GET /api/course/[id]
  * Get a specific course by ID
  */
-export async function GET(
-  request: NextRequest,
-  context: RouteParams
-) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -86,10 +83,7 @@ export async function GET(
  * PUT /api/course/[id]
  * Update a course
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -101,10 +95,14 @@ export async function PUT(
 
     // Check permissions
     if (!hasPermission(user.role, "courses.edit")) {
-      return createAuthErrorResponse("Insufficient permissions to update courses", 403);
+      return createAuthErrorResponse(
+        "Insufficient permissions to update courses",
+        403
+      );
     }
 
-    const courseId = parseInt(params.id);
+    const { id } = await context.params;
+    const courseId = parseInt(id);
     const body = await request.json();
 
     const {
@@ -127,10 +125,20 @@ export async function PUT(
         ...(name !== undefined && { name }),
         ...(units !== undefined && { units: parseInt(units) }),
         ...(description !== undefined && { description }),
-        ...(programme_id !== undefined && { programme_id: programme_id ? parseInt(programme_id) : null }),
-        ...(level_id !== undefined && { level_id: level_id ? parseInt(level_id) : null }),
-        ...(department_id !== undefined && { department_id: department_id ? parseInt(department_id) : null }),
-        ...(semester_position !== undefined && { semester_position: semester_position ? parseInt(semester_position) : null }),
+        ...(programme_id !== undefined && {
+          programme_id: programme_id ? parseInt(programme_id) : null,
+        }),
+        ...(level_id !== undefined && {
+          level_id: level_id ? parseInt(level_id) : null,
+        }),
+        ...(department_id !== undefined && {
+          department_id: department_id ? parseInt(department_id) : null,
+        }),
+        ...(semester_position !== undefined && {
+          semester_position: semester_position
+            ? parseInt(semester_position)
+            : null,
+        }),
         ...(published !== undefined && { published }),
         updated_at: new Date(),
       },
@@ -160,10 +168,7 @@ export async function PUT(
  * DELETE /api/course/[id]
  * Delete a course
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -175,10 +180,14 @@ export async function DELETE(
 
     // Check permissions
     if (!hasPermission(user.role, "courses.delete")) {
-      return createAuthErrorResponse("Insufficient permissions to delete courses", 403);
+      return createAuthErrorResponse(
+        "Insufficient permissions to delete courses",
+        403
+      );
     }
 
-    const courseId = parseInt(params.id);
+    const { id } = await context.params;
+    const courseId = parseInt(id);
 
     // Check if course has enrollments
     const enrollmentCount = await prisma.student_course.count({

@@ -1,11 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import {
-  createGuardRails,
-  checkQuestion,
-  createCourseDocument,
-  type GuardRailsConfig,
-  type GuardRailsResult,
-} from "@/lib/guardrails";
+import { checkQuestion, type GuardRailsConfig } from "@/lib/guardrails";
 import { useChatHistory } from "@/hooks/use-chat-history";
 import { useGuardrailsPreload } from "@/hooks/use-guardrails-preload";
 
@@ -148,7 +142,7 @@ export function useAIChat({
   const { getCachedGuardrails } = useGuardrailsPreload();
 
   const constructLessonData = useCallback(() => {
-    const allLessonsInModule = courseData?.course_lessons || [];
+    const allLessonsInModule = courseData?.course_lesson || []; // Changed from course_lessons to match API response
     const lessonData = currentLessonId
       ? allLessonsInModule.find((l: any) => l.id === currentLessonId)
       : currentLesson;
@@ -198,7 +192,7 @@ export function useAIChat({
   }, [courseData, currentLesson, currentLessonId]);
 
   const calculateProgress = useCallback(() => {
-    const allLessonsInModule = courseData?.course_lessons || [];
+    const allLessonsInModule = courseData?.course_lesson || []; // Changed from course_lessons to match API response
     if (!allLessonsInModule.length) return 0;
     const lessonData = currentLessonId
       ? allLessonsInModule.find((l: any) => l.id === currentLessonId)

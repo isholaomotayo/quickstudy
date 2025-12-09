@@ -66,7 +66,7 @@ module.exports = async (req, res) => {
       req.url = "/api" + req.url;
     }
 
-    // console.log(`Request: ${req.method} ${originalUrl} -> ${req.url}`);
+    console.log(`Request: ${req.method} ${originalUrl} -> ${req.url}`);
 
     // Handle CORS for serverless environment
     if (req.method === "OPTIONS") {

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BarChart3,
   Bell,
@@ -19,67 +21,139 @@ import {
   Users,
   MessageSquare,
 } from "lucide-react";
-import { cookies } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserProfile } from "@/components/ui/user-profile";
 import FutureStudentLanding from "@/components/FutureStudentLanding";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api-wrapper";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Server-side data fetching function
-async function getDashboardData() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token");
-  const role = cookieStore.get("role");
-
-  // Check authentication
-  if (!token || role?.value !== "STUDENT") {
-    redirect("/login");
-  }
-
-  try {
-    // Fetch dashboard data server-side
-    const response = await fetch(
-      `${process.env.API_URL}/api/student/dashboard`,
-      {
-        method: "GET",
-        headers: {
-          Cookie: `token=${token.value}; role=${role.value}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
-        redirect("/login");
-      }
-      throw new Error("Failed to fetch dashboard data");
-    }
-
-    const data = await response.json();
-
-    return {
-      student: data.student,
-      studentGpa: data.studentGpa,
-      studentResults: data.allStudentResult || [],
-      noApprovedRegistrations: data.approvedRegistrationsSize || 0,
-      noUnapprovedRegistrations: data.unApprovedRegistrationsSize || 0,
-      userData: data.userData,
-      isFutureStudent: data.isFutureStudent || false,
-      admittedSession: data.admittedSession || null,
+interface DashboardData {
+  student: {
+    id: string;
+    programme_name: string | null;
+  };
+  studentGpa: {
+    cumulative_gpa: number;
+    class_degree?: {
+      id: number;
+      name: string;
     };
-  } catch (error) {
-    console.error("Dashboard data fetch error:", error);
-    redirect("/login");
-  }
+  } | null;
+  allStudentResult: Array<{
+    id: string;
+    score: number;
+    grade: {
+      name: string;
+    };
+    student_course: {
+      course: {
+        code: string;
+        title?: string;
+        units: number;
+      };
+    };
+  }>;
+  approvedRegistrationsSize: number;
+  unApprovedRegistrationsSize: number;
+  userData: {
+    id: string;
+    email: string;
+    role: string;
+    institution_id: number;
+    first_name: string;
+    last_name: string;
+    username: string;
+  };
+  isFutureStudent: boolean;
+  admittedSession: {
+    name: string;
+    start_date: string;
+  } | null;
 }
 
-export default async function StudentDashboard() {
-  // Fetch data on server-side
-  const dashboardData = await getDashboardData();
+export default function StudentDashboard() {
+  const router = useRouter();
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get("/api/student/dashboard");
+
+        // Extract data from api-wrapper response
+        const apiResponse = response.data || response;
+        const data = apiResponse.data || apiResponse;
+
+        setDashboardData(data);
+      } catch (err) {
+        console.error("Dashboard data fetch error:", err);
+        setError("Failed to load dashboard data");
+
+        // Redirect to signin if unauthorized
+        if ((err as any)?.status === 401 || (err as any)?.status === 403) {
+          router.push("/signin");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [router]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-4 grid gap-6">
+          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+            <CardContent className="p-6">
+              <Skeleton className="h-24 w-full mb-4" />
+              <Skeleton className="h-10 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+        <div className="lg:col-span-4 grid gap-6">
+          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+            <CardContent className="p-6">
+              <Skeleton className="h-32 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+        <div className="lg:col-span-4 grid gap-6">
+          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+            <CardContent className="p-6">
+              <Skeleton className="h-32 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !dashboardData) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg p-6">
+          <div className="text-center space-y-4">
+            <p className="text-red-600 font-medium">{error || "Failed to load dashboard"}</p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   // Check if student is admitted to a future session
   if (dashboardData.isFutureStudent && dashboardData.admittedSession) {
@@ -159,7 +233,7 @@ export default async function StudentDashboard() {
                     <span className="text-sm font-medium">Approved</span>
                   </div>
                   <Badge className="bg-emerald-100 text-emerald-700">
-                    {dashboardData.noApprovedRegistrations}
+                    {dashboardData.approvedRegistrationsSize}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
@@ -168,7 +242,7 @@ export default async function StudentDashboard() {
                     <span className="text-sm font-medium">Unapproved</span>
                   </div>
                   <Badge className="bg-amber-100 text-amber-700">
-                    {dashboardData.noUnapprovedRegistrations}
+                    {dashboardData.unApprovedRegistrationsSize}
                   </Badge>
                 </div>
               </div>
@@ -299,7 +373,7 @@ export default async function StudentDashboard() {
                 {dashboardData.studentGpa?.cumulative_gpa || "N/A"}
               </div>
               <p className="text-sm opacity-90">
-                {dashboardData.studentGpa?.classdegree?.name || "N/A"}
+                {dashboardData.studentGpa?.class_degree?.name || "N/A"}
               </p>
             </div>
             <div className="flex items-center gap-2 mt-4">
@@ -355,9 +429,9 @@ export default async function StudentDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {dashboardData.studentResults &&
-              dashboardData.studentResults.length > 0 ? (
-                dashboardData.studentResults
+              {dashboardData.allStudentResult &&
+              dashboardData.allStudentResult.length > 0 ? (
+                dashboardData.allStudentResult
                   .slice(0, 1)
                   .map((studentresult) => (
                     <div
@@ -366,20 +440,20 @@ export default async function StudentDashboard() {
                     >
                       <div>
                         <p className="font-bold text-gray-900">
-                          {studentresult.studentcourse.course.code}
+                          {studentresult.student_course?.course?.code || "N/A"}
                         </p>
                         <p className="text-sm text-gray-600">
-                          {studentresult.studentcourse.course.title ||
+                          {studentresult.student_course?.course?.title ||
                             "Course Title"}
                         </p>
                       </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-emerald-600">
-                          {studentresult.studentcourse.course.units}
+                          {studentresult.student_course?.course?.units || 0}
                         </div>
                         <Badge className="bg-emerald-100 text-emerald-700 text-xs">
                           {studentresult.score}
-                          {studentresult.grade.name}
+                          {studentresult.grade?.name || ""}
                         </Badge>
                       </div>
                     </div>
@@ -390,7 +464,7 @@ export default async function StudentDashboard() {
                 </div>
               )}
             </div>
-            <Link href="/course-register">
+            <Link href="/results">
               <Button
                 variant="outline"
                 size="sm"

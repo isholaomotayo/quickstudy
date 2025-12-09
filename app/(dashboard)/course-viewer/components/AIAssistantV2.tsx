@@ -23,11 +23,6 @@ import {
 } from "lucide-react";
 import { useAIChat } from "./hooks/use-ai-chat";
 import { useGuardrailsPreload } from "@/hooks/use-guardrails-preload";
-import {
-  createGuardRails,
-  createCourseDocument,
-  type GuardRailsConfig,
-} from "@/lib/guardrails";
 
 // Utility function to format timestamps
 const formatTimestamp = (timestamp: number): string => {
@@ -62,7 +57,7 @@ interface CourseModule {
   name: string;
   description?: string;
   course_id: number;
-  course_lessons?: CourseLesson[];
+  course_lesson?: CourseLesson[]; // Changed from course_lessons to match API response
   order?: number;
   published?: boolean;
 }

@@ -17,10 +17,7 @@ interface RouteParams {
  * GET /api/courselesson/[id]
  * Get a specific course lesson by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -29,7 +26,8 @@ export async function GET(
     }
 
     const user = authResult.user!;
-    const lessonId = parseInt(params.id);
+    const { id } = await context.params;
+    const lessonId = parseInt(id);
 
     const lesson = await prisma.course_lesson.findUnique({
       where: { id: lessonId },
@@ -69,10 +67,7 @@ export async function GET(
  * PUT /api/courselesson/[id]
  * Update a course lesson
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -84,18 +79,17 @@ export async function PUT(
 
     // Check permissions
     if (!hasPermission(user.role, "lms.content.edit")) {
-      return createAuthErrorResponse("Insufficient permissions to update course lessons", 403);
+      return createAuthErrorResponse(
+        "Insufficient permissions to update course lessons",
+        403
+      );
     }
 
-    const lessonId = parseInt(params.id);
+    const { id } = await context.params;
+    const lessonId = parseInt(id);
     const body = await request.json();
 
-    const {
-      name,
-      order,
-      description,
-      content,
-    } = body;
+    const { name, order, description, content } = body;
 
     // Update lesson
     const lesson = await prisma.course_lesson.update({
@@ -134,10 +128,7 @@ export async function PUT(
  * DELETE /api/courselesson/[id]
  * Delete a course lesson
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -149,10 +140,14 @@ export async function DELETE(
 
     // Check permissions
     if (!hasPermission(user.role, "lms.content.edit")) {
-      return createAuthErrorResponse("Insufficient permissions to delete course lessons", 403);
+      return createAuthErrorResponse(
+        "Insufficient permissions to delete course lessons",
+        403
+      );
     }
 
-    const lessonId = parseInt(params.id);
+    const { id } = await context.params;
+    const lessonId = parseInt(id);
 
     // Delete lesson
     await prisma.course_lesson.delete({

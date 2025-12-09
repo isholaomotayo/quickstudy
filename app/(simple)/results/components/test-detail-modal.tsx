@@ -2,26 +2,23 @@
 
 import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
-  Clock,
-  Calendar,
-  CheckCircle,
-  XCircle,
-  Award,
-  TrendingUp,
-  BookOpen,
-  Download,
-  AlertCircle,
+    Clock,
+    Calendar, Award,
+    TrendingUp,
+    BookOpen,
+    Download,
+    AlertCircle
 } from "lucide-react";
 
 interface TestDetail {
@@ -94,7 +91,9 @@ export function TestDetailModal({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const testDetail = await response.json();
+      const result = await response.json();
+      // API wraps response in { success, data, user } structure
+      const testDetail = result.data || result;
       setTestDetail(testDetail);
     } catch (err) {
       setError("Failed to load test details");

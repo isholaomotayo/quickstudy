@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeftIcon, BookOpenIcon, ClockIcon, UserIcon } from "lucide-react";
+import { ClockIcon, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ModernTable } from "@/components/ui/modern-table";
@@ -50,10 +49,12 @@ export default function CoursesPage() {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const data = await api.get(`/api/course`);
+        const courses = await api.get(`/api/course`);
+        console.log("Fetched courses data:", courses);
 
+  
         // Transform the data to match our interface
-        const transformedCourses: Course[] = data.map((course: any) => ({
+        const transformedCourses: Course[] = courses.data.map((course: any) => ({
           id: course.id,
           code: course.code,
           name: course.name || course.title,

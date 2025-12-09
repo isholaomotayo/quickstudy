@@ -12,15 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
-  Bell,
-  Search,
-  Filter,
-  RefreshCw,
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  ChevronLeft,
-  ChevronRight,
+    Bell,
+    Search,
+    Filter,
+    RefreshCw,
+    AlertCircle,
+    CheckCircle2,
+    Clock,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -139,8 +139,12 @@ export default function NotificationsClient() {
       const totalCount = response.headers.get("x-pagination-rowcount");
       const pageCount = response.headers.get("x-pagination-pagecount");
 
-      // Backend now returns notifications with real read status
-      const notificationsWithReadStatus = Array.isArray(data) ? data : [];
+      // Handle response - data should be an array of announcements directly
+      const notificationsWithReadStatus = Array.isArray(data) 
+        ? data 
+        : []; // Fallback to empty array if not an array
+
+      console.log("Announcements response:", { data, notificationsWithReadStatus });
 
       setNotifications(notificationsWithReadStatus);
       setCurrentPage(page);

@@ -31,7 +31,10 @@ async function getUserProfile() {
 // ============================================
 
 // NEW WAY:
-async function updateProfile(updates: { first_name?: string; last_name?: string }) {
+async function updateProfile(updates: {
+  first_name?: string;
+  last_name?: string;
+}) {
   try {
     const response = await api.put("/api/profile", updates);
     return response.data;

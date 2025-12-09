@@ -17,7 +17,7 @@ interface RouteParams {
  * PUT /api/forum/posts/[id]
  * Update a forum post
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -35,7 +35,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const postId = parseInt(params.id);
+    const { id } = await context.params;
+    const postId = parseInt(id);
     const body = await request.json();
     const { body: postBody } = body;
 
@@ -76,7 +77,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/forum/posts/[id]
  * Delete a forum post
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -94,7 +95,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const postId = parseInt(params.id);
+    const { id } = await context.params;
+    const postId = parseInt(id);
 
     // Delete post
     await prisma.school_forum_thread.delete({

@@ -1,16 +1,20 @@
 # API Migration Progress
 
 ## Overview
+
 Migration from Fastify to Next.js API routes using Prisma ORM with incremental feature flag rollout.
 
 ## Migration Status: Phase 1-4 Complete ✅
 
 ### Phase 1: Core APIs (15 endpoints) ✅
+
 **Profile Management**
+
 - ✅ GET `/api/profile` - Get user profile with relations
 - ✅ PUT `/api/profile` - Update user profile
 
 **Course Management**
+
 - ✅ GET `/api/course` - List courses with role-based filtering
 - ✅ POST `/api/course` - Create course
 - ✅ GET `/api/course/[id]` - Get course details with enrollment
@@ -18,6 +22,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/course/[id]` - Delete course (with validation)
 
 **Course Module Management**
+
 - ✅ GET `/api/coursemodule` - List modules for course
 - ✅ POST `/api/coursemodule` - Create module
 - ✅ GET `/api/coursemodule/[id]` - Get module details
@@ -25,6 +30,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/coursemodule/[id]` - Delete module
 
 **Course Lesson Management**
+
 - ✅ GET `/api/courselesson` - List lessons for module
 - ✅ POST `/api/courselesson` - Create lesson
 - ✅ GET `/api/courselesson/[id]` - Get lesson details
@@ -32,7 +38,9 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/courselesson/[id]` - Delete lesson
 
 ### Phase 2: Announcements (11 endpoints) ✅
+
 **School Announcements**
+
 - ✅ GET `/api/announcements` - List announcements with pagination
 - ✅ POST `/api/announcements` - Create announcement
 - ✅ GET `/api/announcements/[id]` - Get announcement details
@@ -43,6 +51,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ POST `/api/announcements/mark-all-read` - Bulk mark as read
 
 **Course Announcements**
+
 - ✅ GET `/api/courseannouncements` - List course announcements
 - ✅ POST `/api/courseannouncements` - Create course announcement
 - ✅ GET `/api/courseannouncements/[id]` - Get course announcement
@@ -50,7 +59,9 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/courseannouncements/[id]` - Delete course announcement
 
 ### Phase 3: Forum & Connect (16 endpoints) ✅
+
 **School Forums**
+
 - ✅ GET `/api/forum/topics` - List school forum topics
 - ✅ POST `/api/forum/topics` - Create forum topic
 - ✅ GET `/api/forum/topics/[id]` - Get topic with threads
@@ -62,6 +73,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/forum/posts/[id]` - Delete post
 
 **Course Forums**
+
 - ✅ GET `/api/forum/course` - List course forum topics
 - ✅ POST `/api/forum/course` - Create course topic
 - ✅ GET `/api/forum/course/[id]` - Get course topic
@@ -73,6 +85,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/forum/course/posts/[id]` - Delete course post
 
 **Time-bound Discussions**
+
 - ✅ GET `/api/discussion/topics` - List discussions (with active filter)
 - ✅ POST `/api/discussion/topics` - Create discussion
 - ✅ GET `/api/discussion/topics/[id]` - Get discussion with comments
@@ -84,7 +97,9 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/discussion/comments/[id]` - Delete comment
 
 ### Phase 4: Student Course & Assessments (16 endpoints) ✅
+
 **Student Course Registration**
+
 - ✅ GET `/api/studentcourse` - List registrations (with filters)
 - ✅ POST `/api/studentcourse` - Register student(s) (bulk support)
 - ✅ GET `/api/studentcourse/[id]` - Get registration details
@@ -92,6 +107,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/studentcourse/[id]` - Delete registration
 
 **Course Tests**
+
 - ✅ GET `/api/coursetest` - List tests (with filters)
 - ✅ POST `/api/coursetest` - Create test
 - ✅ GET `/api/coursetest/[id]` - Get test with questions
@@ -99,6 +115,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/coursetest/[id]` - Delete test (with validation)
 
 **Course Questions**
+
 - ✅ GET `/api/coursequestion` - List questions for test
 - ✅ POST `/api/coursequestion` - Create question
 - ✅ GET `/api/coursequestion/[id]` - Get question details
@@ -106,6 +123,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ DELETE `/api/coursequestion/[id]` - Delete question
 
 **Student Tests (Submissions & Grading)**
+
 - ✅ GET `/api/studenttest` - List submissions (with filters)
 - ✅ POST `/api/studenttest` - Start test (attempt tracking)
 - ✅ GET `/api/studenttest/[id]` - Get submission details
@@ -115,6 +133,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 ## Total Migrated: 58 Endpoints ✅
 
 ## Infrastructure
+
 - ✅ Feature flag system (`/lib/feature-flags.ts`)
 - ✅ API wrapper with routing (`/lib/api-wrapper.ts`)
 - ✅ Permissions configuration updated
@@ -122,6 +141,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - ✅ Prisma client singleton
 
 ## Key Features Implemented
+
 - Per-route feature flags via environment variables
 - Cookie-based authentication
 - Role-based access control with permissions
@@ -135,6 +155,7 @@ Migration from Fastify to Next.js API routes using Prisma ORM with incremental f
 - Attempt tracking
 
 ## Environment Variables
+
 ```bash
 # Phase 1
 USE_NEXTJS_PROFILE=false
@@ -161,7 +182,9 @@ DEBUG_API_ROUTING=true
 ## Next Steps (Phase 5-6)
 
 ### Phase 5: Frontend Updates ✅
+
 **Components Migrated to api-wrapper:**
+
 1. ✅ `/app/(dashboard)/profile/page.tsx` - Profile management (3 API calls)
 2. ✅ `/app/(dashboard)/course-viewer/components/AdminToolbar.tsx` - Lesson & quiz CRUD (5 endpoints)
 3. ✅ `/app/(dashboard)/course-viewer/components/TestSection.tsx` - Quiz/assignment management (7 endpoints)
@@ -170,17 +193,20 @@ DEBUG_API_ROUTING=true
 6. ✅ `/app/(dashboard)/profile/programs/page.tsx` - Student context & programmes (4 endpoints)
 
 **Total Frontend Migration:**
+
 - 6 components updated
 - 31 fetch calls replaced with api-wrapper
 - ~120 lines of boilerplate removed
 - All using `api.get/post/put/delete()`
 
 **Documentation Created:**
+
 - ✅ `/docs/FRONTEND_MIGRATION_GUIDE.md` - Step-by-step migration instructions
 - ✅ `/docs/API_WRAPPER_MIGRATION_EXAMPLES.tsx` - Reusable code patterns
 - ✅ `/docs/PROJECT_SUMMARY.md` - Complete project overview
 
 ### Phase 6: Production Rollout ⏳
+
 - Enable all feature flags in production
 - Monitor performance and errors
 - Run E2E tests on migrated components
@@ -190,7 +216,9 @@ DEBUG_API_ROUTING=true
 - Update deployment documentation
 
 ## Testing Checklist
+
 **Backend APIs:**
+
 - ✅ Profile management workflows
 - ✅ Course CRUD operations
 - ✅ Module and lesson management
@@ -205,6 +233,7 @@ DEBUG_API_ROUTING=true
 - ✅ Authentication flows
 
 **Frontend Components:**
+
 - ✅ Profile page (GET/PUT profile)
 - ✅ AdminToolbar (lesson/quiz CRUD)
 - ✅ TestSection (quiz management)
@@ -216,6 +245,7 @@ DEBUG_API_ROUTING=true
 - [ ] Error tracking in production
 
 ## Technical Decisions
+
 1. **Per-route flags**: Granular control over migration
 2. **Prisma direct**: No transformation layer, use exact schema
 3. **Cookie auth**: Maintain existing authentication
@@ -224,6 +254,7 @@ DEBUG_API_ROUTING=true
 6. **Business validation**: Enforce rules at API level
 
 ## Database Schema Notes
+
 - Uses snake_case fields (created_at, user_id, etc.)
 - Complex Prisma relation names (e.g., `staff_staff_user_idTouser`)
 - Ordering uses `order` field, not `module_number` or `lesson_number`
@@ -232,6 +263,7 @@ DEBUG_API_ROUTING=true
 - Unique constraints have specific naming (e.g., `announcement_id_user_id`)
 
 ## Migration Patterns
+
 ```typescript
 // 1. Authenticate user
 const authResult = await authenticateUser();
@@ -246,8 +278,12 @@ if (!hasPermission(user.role, "permission.name")) {
 
 // 3. Query with Prisma
 const data = await prisma.table.findMany({
-  where: { /* filters */ },
-  include: { /* relations */ },
+  where: {
+    /* filters */
+  },
+  include: {
+    /* relations */
+  },
   orderBy: { created_at: "desc" },
 });
 
@@ -256,7 +292,9 @@ return createSuccessResponse(data, user);
 ```
 
 ## Success Metrics
+
 **Backend Migration:**
+
 - ✅ 58 endpoints migrated
 - ✅ 0 TypeScript errors
 - ✅ All CRUD operations implemented
@@ -265,6 +303,7 @@ return createSuccessResponse(data, user);
 - ✅ Feature flags ready
 
 **Frontend Migration:**
+
 - ✅ 6 components migrated
 - ✅ 31 API calls using api-wrapper
 - ✅ 120+ lines of boilerplate removed
@@ -272,6 +311,7 @@ return createSuccessResponse(data, user);
 - ✅ Migration documentation complete
 
 **Overall Progress:**
+
 - Backend: 100% (Phase 1-4)
 - Frontend: ~30% (6 core components)
 - Documentation: 100%

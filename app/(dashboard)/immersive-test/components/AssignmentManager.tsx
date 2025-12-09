@@ -1,21 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  Plus,
-  Eye,
-  Download,
-  CheckCircle,
-  Clock,
-  Users,
-  FileText,
-  ArrowLeft,
+    Plus,
+    Eye, CheckCircle,
+    Clock,
+    Users,
+    FileText,
+    ArrowLeft
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { translateCode } from "@/helpers/language/translate";
 import {
-  handleApiResponse,
-  handleApiError,
+    handleApiError
 } from "@/helpers/apiResponseHandler";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

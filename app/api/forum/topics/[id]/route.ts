@@ -4,7 +4,6 @@ import {
   authenticateUser,
   createAuthErrorResponse,
   createSuccessResponse,
-  hasInstitutionAccess,
 } from "@/lib/api-auth";
 import { hasPermission } from "@/lib/permissions-config";
 
@@ -18,7 +17,7 @@ interface RouteParams {
  * GET /api/forum/topics/[id]
  * Get a specific forum topic with its threads
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -27,7 +26,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
 
     const topic = await prisma.school_forum_topic.findUnique({
       where: { id: topicId },
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/forum/topics/[id]
  * Update a forum topic
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -101,7 +101,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
     const body = await request.json();
 
     // Check topic exists and user has access
@@ -157,7 +158,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/forum/topics/[id]
  * Delete a forum topic and its threads
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -175,7 +176,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
 
     // Check topic exists and user has access
     const existingTopic = await prisma.school_forum_topic.findUnique({

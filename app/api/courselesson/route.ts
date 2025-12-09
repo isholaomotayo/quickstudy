@@ -71,18 +71,15 @@ export async function POST(request: NextRequest) {
 
     // Check permissions
     if (!hasPermission(user.role, "lms.content.create")) {
-      return createAuthErrorResponse("Insufficient permissions to create course lessons", 403);
+      return createAuthErrorResponse(
+        "Insufficient permissions to create course lessons",
+        403
+      );
     }
 
     const body = await request.json();
 
-    const {
-      course_module_id,
-      name,
-      order,
-      description,
-      content = "",
-    } = body;
+    const { course_module_id, name, order, description, content = "" } = body;
 
     // Validate required fields
     if (!course_module_id || !name || order === undefined) {

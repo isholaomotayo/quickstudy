@@ -32,13 +32,12 @@ export async function GET(request: NextRequest, context: RouteParams) {
     const submission = await prisma.student_test.findUnique({
       where: { id: submissionId },
       include: {
-        course_test: {
+        user_student_test_user_idTouser: {
           select: {
             id: true,
-            name: true,
-            course_id: true,
-            max_score: true,
-            duration_mins: true,
+            first_name: true,
+            last_name: true,
+            email: true,
           },
         },
       },
@@ -49,17 +48,49 @@ export async function GET(request: NextRequest, context: RouteParams) {
     }
 
     // Students can only view their own submissions
-    if (
-      user.role === "STUDENT" &&
-      submission.user_id.toString() !== user.id
-    ) {
+    if (user.role === "STUDENT" && submission.user_id.toString() !== user.id) {
       return createAuthErrorResponse(
         "Insufficient permissions to view this submission",
         403
       );
     }
 
-    return createSuccessResponse(submission, user);
+    // Format response to match Fastify controller
+    // Only include expected fields, format nulls as empty strings, minimal user object
+    const result = {
+      id: submission.id,
+      user_id: submission.user_id?.toString() ?? "",
+      course_test_id: submission.course_test_id ?? 0,
+      test_name: submission.test_name ?? "",
+      duration_mins: submission.duration_mins ?? 0,
+      deadline: submission.deadline ?? "",
+      endtime: submission.endtime ?? "",
+      submitted_at: submission.submitted_at ?? "",
+      attempt_number: submission.attempt_number ?? 1,
+      max_attempts: submission.max_attempts ?? 1,
+      score: submission.score ?? 0,
+      max_score: submission.max_score ?? 0,
+      feedback: submission.feedback ?? [],
+      marked_by: submission.marked_by ? submission.marked_by.toString() : 0,
+      marked_at: submission.marked_at ?? "",
+      created_at: submission.created_at ?? "",
+      updated_at: submission.updated_at ?? "",
+      format: submission.format ?? "quiz",
+      institution_id: submission.institution_id ?? 0,
+      department_id: submission.department_id ?? 0,
+      user: submission.user_student_test_user_idTouser
+        ? {
+            id: submission.user_student_test_user_idTouser.id?.toString() ?? "",
+            first_name:
+              submission.user_student_test_user_idTouser.first_name ?? "",
+            last_name:
+              submission.user_student_test_user_idTouser.last_name ?? "",
+            email: submission.user_student_test_user_idTouser.email ?? "",
+          }
+        : undefined,
+    };
+
+    return createSuccessResponse(result, user);
   } catch (error) {
     console.error("Error fetching student test submission:", error);
     return NextResponse.json(

@@ -1,13 +1,13 @@
-import useSWR from 'swr';
+import useSWR from "swr";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 // Fetcher function for SWR
 const fetcher = async (url: string) => {
   const response = await fetch(url, {
-    credentials: 'include',
+    credentials: "include",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 
@@ -15,7 +15,11 @@ const fetcher = async (url: string) => {
     throw new Error(`Failed to fetch: ${response.statusText}`);
   }
 
-  return response.json();
+  const json = await response.json();
+
+  // Unwrap the data property if it exists (for Next.js API routes)
+  // This handles both old backend format and new Next.js API format
+  return json.data || json;
 };
 
 // Hook for fetching course data
@@ -59,14 +63,17 @@ export function useModuleProgress(moduleId: string) {
 // Hook for updating module progress
 export function useUpdateModuleProgress() {
   const updateProgress = async (moduleId: string, progressData: any) => {
-    const response = await fetch(`${API_BASE_URL}/api/module-progress/${moduleId}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(progressData),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/module-progress/${moduleId}`,
+      {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(progressData),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Failed to update progress: ${response.statusText}`);

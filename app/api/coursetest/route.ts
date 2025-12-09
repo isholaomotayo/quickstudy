@@ -150,12 +150,8 @@ export async function POST(request: NextRequest) {
     const test = await prisma.course_test.create({
       data: {
         course_id: parseInt(course_id),
-        course_module_id: course_module_id
-          ? parseInt(course_module_id)
-          : null,
-        course_lesson_id: course_lesson_id
-          ? parseInt(course_lesson_id)
-          : null,
+        course_module_id: course_module_id ? parseInt(course_module_id) : null,
+        course_lesson_id: course_lesson_id ? parseInt(course_lesson_id) : null,
         name,
         instructions: instructions || null,
         duration_mins: duration_mins ? parseInt(duration_mins) : null,

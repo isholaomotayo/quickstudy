@@ -17,7 +17,7 @@ interface RouteParams {
  * GET /api/discussion/topics/[id]
  * Get a specific discussion topic with its comments
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
 
     const topic = await prisma.course_discussion_topic.findUnique({
       where: { id: topicId },
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/discussion/topics/[id]
  * Update a discussion topic
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -114,7 +115,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
     const requestBody = await request.json();
     const { title, body: topicBody, start_date, end_date } = requestBody;
 
@@ -180,7 +182,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/discussion/topics/[id]
  * Delete a discussion topic
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -198,7 +200,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
 
     // Delete topic
     await prisma.course_discussion_topic.delete({

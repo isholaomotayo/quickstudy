@@ -17,7 +17,7 @@ interface RouteParams {
  * GET /api/coursequestion/[id]
  * Get a specific course question
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const questionId = parseInt(params.id);
+    const { id } = await context.params;
+    const questionId = parseInt(id);
 
     const question = await prisma.course_question.findUnique({
       where: { id: questionId },
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/coursequestion/[id]
  * Update a course question
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -81,7 +82,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const questionId = parseInt(params.id);
+    const { id } = await context.params;
+    const questionId = parseInt(id);
     const body = await request.json();
 
     const { question, details, options, answer, order, marks } = body;
@@ -127,7 +129,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/coursequestion/[id]
  * Delete a course question
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -145,7 +147,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const questionId = parseInt(params.id);
+    const { id } = await context.params;
+    const questionId = parseInt(id);
 
     // Delete question
     await prisma.course_question.delete({

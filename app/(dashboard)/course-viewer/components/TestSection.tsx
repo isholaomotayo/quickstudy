@@ -5,15 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  FileText,
-  Clock,
-  ExternalLink,
-  Play,
-  CheckCircle,
-  AlertCircle,
-  Plus,
-  Edit,
-  Trash2,
+    FileText,
+    Clock,
+    ExternalLink,
+    Play,
+    CheckCircle,
+    AlertCircle,
+    Plus,
+    Edit,
+    Trash2,
 } from "lucide-react";
 import { AssignmentCreatorModal } from "./AssignmentCreatorModal";
 import { AssignmentEditorModal } from "./AssignmentEditorModal";

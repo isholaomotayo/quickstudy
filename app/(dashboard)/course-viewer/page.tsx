@@ -15,7 +15,7 @@ interface CourseModule {
   created_at: string;
   updated_at: string;
   published: boolean;
-  course_lessons?: CourseLesson[];
+  course_lesson?: CourseLesson[]; // Changed from course_lessons to match API response
   // Progress fields (coming from course page)
   progress_percentage?: number;
   completed?: boolean;
@@ -131,7 +131,7 @@ export default function CourseViewerPage() {
   }
 
   // Find the specific module
-  const courseModuleData = courseData.course_modules?.find(
+  const courseModuleData = courseData.course_module?.find(
     (module) => module.id.toString() === courseModuleId
   );
 
@@ -152,7 +152,7 @@ export default function CourseViewerPage() {
     );
   }
 
-  const courseLessons = courseModuleData.course_lessons || [];
+  const courseLessons = courseModuleData.course_lesson || []; // Changed from course_lessons to match API response
 
   return (
     <CourseViewerClient

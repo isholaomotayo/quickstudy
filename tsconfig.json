@@ -8,7 +8,7 @@
       "@/components/*": ["components/*"],
       "@/styles/*": ["styles/*"],
       "@/utils/*": ["utils/*"],
-      "@/backend/*": ["backend/*"],
+      "@/backend/*": ["backend_old/*"],
       "@/helpers/*": ["helpers/*"],
       "@/pages/*": ["pages/*"],
       "@/public/*": ["public/*"],

@@ -2,20 +2,20 @@
 
 import { useState } from "react";
 import {
-  Settings,
-  Plus,
-  Edit,
-  Trash,
-  Eye,
-  EyeOff, FileText,
-  HelpCircle,
-  CheckSquare
+    Settings,
+    Plus,
+    Edit,
+    Trash,
+    Eye,
+    EyeOff, FileText,
+    HelpCircle,
+    CheckSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuTrigger
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { LessonCreator } from "@/app/(simple)/course/components/LessonCreator";
@@ -34,7 +34,7 @@ interface CourseModule {
   created_at: string;
   updated_at: string;
   published?: boolean;
-  course_lessons?: CourseLesson[];
+  course_lesson?: CourseLesson[]; // Changed from course_lessons to match API response
 }
 
 interface CourseLesson {

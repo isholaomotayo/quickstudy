@@ -86,15 +86,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const {
-      course_test_id,
-      question,
-      details,
-      options,
-      answer,
-      order,
-      marks,
-    } = body;
+    const { course_test_id, question, details, options, answer, order, marks } =
+      body;
 
     // Validate required fields
     if (!course_test_id || !question || order === undefined) {

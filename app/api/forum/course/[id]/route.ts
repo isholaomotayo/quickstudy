@@ -17,7 +17,7 @@ interface RouteParams {
  * GET /api/forum/course/[id]
  * Get a specific course forum topic with its threads
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const user = authResult.user!;
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
 
     const topic = await prisma.course_forum_topic.findUnique({
       where: { id: topicId },
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PUT /api/forum/course/[id]
  * Update a course forum topic
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -102,7 +103,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
     const body = await request.json();
     const { title, description } = body;
 
@@ -151,7 +153,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/forum/course/[id]
  * Delete a course forum topic
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     const authResult = await authenticateUser();
 
@@ -169,7 +171,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const topicId = parseInt(params.id);
+    const { id } = await context.params;
+    const topicId = parseInt(id);
 
     // Delete topic
     await prisma.course_forum_topic.delete({

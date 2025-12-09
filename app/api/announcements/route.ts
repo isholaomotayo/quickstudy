@@ -4,7 +4,6 @@ import {
   authenticateUser,
   createAuthErrorResponse,
   createSuccessResponse,
-  hasInstitutionAccess,
 } from "@/lib/api-auth";
 import { hasPermission } from "@/lib/permissions-config";
 
