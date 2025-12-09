@@ -1,0 +1,111 @@
+{/*single-thread*/}
+            <div className="row p-t-10 p-b-10  align-items-center border-bottom">
+              <div className="col">
+                <a href="/neo/forum-discussion" className="text-big">Aliquam et velit vel nisi egestas pulvinar sit amet ac tellus</a>
+                <div className="text-muted small mt-1">Started 5 days ago &nbsp;·&nbsp; <a href="/neo/forum-discussion" className="text-muted">Lică Albulescu</a></div>
+              </div>
+              <div className=" d-md-block col-4">
+                <div className="row no-gutters align-items-center">
+                  <div className="col-4">10</div>
+                  <div className="media col-8 align-items-center">
+                    <div className="avatar avatar">
+                      <img src="assets/img/users/user-3.jpg" alt="..." className="avatar-img rounded-circle" />
+                    </div>
+                    <div className="media-body  ml-2">
+                      <div className=" text-truncate">5 days ago</div>
+                      <a href="/neo/forum-discussion" className="text-muted small text-truncate">by Lică Albulescu</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/*end single-thread*/}
+            {/*single-thread*/}
+            <div className="row p-t-10 p-b-10  align-items-center border-bottom">
+              <div className="col">
+                <a href="/neo/forum-discussion" className="text-big">Aliquam et velit vel nisi egestas pulvinar sit amet ac tellus</a>
+                <div className="text-muted small mt-1">Started 16 days ago &nbsp;·&nbsp; <a href="/neo/forum-discussion" className="text-muted">Venus Kairatbekov</a></div>
+              </div>
+              <div className=" d-md-block col-4">
+                <div className="row no-gutters align-items-center">
+                  <div className="col-4">62</div>
+                  <div className="media col-8 align-items-center">
+                    <div className="avatar avatar">
+                      <img src="assets/img/users/user-2.jpg" alt="..." className="avatar-img rounded-circle" />
+                    </div>
+                    <div className="media-body  ml-2">
+                      <div className=" text-truncate">3 day ago</div>
+                      <a href="/neo/forum-discussion" className="text-muted small text-truncate">by Venus Kairatbekov</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/*end single-thread*/}
+            {/*single-thread*/}
+            <div className="row p-t-10 p-b-10  align-items-center border-bottom">
+              <div className="col">
+                <a href="/neo/forum-discussion" className="text-big">Aliquam et velit vel nisi egestas pulvinar sit amet ac tellus</a>
+                <div className="text-muted small mt-1">Started 9 days ago &nbsp;·&nbsp; <a href="/neo/forum-discussion" className="text-muted">Lian Krause</a></div>
+              </div>
+              <div className=" d-md-block col-4">
+                <div className="row no-gutters align-items-center">
+                  <div className="col-4">12</div>
+                  <div className="media col-8 align-items-center">
+                    <div className="avatar avatar">
+                      <img src="assets/img/users/user-5.jpg" alt="..." className="avatar-img rounded-circle" />
+                    </div>
+                    <div className="media-body  ml-2">
+                      <div className=" text-truncate">7 day ago</div>
+                      <a href="/neo/forum-discussion" className="text-muted small text-truncate">by Lian Krause</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/*end single-thread*/}
+            {/*single-thread*/}
+            <div className="row p-t-10 p-b-10  align-items-center border-bottom">
+              <div className="col">
+                <a href="/neo/forum-discussion" className="text-big">Aliquam et velit vel nisi egestas pulvinar sit amet ac tellus</a>
+                <div className="text-muted small mt-1">Started 45 days ago &nbsp;·&nbsp; <a href="/neo/forum-discussion" className="text-muted">Peter Schmid</a></div>
+              </div>
+              <div className=" d-md-block col-4">
+                <div className="row no-gutters align-items-center">
+                  <div className="col-4">98</div>
+                  <div className="media col-8 align-items-center">
+                    <div className="avatar avatar">
+                      <img src="assets/img/users/user-10.jpg" alt="..." className="avatar-img rounded-circle" />
+                    </div>
+                    <div className="media-body  ml-2">
+                      <div className=" text-truncate">62 days ago</div>
+                      <a href="/neo/forum-discussion" className="text-muted small text-truncate">by Peter Schmid</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/*end single-thread*/}
+            {/*single-thread*/}
+            <div className="row p-t-10 p-b-10  align-items-center border-bottom">
+              <div className="col">
+                <a href="/neo/forum-discussion" className="text-big">Aliquam et velit vel nisi egestas pulvinar sit amet ac tellus</a>
+                <div className="text-muted small mt-1">Started 9 days ago &nbsp;·&nbsp; <a href="/neo/forum-discussion" className="text-muted">Miriam Castellanos</a></div>
+              </div>
+              <div className=" d-md-block col-4">
+                <div className="row no-gutters align-items-center">
+                  <div className="col-4">871</div>
+                  <div className="media col-8 align-items-center">
+                    <div className="avatar avatar">
+                      <img src="assets/img/users/user-8.jpg" alt="..." className="avatar-img rounded-circle" />
+                    </div>
+                    <div className="media-body  ml-2">
+                      <div className=" text-truncate">10 days ago</div>
+                      <a href="/neo/forum-discussion" className="text-muted small text-truncate">by Miriam Castellanos</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/*end single-thread*/}
+            

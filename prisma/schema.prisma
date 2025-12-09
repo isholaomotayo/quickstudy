@@ -1,0 +1,902 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model affiliate {
+  id             BigInt   @id @default(autoincrement())
+  user_id        BigInt?
+  bank           String?  @db.VarChar(255)
+  account_no     String?  @db.VarChar(255)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+  affiliate_paid String[] @default([])
+  user           user?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ai_conversations {
+  id           Int       @id @default(autoincrement())
+  user_id      String    @db.VarChar(255)
+  context_id   Int?
+  context_type String    @default("lesson") @db.VarChar(255)
+  user_prompt  String
+  ai_response  String
+  lesson_data  Json?     @db.Json
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([created_at], map: "idx_created_at")
+  @@index([user_id, context_id], map: "idx_user_context")
+  @@index([user_id, created_at], map: "idx_user_created")
+}
+
+model announcement_reads {
+  id              BigInt        @id @default(autoincrement())
+  announcement_id BigInt
+  user_id         BigInt
+  institution_id  Int
+  read_at         DateTime?     @default(now()) @db.Timestamptz(6)
+  created_at      DateTime?     @db.Timestamptz(6)
+  updated_at      DateTime?     @db.Timestamptz(6)
+  announcements   announcements @relation(fields: [announcement_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "announcement_reads_announcement_id_foreign")
+  institution     institution   @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "announcement_reads_institution_id_foreign")
+  user            user          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "announcement_reads_user_id_foreign")
+
+  @@unique([announcement_id, user_id], map: "announcement_reads_announcement_id_user_id_unique")
+  @@index([announcement_id], map: "announcement_reads_announcement_id_index")
+  @@index([user_id, announcement_id], map: "announcement_reads_user_id_announcement_id_index")
+}
+
+model announcements {
+  id                 BigInt               @id @default(autoincrement())
+  institution_id     Int
+  user_id            BigInt
+  title              String               @db.VarChar(255)
+  body               String
+  created_at         DateTime?            @db.Timestamptz(6)
+  updated_at         DateTime?            @db.Timestamptz(6)
+  announcement_reads announcement_reads[]
+  institution        institution          @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user               user                 @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model class_degree {
+  id             Int           @id @default(autoincrement())
+  name           String        @db.VarChar(255)
+  code           String?       @db.VarChar(255)
+  min_point      Decimal       @db.Decimal(8, 2)
+  max_point      Decimal       @db.Decimal(8, 2)
+  institution_id Int?
+  institution    institution?  @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_gpa    student_gpa[]
+}
+
+model course {
+  id                      Int                       @id @default(autoincrement())
+  programme_id            Int?
+  code                    String                    @db.VarChar(255)
+  name                    String                    @db.VarChar(255)
+  level_id                Int?
+  units                   Int
+  description             String?
+  created_at              DateTime                  @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime                  @default(now()) @db.Timestamptz(6)
+  semester_position       Int?
+  department_id           Int?
+  published               Boolean?                  @default(true)
+  department              department?               @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  level                   level?                    @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  programme               programme?                @relation(fields: [programme_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course_announcement     course_announcement[]
+  course_discussion_topic course_discussion_topic[]
+  course_forum_topic      course_forum_topic[]
+  course_meetings         course_meetings[]
+  course_module           course_module[]
+  course_progress         course_progress[]
+  course_test             course_test[]
+  programme_course        programme_course[]
+  staff_course            staff_course[]
+  student_course          student_course[]
+}
+
+model course_announcement {
+  id         BigInt    @id @default(autoincrement())
+  user_id    BigInt
+  course_id  Int
+  title      String    @db.VarChar(255)
+  body       String
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+  course     course    @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user       user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model course_discussion_comment {
+  id                         BigInt                  @id @default(autoincrement())
+  user_id                    BigInt
+  course_discussion_topic_id BigInt
+  body                       String?
+  created_at                 DateTime?               @db.Timestamptz(6)
+  updated_at                 DateTime?               @db.Timestamptz(6)
+  course_discussion_topic    course_discussion_topic @relation(fields: [course_discussion_topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                       user                    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model course_discussion_topic {
+  id                        BigInt                      @id @default(autoincrement())
+  user_id                   BigInt
+  course_id                 Int
+  title                     String                      @db.VarChar(255)
+  body                      String
+  start_date                DateTime?                   @db.Timestamptz(6)
+  end_date                  DateTime?                   @db.Timestamptz(6)
+  created_at                DateTime?                   @db.Timestamptz(6)
+  updated_at                DateTime?                   @db.Timestamptz(6)
+  course_discussion_comment course_discussion_comment[]
+  course                    course                      @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                      user                        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model course_forum_thread {
+  id                    BigInt             @id @default(autoincrement())
+  user_id               BigInt
+  course_forum_topic_id BigInt
+  body                  String?
+  created_at            DateTime?          @db.Timestamptz(6)
+  updated_at            DateTime?          @db.Timestamptz(6)
+  course_forum_topic    course_forum_topic @relation(fields: [course_forum_topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                  user               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model course_forum_topic {
+  id                  BigInt                @id @default(autoincrement())
+  user_id             BigInt
+  course_id           Int
+  title               String                @db.VarChar(255)
+  description         String
+  created_at          DateTime?             @db.Timestamptz(6)
+  updated_at          DateTime?             @db.Timestamptz(6)
+  course_forum_thread course_forum_thread[]
+  course              course                @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model course_lesson {
+  id                                                               Int               @id @default(autoincrement())
+  course_module_id                                                 Int?
+  name                                                             String            @db.VarChar(255)
+  order                                                            Int
+  description                                                      String?
+  created_at                                                       DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at                                                       DateTime          @default(now()) @db.Timestamptz(6)
+  content                                                          String            @default("")
+  course_module                                                    course_module?    @relation(fields: [course_module_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course_progress_course_progress_current_lesson_idTocourse_lesson course_progress[] @relation("course_progress_current_lesson_idTocourse_lesson")
+  course_progress_course_progress_last_lesson_idTocourse_lesson    course_progress[] @relation("course_progress_last_lesson_idTocourse_lesson")
+  course_test                                                      course_test[]
+
+  // New relations for practice questions
+  practice_questions practice_question[]
+  practice_sessions  practice_session[]
+}
+
+model course_meetings {
+  id               Int       @id @default(autoincrement())
+  course_id        Int
+  course_code      String    @db.VarChar(255)
+  meeting_provider String    @db.VarChar(255)
+  meeting_url      String    @db.VarChar(255)
+  meeting_id       String?   @db.VarChar(255)
+  meeting_data     String?
+  is_active        Boolean?  @default(true)
+  is_persistent    Boolean?  @default(false)
+  expires_at       DateTime? @db.Timestamptz(6)
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+  course           course    @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "course_meetings_course_id_foreign")
+
+  @@index([course_code], map: "course_meetings_course_code_index")
+  @@index([course_id], map: "course_meetings_course_id_index")
+  @@index([is_active], map: "course_meetings_is_active_index")
+  @@index([meeting_provider], map: "course_meetings_meeting_provider_index")
+}
+
+model course_module {
+  id              Int               @id @default(autoincrement())
+  course_id       Int?
+  name            String            @db.VarChar(255)
+  order           Int
+  description     String?
+  created_at      DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime          @default(now()) @db.Timestamptz(6)
+  published       Boolean?          @default(true)
+  course_lesson   course_lesson[]
+  course          course?           @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course_progress course_progress[]
+  course_test     course_test[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model course_progress {
+  id                                                             Int            @id @default(autoincrement())
+  student_id                                                     BigInt
+  course_id                                                      Int
+  course_module_id                                               Int?
+  institution_id                                                 Int
+  progress_data                                                  Json?          @db.Json
+  user_preferences                                               Json?          @db.Json
+  total_lessons                                                  Int?           @default(0)
+  completed_lessons                                              Int?           @default(0)
+  completion_percentage                                          Decimal?       @default(0) @db.Decimal(5, 2)
+  current_lesson_id                                              Int?
+  last_lesson_id                                                 Int?
+  status                                                         String?        @default("not_started")
+  started_at                                                     DateTime?      @db.Timestamptz(6)
+  completed_at                                                   DateTime?      @db.Timestamptz(6)
+  last_accessed_at                                               DateTime?      @db.Timestamptz(6)
+  total_time_minutes                                             Int?           @default(0)
+  session_count                                                  Int?           @default(0)
+  created_at                                                     DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at                                                     DateTime       @default(now()) @db.Timestamptz(6)
+  course                                                         course         @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "course_progress_course_id_foreign")
+  course_module                                                  course_module? @relation(fields: [course_module_id], references: [id], onUpdate: NoAction, map: "course_progress_course_module_id_foreign")
+  course_lesson_course_progress_current_lesson_idTocourse_lesson course_lesson? @relation("course_progress_current_lesson_idTocourse_lesson", fields: [current_lesson_id], references: [id], onUpdate: NoAction, map: "course_progress_current_lesson_id_foreign")
+  institution                                                    institution    @relation(fields: [institution_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "course_progress_institution_id_foreign")
+  course_lesson_course_progress_last_lesson_idTocourse_lesson    course_lesson? @relation("course_progress_last_lesson_idTocourse_lesson", fields: [last_lesson_id], references: [id], onUpdate: NoAction, map: "course_progress_last_lesson_id_foreign")
+  student                                                        student        @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "course_progress_student_id_foreign")
+
+  @@unique([student_id, course_id], map: "course_progress_student_id_course_id_unique")
+  @@index([completion_percentage], map: "course_progress_completion_percentage_index")
+  @@index([course_id, status], map: "course_progress_course_id_status_index")
+  @@index([institution_id], map: "course_progress_institution_id_index")
+  @@index([last_accessed_at], map: "course_progress_last_accessed_at_index")
+  @@index([student_id, status], map: "course_progress_student_id_status_index")
+}
+
+model course_question {
+  id             Int          @id @default(autoincrement())
+  course_test_id Int?
+  question       String       @db.VarChar(255)
+  details        String?
+  options        Json?        @db.Json
+  answer         String?      @default("") @db.VarChar(255)
+  order          Int
+  marks          Int          @default(1)
+  created_at     DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime     @default(now()) @db.Timestamptz(6)
+  course_test    course_test? @relation(fields: [course_test_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model course_test {
+  id               Int               @id @default(autoincrement())
+  course_id        Int?
+  course_module_id Int?
+  course_lesson_id Int?
+  name             String            @db.VarChar(255)
+  instructions     String?
+  duration_mins    Int?
+  deadline         DateTime?         @db.Timestamptz(6)
+  max_attempts     Int?              @default(1)
+  max_score        Int?              @default(0)
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime          @default(now()) @db.Timestamptz(6)
+  format           String            @default("")
+  published        Boolean?          @default(true)
+  course_question  course_question[]
+  course           course?           @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course_lesson    course_lesson?    @relation(fields: [course_lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  course_module    course_module?    @relation(fields: [course_module_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_test     student_test[]
+}
+
+model department {
+  id           Int            @id @default(autoincrement())
+  faculty_id   Int?
+  code         String         @db.VarChar(255)
+  name         String         @db.VarChar(255)
+  email        String?        @db.VarChar(255)
+  phone        String?        @db.VarChar(255)
+  description  String?
+  created_at   DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime       @default(now()) @db.Timestamptz(6)
+  course       course[]
+  faculty      faculty?       @relation(fields: [faculty_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fee          fee[]
+  payment2     payment2[]
+  programme    programme[]
+  staff        staff[]
+  student_test student_test[]
+}
+
+model faculty {
+  id             Int          @id @default(autoincrement())
+  institution_id Int?
+  name           String       @db.VarChar(255)
+  email          String?      @db.VarChar(255)
+  phone          String?      @db.VarChar(255)
+  description    String?
+  created_at     DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime     @default(now()) @db.Timestamptz(6)
+  department     department[]
+  institution    institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  fee            fee[]
+}
+
+model fee {
+  id                        BigInt       @id @default(autoincrement())
+  name                      String       @db.VarChar(255)
+  description               String?      @db.VarChar(255)
+  amount                    Decimal?     @db.Decimal(8, 2)
+  optional                  Int?
+  frequency                 Int?
+  compulsory                Int?
+  institution_id            Int?
+  session_id                Int?
+  faculty_id                Int?
+  department_id             Int?
+  programme_id              Int?
+  level_id                  Int?
+  created_at                DateTime?    @db.Timestamptz(6)
+  updated_at                DateTime?    @db.Timestamptz(6)
+  created_by                BigInt?
+  updated_by                BigInt?
+  active                    Boolean      @default(true)
+  monthly                   Decimal?     @db.Decimal(20, 2)
+  monthly_parts             Int?         @default(0)
+  semesterly                Decimal?     @db.Decimal(20, 2)
+  semesterly_parts          Int?         @default(0)
+  sessionly                 Decimal?     @db.Decimal(20, 2)
+  sessionly_parts           Int?         @default(0)
+  user_fee_created_byTouser user?        @relation("fee_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  department                department?  @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  faculty                   faculty?     @relation(fields: [faculty_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  institution               institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  level                     level?       @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  programme                 programme?   @relation(fields: [programme_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  session                   session?     @relation(fields: [session_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_fee_updated_byTouser user?        @relation("fee_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model grade {
+  id             Int              @id @default(autoincrement())
+  name           String           @db.VarChar(255)
+  weight         Int?
+  min_score      Int?
+  max_score      Int?
+  institution_id Int?
+  point          Decimal?         @default(0) @db.Decimal(3, 2)
+  institution    institution?     @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_result student_result[]
+}
+
+model institution {
+  id                                    Int                  @id @default(autoincrement())
+  code                                  String               @db.VarChar(255)
+  name                                  String               @db.VarChar(255)
+  address                               String               @db.VarChar(255)
+  email                                 String               @db.VarChar(255)
+  phone                                 String               @db.VarChar(255)
+  motto                                 String?              @db.VarChar(255)
+  website                               String?              @db.VarChar(255)
+  twitter                               String?              @db.VarChar(255)
+  facebook                              String?              @db.VarChar(255)
+  youtube                               String?              @db.VarChar(255)
+  description                           String?
+  created_at                            DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at                            DateTime             @default(now()) @db.Timestamptz(6)
+  created_by                            BigInt?
+  updated_by                            BigInt?
+  logo                                  String?              @db.VarChar(255)
+  host_name                             String?              @db.VarChar(255)
+  support_mail                          String?              @db.VarChar(255)
+  admission_mail                        String?              @db.VarChar(255)
+  school_calendar                       String?              @db.VarChar(255)
+  director_signature                    String?              @db.VarChar(255)
+  paywall_on                            Boolean?             @default(false)
+  id_card                               Json?                @db.Json
+  token                                 String?
+  calendar_data                         Json?                @db.Json
+  announcement_reads                    announcement_reads[]
+  announcements                         announcements[]
+  class_degree                          class_degree[]
+  course_progress                       course_progress[]
+  faculty                               faculty[]
+  fee                                   fee[]
+  grade                                 grade[]
+  user_institution_created_byTouser     user?                @relation("institution_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_institution_updated_byTouser     user?                @relation("institution_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  level                                 level[]
+  payment2                              payment2[]
+  payment_account                       payment_account[]
+  semester                              semester[]
+  session                               session[]
+  student_test                          student_test[]
+  user_user_institution_idToinstitution user[]               @relation("user_institution_idToinstitution")
+}
+
+model knex_migrations {
+  id             Int       @id @default(autoincrement())
+  name           String?   @db.VarChar(255)
+  batch          Int?
+  migration_time DateTime? @db.Timestamptz(6)
+}
+
+model knex_migrations_lock {
+  index     Int  @id @default(autoincrement())
+  is_locked Int?
+}
+
+model level {
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(255)
+  description      String?            @default("") @db.VarChar(255)
+  institution_id   Int?               @default(1)
+  course           course[]
+  fee              fee[]
+  institution      institution?       @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "level_institution_id_foreign")
+  programme_course programme_course[]
+  student          student[]
+
+  @@index([institution_id], map: "level_institution_id_index")
+}
+
+model payment2 {
+  id                 Int          @id @default(autoincrement())
+  student_id         BigInt
+  amount             Decimal      @db.Decimal(20, 2)
+  cart               Json?        @db.Json
+  institution_id     Int?
+  department_id      Int?
+  processor          String?      @db.VarChar(255)
+  reference          String?      @db.VarChar(255)
+  ip                 String?      @db.VarChar(255)
+  status             Int?         @default(0)
+  created_at         DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime     @default(now()) @db.Timestamptz(6)
+  paid_at            DateTime?    @db.Timestamptz(6)
+  channel            String?      @db.VarChar(255)
+  processor_currency String?      @db.VarChar(255)
+  processor_status   String?      @db.VarChar(255)
+  department         department?  @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  institution        institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student            student      @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payment_account {
+  id              BigInt       @id @default(autoincrement())
+  institution_id  Int?
+  merchant_id     String?      @db.VarChar(255)
+  terminal_id     String?      @db.VarChar(255)
+  secret_key      String?      @db.VarChar(255)
+  public_key      String?      @db.VarChar(255)
+  created_at      DateTime?    @db.Timestamptz(6)
+  updated_at      DateTime?    @db.Timestamptz(6)
+  test_secret_key String?      @db.VarChar(255)
+  test_public_key String?      @db.VarChar(255)
+  institution     institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model programme {
+  id               Int                @id @default(autoincrement())
+  department_id    Int?
+  name             String             @db.VarChar(255)
+  years            Int
+  prefix           String?            @db.VarChar(255)
+  description      String?
+  created_at       DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime           @default(now()) @db.Timestamptz(6)
+  regno_format     String?            @default("") @db.VarChar(255)
+  course           course[]
+  fee              fee[]
+  department       department?        @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  programme_course programme_course[]
+  student          student[]
+}
+
+model programme_course {
+  id                Int        @id @default(autoincrement())
+  programme_id      Int?
+  course_id         Int?
+  level_id          Int?
+  units             Int?
+  created_at        DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime   @default(now()) @db.Timestamptz(6)
+  semester_position Int?
+  course            course?    @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  level             level?     @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  programme         programme? @relation(fields: [programme_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model school_forum_category {
+  id                 BigInt               @id @default(autoincrement())
+  name               String               @db.VarChar(255)
+  created_at         DateTime?            @db.Timestamptz(6)
+  updated_at         DateTime?            @db.Timestamptz(6)
+  institution_id     String?              @default("1") @db.VarChar(255)
+  school_forum_topic school_forum_topic[]
+}
+
+model school_forum_thread {
+  id                    BigInt             @id @default(autoincrement())
+  user_id               BigInt
+  school_forum_topic_id BigInt
+  body                  String
+  created_at            DateTime?          @db.Timestamptz(6)
+  updated_at            DateTime?          @db.Timestamptz(6)
+  institution_id        String?            @default("1") @db.VarChar(255)
+  school_forum_topic    school_forum_topic @relation(fields: [school_forum_topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                  user               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model school_forum_topic {
+  id                       BigInt                 @id @default(autoincrement())
+  school_forum_category_id BigInt?
+  user_id                  BigInt
+  title                    String                 @db.VarChar(255)
+  body                     String
+  created_at               DateTime?              @db.Timestamptz(6)
+  updated_at               DateTime?              @db.Timestamptz(6)
+  institution_id           String?                @default("1") @db.VarChar(255)
+  school_forum_thread      school_forum_thread[]
+  school_forum_category    school_forum_category? @relation(fields: [school_forum_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                     user                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model semester {
+  id                             Int              @id @default(autoincrement())
+  name                           String           @db.VarChar(255)
+  session_id                     Int?
+  start_date                     String?          @db.VarChar(255)
+  end_date                       String?          @db.VarChar(255)
+  position                       String           @db.VarChar(255)
+  created_at                     DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at                     DateTime         @default(now()) @db.Timestamptz(6)
+  institution_id                 Int?
+  created_by                     BigInt?
+  updated_by                     BigInt?
+  is_active                      Boolean?         @default(false)
+  user_semester_created_byTouser user?            @relation("semester_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  institution                    institution?     @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  session                        session?         @relation(fields: [session_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_semester_updated_byTouser user?            @relation("semester_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student                        student[]
+  student_course                 student_course[]
+  student_gpa                    student_gpa[]
+}
+
+model session {
+  id             Int          @id @default(autoincrement())
+  name           String       @db.VarChar(255)
+  start_year     String       @db.VarChar(255)
+  end_year       String       @db.VarChar(255)
+  start_date     DateTime?    @db.Timestamptz(6)
+  end_date       DateTime?    @db.Timestamptz(6)
+  institution_id Int?
+  is_active      Boolean?     @default(false)
+  fee            fee[]
+  semester       semester[]
+  institution    institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student        student[]
+}
+
+model staff {
+  id                          BigInt         @id @default(autoincrement())
+  staff_no                    String?        @db.VarChar(255)
+  user_id                     BigInt?
+  dept_id                     Int?
+  title                       String?        @db.VarChar(255)
+  gender                      String?        @db.VarChar(255)
+  dob                         DateTime?      @db.Date
+  nationality_id              Int?
+  state_origin_id             Int?
+  lga_id                      Int?
+  is_deleted                  Boolean        @default(false)
+  created_at                  DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime       @default(now()) @db.Timestamptz(6)
+  created_by                  BigInt?
+  updated_by                  BigInt?
+  address                     String?
+  level                       String?
+  designation                 String?
+  department_id               Int?
+  user_staff_created_byTouser user?          @relation("staff_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  department                  department?    @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_staff_updated_byTouser user?          @relation("staff_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_staff_user_idTouser    user?          @relation("staff_user_idTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  staff_course                staff_course[]
+}
+
+model staff_course {
+  id                                 BigInt   @id @default(autoincrement())
+  staff_id                           BigInt?
+  course_id                          Int?
+  created_at                         DateTime @default(now()) @db.Timestamptz(6)
+  updated_at                         DateTime @default(now()) @db.Timestamptz(6)
+  created_by                         BigInt?
+  updated_by                         BigInt?
+  course                             course?  @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_staff_course_created_byTouser user?    @relation("staff_course_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  staff                              staff?   @relation(fields: [staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_staff_course_updated_byTouser user?    @relation("staff_course_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model student {
+  id                            BigInt            @id @default(autoincrement())
+  reg_no                        String?
+  user_id                       BigInt?
+  title                         String?           @db.VarChar(255)
+  gender                        String?           @db.VarChar(255)
+  dob                           DateTime?         @db.Timestamptz(6)
+  nationality_id                Int?
+  state_origin_id               Int?
+  lga_id                        Int?
+  session_admitted_id           Int?
+  ref_fname                     String?           @db.VarChar(255)
+  ref_lname                     String?           @db.VarChar(255)
+  ref_phone                     String?           @db.VarChar(255)
+  ref_address                   String?
+  is_deleted                    Boolean           @default(false)
+  status                        Boolean           @default(false)
+  admitted                      Boolean           @default(false)
+  created_at                    DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at                    DateTime          @default(now()) @db.Timestamptz(6)
+  created_by                    BigInt?
+  updated_by                    BigInt?
+  programme_id                  Int?
+  address                       String?
+  marital_status                String?           @default("SINGLE")
+  employment_status             String?
+  id_card                       String?
+  state_origin                  String?
+  lga_origin                    String?
+  state_residence               String?
+  lga_residence                 String?
+  inst_cert                     String[]
+  grad_year                     String?
+  degree_grade                  String?
+  type_degree                   String?
+  course_studied                String?
+  inst_type                     String?
+  inst_name                     String?
+  entry_level_id                Int?
+  semester_admitted_id          Int?
+  admission_status              String?           @default("ACTIVE")
+  deferment_duration            String?
+  deferment_reason              String?
+  fee_plan                      String?           @default("") @db.VarChar(255)
+  application_type              String            @default("NEW") @db.VarChar(50)
+  is_active                     Boolean           @default(true)
+  course_progress               course_progress[]
+  payment2                      payment2[]
+  user_student_created_byTouser user?             @relation("student_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  level                         level?            @relation(fields: [entry_level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  programme                     programme?        @relation(fields: [programme_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  semester                      semester?         @relation(fields: [semester_admitted_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  session                       session?          @relation(fields: [session_admitted_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_updated_byTouser user?             @relation("student_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_user_idTouser    user?             @relation("student_user_idTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_course                student_course[]
+  student_gpa                   student_gpa[]
+
+  @@index([user_id, is_active], map: "idx_student_user_active")
+  @@index([user_id, programme_id], map: "idx_student_user_programme")
+}
+
+model student_course {
+  id                                   BigInt           @id @default(autoincrement())
+  student_id                           BigInt?
+  course_id                            Int?
+  semester_id                          Int?
+  level_id                             Int?
+  units                                Int?             @default(0)
+  cleared                              Boolean          @default(false)
+  approval_status                      Boolean          @default(false)
+  created_at                           DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at                           DateTime         @default(now()) @db.Timestamptz(6)
+  created_by                           BigInt?
+  updated_by                           BigInt?
+  course                               course?          @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_course_created_byTouser user?            @relation("student_course_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  semester                             semester?        @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student                              student?         @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_course_updated_byTouser user?            @relation("student_course_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_result                       student_result[]
+}
+
+model student_gpa {
+  id                                BigInt        @id @default(autoincrement())
+  student_id                        BigInt?
+  semester_id                       Int?
+  level_id                          Int?
+  prev_tnu                          Int?
+  prev_tcp                          Int?
+  prev_gpa                          Decimal?      @db.Decimal(8, 2)
+  current_tnu                       Int?
+  current_tcp                       Int?
+  current_gpa                       Decimal?      @db.Decimal(8, 2)
+  cumulative_tnu                    Int?
+  cumulative_tcp                    Int?
+  cumulative_gpa                    Decimal?      @db.Decimal(8, 2)
+  class_degree_id                   Int?
+  created_at                        DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at                        DateTime      @default(now()) @db.Timestamptz(6)
+  created_by                        BigInt?
+  updated_by                        BigInt?
+  class_degree                      class_degree? @relation(fields: [class_degree_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_gpa_created_byTouser user?         @relation("student_gpa_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  semester                          semester?     @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student                           student?      @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_gpa_updated_byTouser user?         @relation("student_gpa_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model student_result {
+  id                                   BigInt          @id @default(autoincrement())
+  student_course_id                    BigInt?
+  score                                String          @db.VarChar(255)
+  cumulative_point                     Decimal?        @db.Decimal(8, 2)
+  approved                             Boolean         @default(false)
+  publish                              Boolean         @default(false)
+  grade_id                             Int?
+  result_batch_id                      Int?
+  created_at                           DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at                           DateTime        @default(now()) @db.Timestamptz(6)
+  created_by                           BigInt?
+  updated_by                           BigInt?
+  ca_mark                              Decimal?        @db.Decimal(5, 2)
+  exam_score                           Decimal?        @db.Decimal(5, 2)
+  user_student_result_created_byTouser user?           @relation("student_result_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  grade                                grade?          @relation(fields: [grade_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_course                       student_course? @relation(fields: [student_course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_result_updated_byTouser user?           @relation("student_result_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model student_test {
+  id                                Int         @id @default(autoincrement())
+  user_id                           BigInt
+  course_test_id                    Int
+  test_name                         String      @db.VarChar(255)
+  duration_mins                     Int?
+  deadline                          DateTime?   @db.Timestamptz(6)
+  attempt_number                    Int?
+  max_attempts                      Int?
+  questions_answers                 Json?       @db.Json
+  score                             Int?        @default(0)
+  max_score                         Int?        @default(0)
+  created_at                        DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at                        DateTime    @default(now()) @db.Timestamptz(6)
+  endtime                           DateTime?   @db.Timestamptz(6)
+  submitted_at                      DateTime?   @db.Timestamptz(6)
+  format                            String      @default("") @db.VarChar(255)
+  institution_id                    Int
+  department_id                     Int
+  marked_by                         BigInt?
+  marked_at                         DateTime?   @db.Timestamptz(6)
+  feedback                          Json?       @db.Json
+  course_test                       course_test @relation(fields: [course_test_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  department                        department  @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  institution                       institution @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_test_marked_byTouser user?       @relation("student_test_marked_byTouser", fields: [marked_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_student_test_user_idTouser   user        @relation("student_test_user_idTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model practice_question {
+  id                Int      @id @default(autoincrement())
+  lesson_id         Int
+  question_text     String
+  question_type     String   @default("multiple_choice") @db.VarChar(50) // multiple_choice, true_false
+  options           Json?    @db.Json // For MCQs: {"A": {"text": "...", "is_correct": true}, ...}
+  correct_answer    String? // Correct option key (A, B, C, D)
+  explanation       String // Detailed explanation of why the answer is correct
+  difficulty_level  String   @default("medium") @db.VarChar(20) // easy, medium, hard
+  ai_generated      Boolean  @default(true)
+  generated_at      DateTime @default(now()) @db.Timestamptz(6)
+  generated_by_user BigInt
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relations
+  course_lesson course_lesson @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+  generated_by  user          @relation("practice_question_generated_by", fields: [generated_by_user], references: [id])
+
+  @@index([lesson_id])
+  @@index([difficulty_level])
+  @@index([generated_at])
+}
+
+model practice_session {
+  id                    Int       @id @default(autoincrement())
+  user_id               BigInt
+  lesson_id             Int
+  questions_data        Json      @db.Json // Snapshot of questions used in this session
+  user_answers          Json?     @db.Json // User's answers for each question
+  score                 Int       @default(0)
+  total_questions       Int
+  completed_at          DateTime? @db.Timestamptz(6)
+  session_duration_mins Int? // Duration in minutes
+  created_at            DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime  @default(now()) @db.Timestamptz(6)
+
+  // Relations
+  user          user          @relation("practice_session_user", fields: [user_id], references: [id], onDelete: Cascade)
+  course_lesson course_lesson @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, lesson_id])
+  @@index([completed_at])
+}
+
+model user {
+  id                                             BigInt                      @id @default(autoincrement())
+  username                                       String                      @db.VarChar(255)
+  password                                       String                      @db.VarChar(255)
+  first_name                                     String                      @db.VarChar(255)
+  last_name                                      String                      @db.VarChar(255)
+  other_name                                     String?                     @db.VarChar(255)
+  email                                          String                      @db.VarChar(255)
+  phone                                          String?                     @db.VarChar(255)
+  code                                           String?                     @db.VarChar(255)
+  role                                           String?                     @default("APPLICANT")
+  application_declined_reason                    String?
+  active                                         Boolean                     @default(false)
+  admin                                          Int                         @default(0)
+  reset_code                                     String?                     @db.VarChar(255)
+  avatar                                         String?                     @db.VarChar(255)
+  personal_info                                  String?
+  registration_source                            String?                     @default("web") @db.VarChar(255)
+  enable_contact_me                              Boolean                     @default(false)
+  created_at                                     DateTime                    @default(now()) @db.Timestamptz(6)
+  updated_at                                     DateTime                    @default(now()) @db.Timestamptz(6)
+  institution_id                                 Int?
+  created_by                                     BigInt?
+  updated_by                                     BigInt?
+  referral_code                                  String?                     @default("UNN")
+  account_active                                 Boolean?                    @default(true)
+  affiliate                                      affiliate[]
+  announcement_reads                             announcement_reads[]
+  announcements                                  announcements[]
+  course_announcement                            course_announcement[]
+  course_discussion_comment                      course_discussion_comment[]
+  course_discussion_topic                        course_discussion_topic[]
+  course_forum_thread                            course_forum_thread[]
+  course_forum_topic                             course_forum_topic[]
+  fee_fee_created_byTouser                       fee[]                       @relation("fee_created_byTouser")
+  fee_fee_updated_byTouser                       fee[]                       @relation("fee_updated_byTouser")
+  institution_institution_created_byTouser       institution[]               @relation("institution_created_byTouser")
+  institution_institution_updated_byTouser       institution[]               @relation("institution_updated_byTouser")
+  school_forum_thread                            school_forum_thread[]
+  school_forum_topic                             school_forum_topic[]
+  semester_semester_created_byTouser             semester[]                  @relation("semester_created_byTouser")
+  semester_semester_updated_byTouser             semester[]                  @relation("semester_updated_byTouser")
+  staff_staff_created_byTouser                   staff[]                     @relation("staff_created_byTouser")
+  staff_staff_updated_byTouser                   staff[]                     @relation("staff_updated_byTouser")
+  staff_staff_user_idTouser                      staff[]                     @relation("staff_user_idTouser")
+  staff_course_staff_course_created_byTouser     staff_course[]              @relation("staff_course_created_byTouser")
+  staff_course_staff_course_updated_byTouser     staff_course[]              @relation("staff_course_updated_byTouser")
+  student_student_created_byTouser               student[]                   @relation("student_created_byTouser")
+  student_student_updated_byTouser               student[]                   @relation("student_updated_byTouser")
+  student_student_user_idTouser                  student[]                   @relation("student_user_idTouser")
+  student_course_student_course_created_byTouser student_course[]            @relation("student_course_created_byTouser")
+  student_course_student_course_updated_byTouser student_course[]            @relation("student_course_updated_byTouser")
+  student_gpa_student_gpa_created_byTouser       student_gpa[]               @relation("student_gpa_created_byTouser")
+  student_gpa_student_gpa_updated_byTouser       student_gpa[]               @relation("student_gpa_updated_byTouser")
+  student_result_student_result_created_byTouser student_result[]            @relation("student_result_created_byTouser")
+  student_result_student_result_updated_byTouser student_result[]            @relation("student_result_updated_byTouser")
+  student_test_student_test_marked_byTouser      student_test[]              @relation("student_test_marked_byTouser")
+  student_test_student_test_user_idTouser        student_test[]              @relation("student_test_user_idTouser")
+  user_user_created_byTouser                     user?                       @relation("user_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_user_user_created_byTouser               user[]                      @relation("user_created_byTouser")
+  institution_user_institution_idToinstitution   institution?                @relation("user_institution_idToinstitution", fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_user_updated_byTouser                     user?                       @relation("user_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_user_user_updated_byTouser               user[]                      @relation("user_updated_byTouser")
+
+  // New relations for practice questions
+  practice_questions_generated practice_question[] @relation("practice_question_generated_by")
+  practice_sessions            practice_session[]  @relation("practice_session_user")
+}

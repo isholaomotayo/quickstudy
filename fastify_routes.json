@@ -1,0 +1,3634 @@
+{
+    "swagger": {
+        "info": {
+            "title": "Fastify API",
+            "description": "Docs for our fastify api",
+            "version": "1.0.0"
+        },
+        "host": "localhost",
+        "schemes": [
+            "http"
+        ],
+        "consumes": [
+            "application/json"
+        ],
+        "produces": [
+            "application/json"
+        ],
+        "paths": {
+            "/api/affiliate/verifyToken": {
+                "post": {
+                    "summary": "Verify Affiliate JWT",
+                    "description": "Verify Affiliate JWT",
+                    "tags": [
+                        "Affiliate"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/affiliate/login": {
+                "post": {
+                    "summary": "Login as an Affiliate",
+                    "description": "Login as an Affiliate",
+                    "tags": [
+                        "Affiliate"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/affiliate": {
+                "get": {
+                    "summary": "Get all Affliate in the database",
+                    "description": "Get all Affiliate in the database",
+                    "tags": [
+                        "Affiliate"
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Adds new Affiliate to the database",
+                    "description": "Add new Affiliate to the database",
+                    "tags": [
+                        "Affiliate"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "active": {
+                                        "type": "integer"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "New Affiliate",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "active": {
+                                        "type": "integer"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "description": "New Affiliate"
+                        }
+                    }
+                }
+            },
+            "/api/affiliate/applicant": {
+                "get": {
+                    "summary": "Get all users in the database",
+                    "description": "Get all users in the database",
+                    "tags": [
+                        "User"
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/affiliate/{id}": {
+                "get": {
+                    "summary": "Retrieve a Affiliate from the database",
+                    "description": "Retrieve a Affiliate from the database using the id",
+                    "tags": [
+                        "Affiliate"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "integer",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "put": {
+                    "summary": "Updates an Affiliate in the database",
+                    "description": "Updates an new Affiliate in the database",
+                    "tags": [
+                        "Affiliate"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "active": {
+                                        "type": "integer"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "integer",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete an Affiliate from the database",
+                    "description": "Delete an Affiliate from the database using the id",
+                    "tags": [
+                        "Affiliate"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "integer",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/schoolAnnouncement": {
+                "post": {
+                    "summary": "Create a new school announcement",
+                    "description": "Create a new school announcement",
+                    "tags": [
+                        "School Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "title",
+                                    "body",
+                                    "user_id",
+                                    "institution_id"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "body": {
+                                        "type": "string"
+                                    },
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "institution_id": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "get": {
+                    "summary": "List all school announcements",
+                    "description": "List all school announcements",
+                    "tags": [
+                        "School Announcement"
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/schoolAnnouncement/{institution_id}": {
+                "get": {
+                    "summary": "Get announcements for an institution",
+                    "description": "Get announcements for an institution",
+                    "tags": [
+                        "School Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "institution_id",
+                            "in": "path"
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/schoolAnnouncement/{id}": {
+                "put": {
+                    "summary": "Update an announcement",
+                    "description": "Update an announcement",
+                    "tags": [
+                        "School Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "body": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name": "id",
+                            "in": "path"
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete an announcement",
+                    "description": "Delete an announcement",
+                    "tags": [
+                        "School Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "in": "path"
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/schoolAnnouncement/search": {
+                "get": {
+                    "summary": "Search school announcements",
+                    "description": "Search school announcements",
+                    "tags": [
+                        "School Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "query",
+                            "in": "query"
+                        },
+                        {
+                            "name": "pgsize",
+                            "in": "query"
+                        },
+                        {
+                            "name": "pg",
+                            "in": "query"
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/courseannouncements": {
+                "post": {
+                    "summary": "Create a new forum category",
+                    "description": "Create a new forum category",
+                    "tags": [
+                        "Course Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "title",
+                                    "body",
+                                    "user_id",
+                                    "course_id"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "body": {
+                                        "type": "string"
+                                    },
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "get": {
+                    "summary": "List all forum categories",
+                    "description": "List all forum categories",
+                    "tags": [
+                        "Course Announcement"
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/courseannouncements/{course_id}": {
+                "get": {
+                    "summary": "Get a single forum Topic",
+                    "description": "Get a single forum Topic",
+                    "tags": [
+                        "Course Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "course_id",
+                            "in": "path"
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/courseannouncements/{id}": {
+                "put": {
+                    "summary": "Update a single forum category",
+                    "description": "Update a single forum category",
+                    "tags": [
+                        "Course Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "body": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name": "id",
+                            "in": "path"
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete Course Announcement",
+                    "description": "Delete Course Announcement",
+                    "tags": [
+                        "Course Announcement"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "in": "path"
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/payment": {
+                "post": {
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/auth/register": {
+                "post": {
+                    "summary": "Register a user to the database",
+                    "description": "Register a user to the database",
+                    "tags": [
+                        "Authentication"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "username",
+                                    "password",
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "institution_id": {
+                                        "type": "integer"
+                                    },
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    },
+                                    "other_name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "active": {
+                                        "type": "integer"
+                                    },
+                                    "admin": {
+                                        "type": "integer"
+                                    },
+                                    "reset_code": {
+                                        "type": "string"
+                                    },
+                                    "avatar": {
+                                        "type": "string"
+                                    },
+                                    "personal_info": {
+                                        "type": "string"
+                                    },
+                                    "registration_source": {
+                                        "type": "string"
+                                    },
+                                    "enable_contact_me": {
+                                        "type": "integer"
+                                    },
+                                    "role": {
+                                        "type": "string"
+                                    },
+                                    "student": {
+                                        "type": "object"
+                                    },
+                                    "staff": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/auth/login": {
+                "post": {
+                    "summary": "Login user",
+                    "description": "Login user",
+                    "tags": [
+                        "Authentication"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "username",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/auth/logout": {
+                "get": {
+                    "summary": "Logout User",
+                    "description": "Logout User",
+                    "tags": [
+                        "Authentication"
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/auth/profile": {
+                "get": {
+                    "summary": "get profile of currently logged in user",
+                    "description": "get profile of currently logged in user",
+                    "tags": [
+                        "Authentication"
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/institution": {
+                "get": {
+                    "summary": "Get all institutions in the database",
+                    "description": "Get all institutions in the database",
+                    "tags": [
+                        "Institution"
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "Array containing all institutions",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "readOnly": true
+                                        },
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "address": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "phone": {
+                                            "type": "string"
+                                        },
+                                        "motto": {
+                                            "type": "string"
+                                        },
+                                        "website": {
+                                            "type": "string"
+                                        },
+                                        "twitter": {
+                                            "type": "string"
+                                        },
+                                        "facebook": {
+                                            "type": "string"
+                                        },
+                                        "youtube": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "logo": {
+                                            "type": "string"
+                                        },
+                                        "school_calendar": {
+                                            "type": "string"
+                                        },
+                                        "director_signature": {
+                                            "type": "string"
+                                        },
+                                        "id_card": {
+                                            "type": "object",
+                                            "properties": {
+                                                "front": {
+                                                    "type": "string"
+                                                },
+                                                "back": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "paywall_on": {
+                                            "type": "boolean",
+                                            "default": false
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "Array containing all institutions"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Add a new institution to the database",
+                    "description": "Add a new institution to the database",
+                    "tags": [
+                        "Institution"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "code",
+                                    "name",
+                                    "address",
+                                    "email",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "motto": {
+                                        "type": "string"
+                                    },
+                                    "website": {
+                                        "type": "string"
+                                    },
+                                    "twitter": {
+                                        "type": "string"
+                                    },
+                                    "facebook": {
+                                        "type": "string"
+                                    },
+                                    "youtube": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "logo": {
+                                        "type": "string"
+                                    },
+                                    "school_calendar": {
+                                        "type": "string"
+                                    },
+                                    "director_signature": {
+                                        "type": "string"
+                                    },
+                                    "id_card": {
+                                        "type": "object",
+                                        "properties": {
+                                            "front": {
+                                                "type": "string"
+                                            },
+                                            "back": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "paywall_on": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/institution/{id}": {
+                "get": {
+                    "summary": "Get a institution from the database",
+                    "description": "Get a institution from the database",
+                    "tags": [
+                        "Institution"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "put": {
+                    "summary": "Update an institution in the database",
+                    "description": "Update an institution in the database",
+                    "tags": [
+                        "Institution"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "motto": {
+                                        "type": "string"
+                                    },
+                                    "website": {
+                                        "type": "string"
+                                    },
+                                    "twitter": {
+                                        "type": "string"
+                                    },
+                                    "facebook": {
+                                        "type": "string"
+                                    },
+                                    "youtube": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "logo": {
+                                        "type": "string"
+                                    },
+                                    "school_calendar": {
+                                        "type": "string"
+                                    },
+                                    "director_signature": {
+                                        "type": "string"
+                                    },
+                                    "id_card": {
+                                        "type": "object",
+                                        "properties": {
+                                            "front": {
+                                                "type": "string"
+                                            },
+                                            "back": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "paywall_on": {
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete an institution from the database",
+                    "description": "Delete an institution from the database",
+                    "tags": [
+                        "Institution"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "",
+                                "type": "object"
+                            },
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/institution/params": {
+                "post": {
+                    "summary": "Get institution by parameters",
+                    "description": "Get an institution by providing specific parameters in the body",
+                    "tags": [
+                        "Institution"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object"
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/faculty": {
+                "get": {
+                    "summary": "Get all faculties in the database",
+                    "description": "Get all faculties in the database",
+                    "tags": [
+                        "Faculty"
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "Array containing all faculties",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "readOnly": true
+                                        },
+                                        "institution_id": {
+                                            "type": "integer"
+                                        },
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "phone": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "Array containing all faculties"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Add a faculty to the database",
+                    "description": "Add a faculty to the database",
+                    "tags": [
+                        "Faculty"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "institution_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A Faculty",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "institution_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A Faculty"
+                        }
+                    }
+                }
+            },
+            "/api/faculty/{id}": {
+                "get": {
+                    "summary": "Get a faculty from the database",
+                    "description": "Get a faculty from the database",
+                    "tags": [
+                        "Faculty"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A Faculty with Departments",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "institution_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "departments": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "faculty_id": {
+                                                    "type": "integer"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                },
+                                                "phone": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "A Faculty with Departments"
+                        }
+                    }
+                },
+                "put": {
+                    "summary": "Update a faculty in the database",
+                    "description": "Update a faculty in the database",
+                    "tags": [
+                        "Faculty"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "institution_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A Faculty",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "institution_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A Faculty"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete a faculty from the database",
+                    "description": "Delete a faculty from the database",
+                    "tags": [
+                        "Faculty"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "",
+                                "type": "object"
+                            },
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/department": {
+                "get": {
+                    "summary": "Get all departments in the database",
+                    "description": "Get all departments in the database",
+                    "tags": [
+                        "department"
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "Array containing all departments",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "readOnly": true
+                                        },
+                                        "faculty_id": {
+                                            "type": "integer"
+                                        },
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "phone": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "Array containing all departments"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Add a department to the database",
+                    "description": "Add a department to the database",
+                    "tags": [
+                        "department"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A department",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A department"
+                        }
+                    }
+                }
+            },
+            "/api/department/{id}": {
+                "get": {
+                    "summary": "Get a department from the database",
+                    "description": "Get a department from the database",
+                    "tags": [
+                        "department"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A department with programmes",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "programmes": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "programme_id": {
+                                                    "type": "integer"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "level_id": {
+                                                    "type": "integer"
+                                                },
+                                                "units": {
+                                                    "type": "integer"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "semester_position": {
+                                                    "type": "integer"
+                                                },
+                                                "department_id": {
+                                                    "type": "integer"
+                                                },
+                                                "published": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "A department with programmes"
+                        }
+                    }
+                },
+                "put": {
+                    "summary": "Update a department in the database",
+                    "description": "Update a department in the database",
+                    "tags": [
+                        "department"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A department",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A department"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete a department from the database",
+                    "description": "Delete a department from the database",
+                    "tags": [
+                        "department"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "",
+                                "type": "object"
+                            },
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/programme": {
+                "get": {
+                    "summary": "Get all programmes in the database",
+                    "description": "Get all programmes in the database",
+                    "tags": [
+                        "programme"
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "Array containing all programmes",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "readOnly": true
+                                        },
+                                        "department_id": {
+                                            "type": "integer"
+                                        },
+                                        "faculty_id": {
+                                            "type": "integer"
+                                        },
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "duration": {
+                                            "type": "string"
+                                        },
+                                        "years": {
+                                            "type": "integer"
+                                        },
+                                        "prefix": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "regno_format": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "Array containing all programmes"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Add a programme to the database",
+                    "description": "Add a programme to the database",
+                    "tags": [
+                        "programme"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "type": "string"
+                                    },
+                                    "years": {
+                                        "type": "integer"
+                                    },
+                                    "prefix": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "regno_format": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A programme",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "type": "string"
+                                    },
+                                    "years": {
+                                        "type": "integer"
+                                    },
+                                    "prefix": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "regno_format": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A programme"
+                        }
+                    }
+                }
+            },
+            "/api/programme/{id}": {
+                "get": {
+                    "summary": "Get a programme from the database",
+                    "description": "Get a programme from the database",
+                    "tags": [
+                        "programme"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A programme with courses",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "type": "string"
+                                    },
+                                    "years": {
+                                        "type": "integer"
+                                    },
+                                    "prefix": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "regno_format": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "courses": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "programme_id": {
+                                                    "type": "integer"
+                                                },
+                                                "code": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "level_id": {
+                                                    "type": "integer"
+                                                },
+                                                "units": {
+                                                    "type": "integer"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "semester_position": {
+                                                    "type": "integer"
+                                                },
+                                                "department_id": {
+                                                    "type": "integer"
+                                                },
+                                                "published": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "A programme with courses"
+                        }
+                    }
+                },
+                "put": {
+                    "summary": "Update a programme in the database",
+                    "description": "Update a programme in the database",
+                    "tags": [
+                        "programme"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "type": "string"
+                                    },
+                                    "years": {
+                                        "type": "integer"
+                                    },
+                                    "prefix": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "regno_format": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A programme",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "faculty_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "type": "string"
+                                    },
+                                    "years": {
+                                        "type": "integer"
+                                    },
+                                    "prefix": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "regno_format": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A programme"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete a programme from the database",
+                    "description": "Delete a programme from the database",
+                    "tags": [
+                        "programme"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "",
+                                "type": "object"
+                            },
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/programmecourse": {
+                "get": {
+                    "summary": "Get all programme courses in the database",
+                    "description": "Get all programme courses in the database",
+                    "tags": [
+                        "programme course"
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "Array containing all programme courses",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "readOnly": true
+                                        },
+                                        "programme_id": {
+                                            "type": "integer"
+                                        },
+                                        "course_id": {
+                                            "type": "integer"
+                                        },
+                                        "level_id": {
+                                            "type": "integer"
+                                        },
+                                        "semester_id": {
+                                            "type": "integer"
+                                        },
+                                        "course_type": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "Array containing all programme courses"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Add a programme course to the database",
+                    "description": "Add a programme course to the database",
+                    "tags": [
+                        "programme course"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "course_id",
+                                    "level_id",
+                                    "semester_id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "semester_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_type": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A programme course",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "semester_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_type": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A programme course"
+                        }
+                    }
+                }
+            },
+            "/api/programmecourse/{id}": {
+                "get": {
+                    "summary": "Get a programme course from the database",
+                    "description": "Get a programme course from the database",
+                    "tags": [
+                        "programme course"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A programme course",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "semester_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_type": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A programme course"
+                        }
+                    }
+                },
+                "put": {
+                    "summary": "Update a programme course in the database",
+                    "description": "Update a programme course in the database",
+                    "tags": [
+                        "programme course"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "course_id",
+                                    "level_id",
+                                    "semester_id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "semester_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_type": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A programme course",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "semester_id": {
+                                        "type": "integer"
+                                    },
+                                    "course_type": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    }
+                                }
+                            },
+                            "description": "A programme course"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete a programme course from the database",
+                    "description": "Delete a programme course from the database",
+                    "tags": [
+                        "programme course"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "",
+                                "type": "object"
+                            },
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/programmecourse/search": {
+                "get": {
+                    "summary": "Retrieve Programme Courses from the database",
+                    "description": "Retrieve Programme Courses from the database using the search params",
+                    "tags": [
+                        "Programme-Course"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "integer",
+                            "required": false,
+                            "name": "id",
+                            "in": "query"
+                        },
+                        {
+                            "type": "integer",
+                            "required": false,
+                            "name": "course_id",
+                            "in": "query"
+                        },
+                        {
+                            "type": "integer",
+                            "required": false,
+                            "name": "level_id",
+                            "in": "query"
+                        },
+                        {
+                            "type": "integer",
+                            "required": false,
+                            "name": "semester_id",
+                            "in": "query"
+                        },
+                        {
+                            "type": "integer",
+                            "required": false,
+                            "name": "programme_id",
+                            "in": "query"
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/course": {
+                "get": {
+                    "summary": "Get all courses in the database",
+                    "description": "Get all courses in the database",
+                    "tags": [
+                        "course"
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "Array containing all courses",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "readOnly": true
+                                        },
+                                        "programme_id": {
+                                            "type": "integer"
+                                        },
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "level_id": {
+                                            "type": "integer"
+                                        },
+                                        "units": {
+                                            "type": "integer"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "semester_position": {
+                                            "type": "integer"
+                                        },
+                                        "department_id": {
+                                            "type": "integer"
+                                        },
+                                        "published": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "Array containing all courses"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Add a course to the database",
+                    "description": "Add a course to the database",
+                    "tags": [
+                        "course"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "units": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "semester_position": {
+                                        "type": "integer"
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A course",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "units": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "semester_position": {
+                                        "type": "integer"
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            },
+                            "description": "A course"
+                        }
+                    }
+                }
+            },
+            "/api/course/{id}": {
+                "get": {
+                    "summary": "Get a course from the database",
+                    "description": "Get a course from the database",
+                    "tags": [
+                        "course"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A course with its level, department, modules, lessons and tests",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "units": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "semester_position": {
+                                        "type": "integer"
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    },
+                                    "level": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "institution_id": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "department": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "faculty_id": {
+                                                "type": "integer"
+                                            },
+                                            "code": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "email": {
+                                                "type": "string"
+                                            },
+                                            "phone": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        }
+                                    },
+                                    "course_modules": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "course_id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "order": {
+                                                    "type": "integer"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "published": {
+                                                    "type": "boolean"
+                                                },
+                                                "course_lessons": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "course_module_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "order": {
+                                                                "type": "integer"
+                                                            },
+                                                            "description": {
+                                                                "type": "string"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "content": {
+                                                                "type": "string"
+                                                            },
+                                                            "course_tests": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "course_id": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "course_module_id": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "course_lesson_id": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "instructions": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "duration_mins": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "deadline": {
+                                                                            "type": "string",
+                                                                            "format": "date-time"
+                                                                        },
+                                                                        "max_attempts": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "max_score": {
+                                                                            "type": "integer"
+                                                                        },
+                                                                        "created_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time"
+                                                                        },
+                                                                        "updated_at": {
+                                                                            "type": "string",
+                                                                            "format": "date-time"
+                                                                        },
+                                                                        "format": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "published": {
+                                                                            "type": "boolean"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "A course with its level, department, modules, lessons and tests"
+                        }
+                    }
+                },
+                "put": {
+                    "summary": "Update a course in the database",
+                    "description": "Update a course in the database",
+                    "tags": [
+                        "course"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "units": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "semester_position": {
+                                        "type": "integer"
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A course with its level",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "programme_id": {
+                                        "type": "integer"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "units": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "semester_position": {
+                                        "type": "integer"
+                                    },
+                                    "department_id": {
+                                        "type": "integer"
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    },
+                                    "level": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "institution_id": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "A course with its level"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete a course from the database",
+                    "description": "Delete a course from the database",
+                    "tags": [
+                        "course"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "",
+                                "type": "object"
+                            },
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/coursemodule": {
+                "get": {
+                    "summary": "Get all course modules in the database",
+                    "description": "Get all course modules in the database",
+                    "tags": [
+                        "coursemodule"
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "Array containing all course modules",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "readOnly": true
+                                        },
+                                        "course_id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "order": {
+                                            "type": "integer"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "published": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "Array containing all course modules"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Add a course module to the database",
+                    "description": "Add a course module to the database",
+                    "tags": [
+                        "coursemodule"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "course_id",
+                                    "name",
+                                    "order"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "order": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A course module",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "order": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            },
+                            "description": "A course module"
+                        }
+                    }
+                }
+            },
+            "/api/coursemodule/{id}": {
+                "get": {
+                    "summary": "Get a course module from the database",
+                    "description": "Get a course module from the database",
+                    "tags": [
+                        "coursemodule"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A course module with lessons",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "order": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    },
+                                    "course_lessons": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "course_module_id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "order": {
+                                                    "type": "integer"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "content": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "A course module with lessons"
+                        }
+                    }
+                },
+                "put": {
+                    "summary": "Update a course module in the database",
+                    "description": "Update a course module in the database",
+                    "tags": [
+                        "coursemodule"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "body",
+                            "in": "body",
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "course_id",
+                                    "name",
+                                    "order"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "order": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "A course module",
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "course_id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "order": {
+                                        "type": "integer"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "created_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "readOnly": true
+                                    },
+                                    "published": {
+                                        "type": "boolean"
+                                    }
+                                }
+                            },
+                            "description": "A course module"
+                        }
+                    }
+                },
+                "delete": {
+                    "summary": "Delete a course module from the database",
+                    "description": "Delete a course module from the database",
+                    "tags": [
+                        "coursemodule"
+                    ],
+                    "parameters": [
+                        {
+                            "type": "string",
+                            "name": "id",
+                            "in": "path",
+                            "required": true
+                        }
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "",
+                                "type": "object"
+                            },
+                            "description": "Default Response"
+                        }
+                    }
+                }
+            },
+            "/api/courselesson": {
+                "get": {
+                    "summary": "Get all course lessons in the database",
+                    "description": "Get all course lessons in the database",
+                    "tags": [
+                        "courselesson"
+                    ],
+                    "responses": {
+                        "200": {
+                            "schema": {
+                                "description": "Array containing all course lessons",
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "readOnly": true
+                                        },
+                                        "course_module_id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "order": {
+                                            "type": "integer"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "readOnly": true
+                                        },
+                                        "content": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "Array containing all course lessons"
+                        }
+                    }
+                },
+                "post": {
+                    "summary": "Add a course lesson to the database","descripti

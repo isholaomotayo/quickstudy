@@ -1,0 +1,37 @@
+.widget-2:after {
+  background-image: url("/custom/img/reg-bg.jpg");
+}
+.widget-3:after {
+  background-image: url("/custom/img/calender-bg2.jpeg");
+}
+.widget-4:after {
+  background-image: url("/custom/img/news-bg4.jpg");
+}
+.widget-21 {
+  /* background-image: url("/custom/img/faq-bg.png") ;
+  background-repeat: no-repeat;
+  background-position: center; */
+}
+.widget-21 table tr td,
+table tr th {
+  background-color: inherit !important;
+  border-bottom: none;
+}
+.modal-90w {
+  width: 90%;
+  max-width: none !important;
+}
+
+#nprogress .bar {
+  background: #29d;
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px !important ;
+}
+
+.darkerBg {
+  background: #00000034 !important;
+}

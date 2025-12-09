@@ -1,0 +1,334 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
+  BookOpen,
+  GraduationCap,
+  TrendingUp,
+  Award,
+  Calendar,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  ExternalLink,
+} from "lucide-react";
+import { CourseResults } from "./components/course-results";
+import { LearningResults } from "./components/learning-results";
+import { ResultsSummary } from "./components/results-summary";
+import { ExportResults } from "./components/export-results";
+import { useUserData } from "@/hooks/useUserData";
+
+interface StudentResult {
+  id: number;
+  score: number;
+  grade: {
+    name: string;
+    point: number;
+  };
+  studentcourse: {
+    course: {
+      code: string;
+      name: string;
+      units: number;
+    };
+    level: {
+      name: string;
+    };
+    semester: {
+      name: string;
+    };
+  };
+  publish: boolean;
+}
+
+interface StudentGPA {
+  id: number;
+  semester_gpa: number;
+  current_gpa: number;
+  cumulative_gpa: number;
+  level: {
+    name: string;
+  };
+  semester: {
+    name: string;
+  };
+}
+
+interface LearningResult {
+  id: number; // This is now the student_test.id
+  course_test_id: number;
+  name: string;
+  test_name: string;
+}
+
+export function ResultsClient() {
+  const { userData } = useUserData();
+  const [activeTab, setActiveTab] = useState("course");
+  const [courseResults, setCourseResults] = useState<StudentResult[]>([]);
+  const [learningResults, setLearningResults] = useState<LearningResult[]>([]);
+  const [studentGpas, setStudentGpas] = useState<StudentGPA[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  useEffect(() => {
+    if (userData) {
+      fetchResults();
+    }
+  }, [userData]);
+
+  const fetchResults = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!userData || !userData.student_id) {
+        setError("Student information not available. Please log in again.");
+        return;
+      }
+
+      // Fetch course results for the specific student
+      const courseResultsResponse = await fetch(
+        `/api/studentresult/${userData.student_id}`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (courseResultsResponse.ok) {
+        const courseData = await courseResultsResponse.json();
+        setCourseResults(courseData || []);
+      } else {
+        console.error(
+          "Course results response not ok:",
+          courseResultsResponse.status
+        );
+        if (courseResultsResponse.status === 401) {
+          setError("Authentication required. Please sign in again.");
+        } else {
+          setError("Failed to load course results");
+        }
+      }
+
+      // Fetch student GPAs for the specific student
+      const gpasResponse = await fetch(
+        `/api/studentgpa/studentid/${userData.student_id}`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (gpasResponse.ok) {
+        const gpasData = await gpasResponse.json();
+        setStudentGpas(gpasData || []);
+      } else {
+        console.error("GPAs response not ok:", gpasResponse.status);
+        if (gpasResponse.status === 401) {
+          setError("Authentication required. Please sign in again.");
+        } else {
+          setError("Failed to load GPA data");
+        }
+      }
+
+      // Fetch learning results
+      const learningResultsResponse = await fetch("/api/studenttest/new", {
+        credentials: "include",
+      });
+
+      if (learningResultsResponse.ok) {
+        const learningData = await learningResultsResponse.json();
+        setLearningResults(learningData || []);
+      } else {
+        console.error(
+          "Learning results response not ok:",
+          learningResultsResponse.status
+        );
+        if (learningResultsResponse.status === 401) {
+          setError("Authentication required. Please sign in again.");
+        }
+      }
+    } catch (err) {
+      setError("Failed to load results. Please try again.");
+      console.error("Error fetching results:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchResults();
+  };
+
+  const handleExport = async (format: "pdf" | "print") => {
+    setIsExporting(true);
+    try {
+      if (format === "pdf") {
+        // For now, we'll just trigger print which can be saved as PDF
+        window.print();
+      } else {
+        window.print();
+      }
+    } catch (error) {
+      console.error("Export error:", error);
+      throw error;
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const calculateOverallCGPA = () => {
+    if (!studentGpas || !studentGpas.length) return 0;
+    const latestGpa = studentGpas[studentGpas.length - 1];
+    return parseFloat(String(latestGpa.cumulative_gpa) || "0");
+  };
+
+  const getClassOfDegree = (cgpa: number) => {
+    if (cgpa >= 4.5) return "First Class";
+    if (cgpa >= 3.5) return "Second Class Upper";
+    if (cgpa >= 2.5) return "Second Class Lower";
+    if (cgpa >= 1.5) return "Third Class";
+    return "Pass";
+  };
+
+  const getDegreeClassColor = (cgpa: number) => {
+    if (cgpa >= 4.5) return "bg-green-100 text-green-800";
+    if (cgpa >= 3.5) return "bg-blue-100 text-blue-800";
+    if (cgpa >= 2.5) return "bg-yellow-100 text-yellow-800";
+    if (cgpa >= 1.5) return "bg-orange-100 text-orange-800";
+    return "bg-gray-100 text-gray-800";
+  };
+
+  const overallCGPA = calculateOverallCGPA();
+  const degreeClass = getClassOfDegree(overallCGPA);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="text-gray-600">Loading your results...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+              <AlertCircle className="h-8 w-8 text-red-600" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900">
+              Authentication Required
+            </h3>
+            <p className="text-sm text-gray-500">
+              Please log in to view your academic results.
+            </p>
+            <Button
+              onClick={() => (window.location.href = "/signin")}
+              variant="outline"
+            >
+              Go to Sign In
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center space-y-4">
+            <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
+            <p className="text-red-600">{error}</p>
+            <Button onClick={fetchResults} variant="outline">
+              Try Again
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Results Summary - only show if we have data */}
+      {(courseResults.length > 0 || studentGpas.length > 0) && (
+        <ResultsSummary results={courseResults} gpas={studentGpas} />
+      )}
+
+      {/* Export & Share - only show if we have data */}
+      {(courseResults.length > 0 || learningResults.length > 0) && (
+        <ExportResults onExport={handleExport} isExporting={isExporting} />
+      )}
+
+      {/* Results Tabs */}
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="course" className="flex items-center space-x-2">
+            <BookOpen className="h-4 w-4" />
+            <span>Course Results</span>
+          </TabsTrigger>
+          <TabsTrigger value="learning" className="flex items-center space-x-2">
+            <GraduationCap className="h-4 w-4" />
+            <span>Learning Results</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="course" className="space-y-4">
+          <CourseResults
+            results={courseResults}
+            gpas={studentGpas}
+            onRefresh={fetchResults}
+          />
+        </TabsContent>
+
+        <TabsContent value="learning" className="space-y-4">
+          <LearningResults results={learningResults} onRefresh={fetchResults} />
+        </TabsContent>
+      </Tabs>
+
+      {/* Show message when no results are available */}
+      {courseResults.length === 0 &&
+        learningResults.length === 0 &&
+        !loading &&
+        !error && (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                  <BookOpen className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900">
+                  No Results Available
+                </h3>
+                <p className="text-sm text-gray-500">
+                  You don't have any published results yet. Results will appear
+                  here once they are published by your instructors.
+                </p>
+                <Button onClick={fetchResults} variant="outline">
+                  Refresh
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+    </div>
+  );
+}
