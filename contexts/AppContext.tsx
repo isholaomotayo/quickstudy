@@ -2,12 +2,12 @@
 
 import type React from "react";
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
 } from "react";
 import { useRouter } from "next/navigation";
 
@@ -185,6 +185,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         "userId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       document.cookie =
         "institutionId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie =
+        "userSignature=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie =
+        "roleSignature=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      
+      // Clear the userData state
+      setUserData(null);
+      
+      // Reset retry count
+      retryCount.current = 0;
     }
   }, []);
 

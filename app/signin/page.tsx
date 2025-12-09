@@ -28,6 +28,7 @@ import {
     userLogin,
 } from "../../helpers/FetchWrapper";
 import { setAuthCookies } from "../../helpers/utils";
+import { useApp } from "../../contexts/AppContext";
 
 interface SigninState {
   resetCode?: string;
@@ -52,6 +53,7 @@ interface SigninState {
 function SigninComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const appContext = useApp();
 
   if (!searchParams) {
     return null;
@@ -81,11 +83,28 @@ function SigninComponent() {
     const checkAuthAndLoadInstitution = async () => {
       // Handle logout
       if (searchParams.get("logout")) {
+        // Clear all auth cookies
         removeCookies({}, "token", { path: "/" });
         removeCookies({}, "role", { path: "/" });
         removeCookies({}, "userId", { path: "/" });
         removeCookies({}, "userData", { path: "/" });
         removeCookies({}, "institutionId", { path: "/" });
+        removeCookies({}, "userSignature", { path: "/" });
+        removeCookies({}, "roleSignature", { path: "/" });
+        
+        // Clear context
+        if (appContext?.clearAuthCookies) {
+          appContext.clearAuthCookies();
+        }
+        
+        // Clear local state
+        setState((prev) => ({
+          ...prev,
+          email: "",
+          password: "",
+          error: undefined,
+        }));
+        
         return;
       }
 
@@ -170,10 +189,12 @@ function SigninComponent() {
           redirectUrl = "/affiliate";
         } else if (userRole === "STUDENT") {
           redirectUrl = "/students";
+        } else if (userRole === "SUPERADMIN") {
+          redirectUrl = "/ops";
         } else if (userRole === "STAFF" || userRole === "LECTURER") {
-          redirectUrl = "/staff";
-        } else if (userRole && userRole.slice(-5) === "ADMIN") {
-          redirectUrl = "/admin";
+          redirectUrl = "/manage";
+        } else if (userRole && userRole.endsWith("ADMIN")) {
+          redirectUrl = "/manage";
         }
 
         // Check for redirect parameter

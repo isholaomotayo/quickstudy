@@ -94,10 +94,17 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Get student info
+    // Get student info with only necessary fields
     const student = await prisma.student.findFirst({
       where: {
         user_id: BigInt(user.id),
+      },
+      select: {
+        id: true,
+        programme_id: true,
+        semester_admitted_id: true,
+        entry_level_id: true,
+        session_admitted_id: true,
       },
     });
 
@@ -110,13 +117,20 @@ export async function GET(req: NextRequest) {
     if (student.programme_id) {
       const programme = await prisma.programme.findFirst({
         where: { id: student.programme_id },
+        select: { name: true },
       });
       programmeName = programme?.name || null;
     }
 
-    // Add programme name to student data
-    const studentData: any = {
-      ...student,
+    // Return only the fields needed by frontend
+    const studentData: {
+      id: string;
+      programme_name: string | null;
+      current_semester?: string | null;
+      current_level_id?: number;
+      current_level?: number;
+    } = {
+      id: student.id.toString(),
       programme_name: programmeName,
     };
 
@@ -198,21 +212,50 @@ export async function GET(req: NextRequest) {
           },
         },
         include: {
-          grade: true,
+          grade: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           student_course: {
             include: {
-              course: true,
-              semester: true,
+              course: {
+                select: {
+                  id: true,
+                  code: true,
+                  name: true,
+                  units: true,
+                },
+              },
+              semester: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
         },
+        orderBy: {
+          created_at: 'desc',
+        },
       });
 
-      // Transform snake_case to camelCase for frontend compatibility
+      // Map name to title for frontend compatibility
       allStudentResult = rawResults.map((result) => ({
         ...result,
-        studentcourse: result.student_course,
-        student_course: undefined,
+        student_course: result.student_course
+          ? {
+              ...result.student_course,
+              course: result.student_course.course
+                ? {
+                    ...result.student_course.course,
+                    title: result.student_course.course.name,
+                  }
+                : null,
+            }
+          : null,
       }));
     }
 
