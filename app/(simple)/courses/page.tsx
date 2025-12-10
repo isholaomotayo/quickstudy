@@ -50,8 +50,6 @@ export default function CoursesPage() {
       try {
         setLoading(true);
         const courses = await api.get(`/api/course`);
-        console.log("Fetched courses data:", courses);
-
   
         // Transform the data to match our interface
         const transformedCourses: Course[] = courses.data.map((course: any) => ({

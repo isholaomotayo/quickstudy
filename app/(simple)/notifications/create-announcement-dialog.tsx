@@ -60,9 +60,9 @@ export function CreateAnnouncementDialog({ onAnnouncementCreated }: CreateAnnoun
     try {
       const response = await fetch("/api/schoolAnnouncement", {
         method: "POST",
+        credentials: "include", // Automatically sends cookies securely
         headers: {
           "Content-Type": "application/json",
-          "Cookie": document.cookie,
         },
         body: JSON.stringify({
           title: title,

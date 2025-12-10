@@ -15,9 +15,7 @@ import {
   getInstituionByParams,
   resetPassword,
   sendForgotPasswordLink,
-  userLogin,
 } from "../helpers/FetchWrapper";
-import { setAuthCookies } from "../helpers/utils";
 
 const cookieExpiry = 1000 * 60 * 60 * 24 * 365;
 
@@ -134,74 +132,85 @@ class Login extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    let login = await userLogin(this.state);
-
-    if (login.status === 200) {
-      login = await login.json();
-
-      setAuthCookies(login);
-
-      let userRole = login.role;
-
-      this.setState({
-        username: "",
-        email: "",
-        password: "",
+    try {
+      // Use the new Next.js API route which sets signed cookies
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: this.state.email,
+          password: this.state.password,
+        }),
       });
 
-      // check role and set appropriate redirect url
-      if (userRole == "APPLICANT") {
-        this.setState(
-          {
-            url: "/applicant",
-            toDashboard: true,
-          },
-          () => this.checkRedirect()
-        );
-      } else if (userRole == "AFFILIATE") {
-        this.setState(
-          {
-            url: "/affiliate",
-            toDashboard: true,
-          },
-          () => this.checkRedirect()
-        );
-      } else if (userRole == "STUDENT") {
-        this.setState(
-          {
-            url: "/students",
-            toDashboard: true,
-          },
-          () => this.checkRedirect()
-        );
-      } else if (userRole == "STAFF" || userRole == "LECTURER") {
-        this.setState(
-          {
-            url: "/staff",
-            toDashboard: true,
-          },
-          () => this.checkRedirect()
-        );
-      } else if (userRole && userRole.slice(-5) == "ADMIN") {
-        this.setState(
-          {
-            url: "/admin",
-            toDashboard: true,
-          },
-          () => this.checkRedirect()
-        );
-      }
-    } else {
-      if (login.status === 401) {
-        toast.error("Email or Password Incorrect. Try again");
+      if (response.ok) {
+        const login = await response.json();
+        const userRole = login.role;
+
+        this.setState({
+          username: "",
+          email: "",
+          password: "",
+        });
+
+        // check role and set appropriate redirect url
+        if (userRole == "APPLICANT") {
+          this.setState(
+            {
+              url: "/applicant",
+              toDashboard: true,
+            },
+            () => this.checkRedirect()
+          );
+        } else if (userRole == "AFFILIATE") {
+          this.setState(
+            {
+              url: "/affiliate",
+              toDashboard: true,
+            },
+            () => this.checkRedirect()
+          );
+        } else if (userRole == "STUDENT") {
+          this.setState(
+            {
+              url: "/students",
+              toDashboard: true,
+            },
+            () => this.checkRedirect()
+          );
+        } else if (userRole == "STAFF" || userRole == "LECTURER") {
+          this.setState(
+            {
+              url: "/staff",
+              toDashboard: true,
+            },
+            () => this.checkRedirect()
+          );
+        } else if (userRole && userRole.slice(-5) == "ADMIN") {
+          this.setState(
+            {
+              url: "/admin",
+              toDashboard: true,
+            },
+            () => this.checkRedirect()
+          );
+        }
       } else {
-        const error = await login.json();
-        if (error.message.includes("Your account has been deactivated")) {
-          toast.error(error.message);
+        if (response.status === 401) {
+          toast.error("Email or Password Incorrect. Try again");
         } else {
-          toast.error("Login Error! Please try again");
+          const errorData = await response.json();
+          if (errorData.error?.includes("Your account has been deactivated")) {
+            toast.error(errorData.error);
+          } else {
+            toast.error(errorData.error || "Login Error! Please try again");
+          }
         }
       }
+    } catch (error) {
+      toast.error("Network error. Please try again.");
     }
   };
 

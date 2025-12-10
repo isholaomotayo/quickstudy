@@ -11,23 +11,21 @@ import { Label } from "../../components/ui/label";
 import { GlassCard } from "../../components/ui/glass-card";
 import { OptimizedDynamicBackground } from "@/components/ui/webgl-mesh-gradient";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "../../components/ui/dialog";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { AlertTriangle, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import {
-    getAuthData,
-    getInstituionByParams,
-    resetPassword,
-    sendForgotPasswordLink,
-    userLogin,
+  getAuthData,
+  getInstituionByParams,
+  resetPassword,
+  sendForgotPasswordLink,
 } from "../../helpers/FetchWrapper";
-import { setAuthCookies } from "../../helpers/utils";
 import { useApp } from "../../contexts/AppContext";
 
 interface SigninState {
@@ -83,18 +81,28 @@ function SigninComponent() {
     const checkAuthAndLoadInstitution = async () => {
       // Handle logout
       if (searchParams.get("logout")) {
-        // Clear all auth cookies
-        removeCookies({}, "token", { path: "/" });
-        removeCookies({}, "role", { path: "/" });
-        removeCookies({}, "userId", { path: "/" });
-        removeCookies({}, "userData", { path: "/" });
-        removeCookies({}, "institutionId", { path: "/" });
-        removeCookies({}, "userSignature", { path: "/" });
-        removeCookies({}, "roleSignature", { path: "/" });
-        
+        try {
+          // Call backend to delete httpOnly cookies
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+        } catch (error) {
+          console.error('Error calling logout API:', error);
+        }
+
+        // Clear client-side cookies
+        const cookieOptions = { path: "/" };
+        removeCookies(null, "userData", cookieOptions);
+        removeCookies(null, "role", cookieOptions);
+        removeCookies(null, "userId", cookieOptions);
+        removeCookies(null, "institutionId", cookieOptions);
+
         // Clear context
         if (appContext?.clearAuthCookies) {
-          appContext.clearAuthCookies();
+          await appContext.clearAuthCookies();
         }
         
         // Clear local state
@@ -164,14 +172,21 @@ function SigninComponent() {
     setState((prev) => ({ ...prev, isLoading: true, error: undefined }));
 
     try {
-      let login = await userLogin(state);
+      // Use the new Next.js API route which sets signed cookies
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: state.email,
+          password: state.password,
+        }),
+      });
 
-      if (login.status === 200) {
-        const loginData = await login.json();
-
-        setAuthCookies(loginData);
-
-        let userRole = loginData.role;
+      if (response.ok) {
+        const loginData = await response.json();
+        const userRole = loginData.role;
 
         setState((prev) => ({
           ...prev,
@@ -212,19 +227,19 @@ function SigninComponent() {
       } else {
         setState((prev) => ({ ...prev, isLoading: false }));
 
-        if (login.status === 401) {
+        if (response.status === 401) {
           setState((prev) => ({
             ...prev,
             error: "Email or Password Incorrect. Please try again.",
           }));
         } else {
-          const error = await login.json();
-          if (error.message.includes("Your account has been deactivated")) {
-            setState((prev) => ({ ...prev, error: error.message }));
+          const errorData = await response.json();
+          if (errorData.error?.includes("Your account has been deactivated")) {
+            setState((prev) => ({ ...prev, error: errorData.error }));
           } else {
             setState((prev) => ({
               ...prev,
-              error: "Login Error! Please try again.",
+              error: errorData.error || "Login Error! Please try again.",
             }));
           }
         }

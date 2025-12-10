@@ -4,10 +4,11 @@ import Script from "next/script";
 import { Toaster } from "sonner";
 import { AppProvider } from "@/contexts/AppContext";
 import SWRProvider from "@/components/providers/SWRProvider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 export const metadata: Metadata = {
-  title: "iLearn - Student Portal",
-  description: "Student Dashboard and Learning Management System",
+  title: "QuickStudy Portal",
+  description: "Learning dashboard and student services for QuickStudy.",
 };
 
 export default function RootLayout({
@@ -16,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <Script
           src="https://js.paystack.co/v2/inline.js"
@@ -24,17 +25,19 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <AppProvider>
-          <SWRProvider>
-            {children}
-            <Toaster
-              position="top-right"
-              duration={4000}
-              richColors
-              closeButton
-            />
-          </SWRProvider>
-        </AppProvider>
+        <ThemeProvider>
+          <AppProvider>
+            <SWRProvider>
+              {children}
+              <Toaster
+                position="top-right"
+                duration={4000}
+                richColors
+                closeButton
+              />
+            </SWRProvider>
+          </AppProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

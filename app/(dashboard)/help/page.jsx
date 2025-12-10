@@ -1,6 +1,5 @@
 "use client";
 
-import { getCookies } from "cookies-next";
 import {
 	ArrowLeft,
 	ChevronDown,
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import KnowledgeBaseData from "./data";
+import { useUser } from "@/contexts/AppContext";
 
 export default function HelpSupportPage() {
 	const [mounted, setMounted] = useState(false);
@@ -34,18 +34,19 @@ export default function HelpSupportPage() {
 		KnowledgeBaseData.getByRole("student"),
 	);
 	const [filteredKnowledge, setFilteredKnowledge] = useState([]);
+	const { userData, isLoading } = useUser();
 
 	useEffect(() => {
 		setMounted(true);
-		// Get user role from cookie using cookies-next
-		Promise.resolve(getCookies()).then((cookies) => {
-			const currentRole = cookies.role || "student"; // Default to student if no role cookie
+		// Get user role from AppContext (secure, verified)
+		if (!isLoading && userData) {
+			const currentRole = userData.role || "student"; // Default to student if no role
 
 			const data = KnowledgeBaseData.getByRole(currentRole);
 			setRoleData(data);
 			setFilteredKnowledge(data.knowledgeBase);
-		});
-	}, []);
+		}
+	}, [userData, isLoading]);
 
 	useEffect(() => {
 		if (searchQuery && roleData.knowledgeBase) {

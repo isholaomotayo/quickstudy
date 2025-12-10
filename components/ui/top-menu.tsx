@@ -152,7 +152,7 @@ export function TopMenu(
   };
 
   return (
-    <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200">
+    <div className="border-b border-border bg-card/80 backdrop-blur">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center gap-6 overflow-x-auto">
           {navigation.map((item) => {
@@ -165,8 +165,8 @@ export function TopMenu(
                 href={item.href}
                 className={`flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors ${
                   active
-                    ? "text-blue-600 border-b-2 border-blue-600 pb-1"
-                    : "text-gray-600 hover:text-blue-600"
+                    ? "text-primary border-b-2 border-primary pb-1"
+                    : "text-muted-foreground hover:text-primary"
                 }`}
               >
                 <IconComponent className="w-4 h-4" />

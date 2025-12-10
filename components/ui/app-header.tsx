@@ -3,6 +3,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUserData } from "@/hooks/useUserData";
 import { Button } from "./button";
+import { Badge } from "./badge";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function AppHeader({
   title,
@@ -28,33 +30,58 @@ export default function AppHeader({
 
     return "/"; // Default fallback
   };
+
+  const homeLink = getHomeLink();
+
   return (
-    <div className="flex items-center space-x-4">
-      {showBackButton && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="gap-2"
-          onClick={() => router.back()}
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Back
-        </Button>
-      )}
-      {title ? (
-        title
-      ) : (
-        <>
-          <Link href={getHomeLink()}>
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <GraduationCap className="w-6 h-6 text-white" />
+    <div className="flex flex-col gap-3 rounded-xl border border-border/80 bg-card/80 px-4 py-3 shadow-sm backdrop-blur">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {showBackButton && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+              onClick={() => router.back()}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back
+            </Button>
+          )}
+
+          <Link href={homeLink} className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+              <GraduationCap className="w-5 h-5" />
+            </div>
+            <div className="leading-tight">
+              <p className="text-sm font-semibold text-foreground">QuickStudy</p>
+              <p className="text-xs text-muted-foreground">
+                Focused learning, simplified.
+              </p>
             </div>
           </Link>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            HyperLearn Portal
-          </h1>
-        </>
-      )}
+
+          {title && (
+            <div className="flex items-center gap-2 border-l border-border/70 pl-3 text-sm font-medium text-foreground">
+              {title}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {userData?.role && (
+            <Badge variant="outline" className="border-border text-foreground">
+              {userData.role}
+            </Badge>
+          )}
+          <Link href={homeLink}>
+            <Button variant="outline" size="sm" className="border-border">
+              Home
+            </Button>
+          </Link>
+          <ThemeToggle />
+        </div>
+      </div>
     </div>
   );
 }

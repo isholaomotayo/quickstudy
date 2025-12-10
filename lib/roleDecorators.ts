@@ -1,14 +1,13 @@
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 import React from 'react';
 import { UserRole, RoleOptions, DEFAULT_ROLE_OPTIONS, canAccess, hasAnyRole, hasAllRoles, isRejectedRole } from './roles';
+import { getUserFromSecureCookies } from './api-auth';
 
-// Helper function to get user role from cookies (server-side)
+// Helper function to get user role from cookies (server-side) with signature verification
 async function getUserRoleFromCookies(): Promise<UserRole | null> {
   try {
-    const cookieStore = await cookies();
-    const role = cookieStore.get('role')?.value;
-    return role as UserRole || null;
+    const user = await getUserFromSecureCookies(); // ✅ Verifies signatures
+    return user?.role || null;
   } catch (error) {
     console.error('Error getting user role from cookies:', error);
     return null;
@@ -16,10 +15,18 @@ async function getUserRoleFromCookies(): Promise<UserRole | null> {
 }
 
 // Helper function to get user role from context (client-side)
+// Reads from AppContext which verifies signatures
 function getUserRoleFromContext(): UserRole | null {
   if (typeof window === 'undefined') return null;
-  
+
   try {
+    // Try to read from window.__APP_USER_DATA set by AppContext
+    const appUserData = (window as any).__APP_USER_DATA;
+    if (appUserData?.role) {
+      return appUserData.role as UserRole;
+    }
+
+    // Fallback: read from cookie (will be rejected by server if tampered)
     const getCookieValue = (name: string): string | null => {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -28,7 +35,7 @@ function getUserRoleFromContext(): UserRole | null {
       }
       return null;
     };
-    
+
     const role = getCookieValue('role');
     return role as UserRole || null;
   } catch (error) {

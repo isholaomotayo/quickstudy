@@ -210,6 +210,13 @@ export function CalendarClient() {
     }
   };
 
+  // Redirect to login if not authenticated (must be in useEffect to avoid render-time updates)
+  useEffect(() => {
+    if (!userLoading && !userData) {
+      router.push("/signin");
+    }
+  }, [userLoading, userData, router]);
+
   useEffect(() => {
     if (!userLoading && userData) {
       fetchData();
@@ -424,8 +431,8 @@ export function CalendarClient() {
     }
   };
 
-  // Show loading if user authentication is still being checked
-  if (userLoading) {
+  // Show loading if user authentication is still being checked or if not authenticated
+  if (userLoading || !userData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
         <div className="max-w-6xl mx-auto space-y-8">
@@ -448,12 +455,6 @@ export function CalendarClient() {
         </div>
       </div>
     );
-  }
-
-  // Redirect to login if not authenticated
-  if (!userData) {
-    router.push("/signin");
-    return null;
   }
 
   if (loading) {

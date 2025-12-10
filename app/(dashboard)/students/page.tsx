@@ -10,27 +10,23 @@ import {
   Clock,
   CreditCard,
   Eye,
-  FileText,
-  GraduationCap,
-  Globe,
-  HelpCircle,
-  Mail,
+  Globe, Mail,
   MessageCircle,
   Phone,
   TrendingUp,
   Users,
-  MessageSquare,
+  MessageSquare
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserProfile } from "@/components/ui/user-profile";
 import FutureStudentLanding from "@/components/FutureStudentLanding";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-wrapper";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 
 interface DashboardData {
   student: {
@@ -180,420 +176,320 @@ export default function StudentDashboard() {
     : "ST";
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Left Column */}
-      <div className="lg:col-span-4 grid gap-6">
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-left duration-700">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 text-blue-600 mb-2">
-              <Users className="w-4 h-4" />
-              <span className="text-sm font-medium">WELCOME</span>
-              <ChevronRight className="w-4 h-4" />
+    <div className="space-y-6">
+      <section className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+        <Card className="xl:col-span-8 border border-slate-100 shadow-sm bg-white">
+          <CardContent className="p-5 space-y-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-emerald-700">
+                  <Users className="w-4 h-4" />
+                  <span className="text-sm font-medium">Welcome back</span>
+                  <ChevronRight className="w-4 h-4" />
+                  <span className="text-sm text-slate-500">{studentName}</span>
+                </div>
+                <h1 className="text-2xl font-semibold text-slate-900">
+                  Your Academic information
+                </h1>
+     
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Link href="/courses">
+                  <Button size="sm" className="gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    Continue
+                  </Button>
+                </Link>
+                <Link href="/profile">
+                  <Button variant="outline" size="sm" className="gap-2 border-slate-200">
+                    <Eye className="w-4 h-4" />
+                    Profile
+                  </Button>
+                </Link>
+              </div>
             </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <UserProfile
-              customRole={dashboardData.student?.programme_name || "N/A"}
-              variant="detailed"
-              size="lg"
-            />
-            <Link href="/profile">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full gap-2 bg-white/50 backdrop-blur-sm mt-4"
-              >
-                <Eye className="w-4 h-4" />
-                View Profile
-              </Button>
-            </Link>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3">
+                <p className="text-xs uppercase tracking-wide text-slate-500">
+                  Programme
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  {dashboardData.student?.programme_name || "N/A"}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3">
+                <p className="text-xs uppercase tracking-wide text-slate-500">
+                  Admission session
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  {dashboardData.admittedSession?.name || "Not assigned"}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-3">
+                <p className="text-xs uppercase tracking-wide text-slate-500">
+                  Status
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">
+                  {dashboardData.userData?.role || "Student"}
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Course Registration Card */}
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-left duration-700 delay-100">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 text-emerald-600 mb-2">
-              <CheckCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                COURSE REGISTRATION APPROVALS
-              </span>
-              <ChevronRight className="w-4 h-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-4">
+        <Card className="xl:col-span-4 border border-slate-100 shadow-sm bg-gradient-to-br from-primary/10 via-white to-white dark:from-primary/20 dark:via-slate-900 dark:to-slate-950">
+          <CardContent className="p-5 space-y-3">
+            <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                  Current Semester
-                </h3>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                    <span className="text-sm font-medium">Approved</span>
-                  </div>
-                  <Badge className="bg-emerald-100 text-emerald-700">
-                    {dashboardData.approvedRegistrationsSize}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                    <span className="text-sm font-medium">Unapproved</span>
-                  </div>
-                  <Badge className="bg-amber-100 text-amber-700">
-                    {dashboardData.unApprovedRegistrationsSize}
-                  </Badge>
-                </div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Profile</p>
+                <p className="text-lg font-semibold mt-1 text-foreground">{studentName || "Student"}</p>
+                <p className="text-sm text-muted-foreground">
+                  {dashboardData.student?.programme_name || "Programme"}
+                </p>
               </div>
+              <Badge className="bg-primary/10 text-primary border-primary/20">{initials}</Badge>
             </div>
-            <Link href="/course-register">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full gap-2 bg-white/50 backdrop-blur-sm mt-4"
-              >
-                <Eye className="w-4 h-4" />
-                Show more
+            <Separator className="bg-border/60" />
+            <div className="flex items-center gap-3 text-sm text-foreground">
+              <CheckCircle className="w-4 h-4 text-primary" />
+              <span>Keep your details up to date.</span>
+            </div>
+            <Link href="/profile">
+              <Button variant="secondary" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                Manage profile
               </Button>
             </Link>
           </CardContent>
         </Card>
+      </section>
 
-        {/* Connect & Collaborate Card */}
-        <Card className="bg-gradient-to-br from-blue-500 to-purple-600 text-white border-0 shadow-xl animate-in slide-in-from-left duration-700 delay-200">
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" />
-                <span className="text-xs font-medium opacity-90">
-                  CONNECT & COLLABORATE
-                </span>
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <Card className="border border-slate-100 shadow-sm bg-[radial-gradient(circle_at_20%_20%,rgba(20,184,166,0.08),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(59,130,246,0.06),transparent_35%)]">
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-600">
+                <TrendingUp className="w-4 h-4" />
+                <span className="text-sm font-medium">Cumulative GPA</span>
               </div>
-              <h3 className="text-lg font-bold">
-                Join discussions and ask questions
-              </h3>
-              <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-white/70" />
-              </div>
-            </div>
-            <Link href="/connect">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-white/20 hover:bg-white/30 text-white border-0 mt-3 text-xs"
-              >
-                Get Started
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* OER Resources Card */}
-        <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0 shadow-xl animate-in slide-in-from-left duration-700 delay-300">
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4" />
-                <span className="text-xs font-medium opacity-90">
-                  OPEN EDUCATIONAL RESOURCES
-                </span>
-              </div>
-              <h3 className="text-lg font-bold">
-                Free learning resources from top universities
-              </h3>
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-white/70" />
-              </div>
-            </div>
-            <Link href="/oer">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-white/20 hover:bg-white/30 text-white border-0 mt-3 text-xs"
-              >
-                Explore Resources
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Middle Column */}
-      <div className="lg:col-span-4 grid gap-6">
-        {/* Payments Card */}
-        <Card className="bg-gradient-to-br from-purple-600 to-purple-700 text-white border-0 shadow-xl animate-in slide-in-from-top duration-700">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 mb-2">
-              <CreditCard className="w-4 h-4" />
-              <span className="text-sm font-medium opacity-90">PAYMENTS</span>
-              <ChevronRight className="w-4 h-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-3">
-              <div className="space-y-1 text-sm opacity-90">
-                <div className="flex items-center justify-between">
-                  <span>Tuition Fees</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Registration Fee</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Exam Fee</span>
-                </div>
-              </div>
-            </div>
-            <Link href="/payments">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="w-full bg-white/20 hover:bg-white/30 text-white border-0 mt-4"
-              >
-                View Payments
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* GPA Card */}
-        <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0 shadow-xl animate-in slide-in-from-top duration-700 delay-100">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-4 h-4" />
-              <span className="text-sm font-medium opacity-90">
-                CUMULATIVE GPA
-              </span>
-              <ChevronRight className="w-4 h-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-3">
-              <div className="text-4xl font-bold">
-                {dashboardData.studentGpa?.cumulative_gpa || "N/A"}
-              </div>
-              <p className="text-sm opacity-90">
-                {dashboardData.studentGpa?.class_degree?.name || "N/A"}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 mt-4">
-              <BarChart3 className="w-4 h-4" />
-              <Link href="/cgpa">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs"
-                >
-                  View GPA
-                </Button>
+              <Link href="/cgpa" className="text-xs text-emerald-700 hover:underline">
+                View
               </Link>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Online Learning Card */}
-        <Card className="bg-gradient-to-r from-slate-600 to-slate-700 text-white border-0 shadow-xl animate-in slide-in-from-bottom duration-700 delay-200">
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4" />
-                <span className="text-xs font-medium opacity-90">
-                  ONLINE EDUCATION
-                </span>
-              </div>
-              <h3 className="text-lg font-bold">
-                Learning at your convenience
-              </h3>
-              <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white/70" />
-              </div>
-            </div>
-            <Link href="/courses">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-white/20 hover:bg-white/30 text-white border-0 text-xs mt-3"
-              >
-                Get Started
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* Course Results Card */}
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-bottom duration-700 delay-300">
-          <CardHeader>
-            <CardTitle className="text-emerald-600 text-lg">
-              Course Results
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {dashboardData.allStudentResult &&
-              dashboardData.allStudentResult.length > 0 ? (
-                dashboardData.allStudentResult
-                  .slice(0, 1)
-                  .map((studentresult) => (
-                    <div
-                      key={studentresult.id}
-                      className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg"
-                    >
-                      <div>
-                        <p className="font-bold text-gray-900">
-                          {studentresult.student_course?.course?.code || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {studentresult.student_course?.course?.title ||
-                            "Course Title"}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-emerald-600">
-                          {studentresult.student_course?.course?.units || 0}
-                        </div>
-                        <Badge className="bg-emerald-100 text-emerald-700 text-xs">
-                          {studentresult.score}
-                          {studentresult.grade?.name || ""}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))
-              ) : (
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-lg">
-                  <p className="text-gray-600">No results available</p>
-                </div>
-              )}
-            </div>
-            <Link href="/results">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 bg-white/50 backdrop-blur-sm mt-4"
-              >
-                <Eye className="w-4 h-4" />
-                View more results
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Right Column */}
-      <div className="lg:col-span-4 grid gap-6">
-        {/* Help & Support Card */}
-        <Card className="bg-gradient-to-br from-slate-700 to-slate-800 text-white border-0 shadow-xl animate-in slide-in-from-right duration-700">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2 mb-2">
-              <HelpCircle className="w-4 h-4" />
-              <span className="text-sm font-medium opacity-90">
-                HELP & SUPPORT
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-semibold text-slate-900">
+                {dashboardData.studentGpa?.cumulative_gpa || "N/A"}
               </span>
+              <Badge variant="outline" className="border-emerald-200 text-emerald-700">
+                {dashboardData.studentGpa?.class_degree?.name || "Pending"}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-slate-100 shadow-sm bg-[radial-gradient(circle_at_15%_30%,rgba(34,197,94,0.08),transparent_40%),radial-gradient(circle_at_90%_0%,rgba(251,191,36,0.08),transparent_45%)]">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-600">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-sm font-medium">Course registration</span>
+              </div>
+              <Link href="/course-register" className="text-xs text-emerald-700 hover:underline">
+                Review
+              </Link>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="rounded-lg border border-slate-100 bg-white/70 p-2.5">
+                <p className="text-[11px] text-muted-foreground">Registered</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-slate-400" />
+                  <span className="text-sm font-semibold text-slate-900">
+                    {dashboardData.approvedRegistrationsSize + dashboardData.unApprovedRegistrationsSize}
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-lg border border-slate-100 bg-white/70 p-2.5">
+                <p className="text-[11px] text-muted-foreground">Approved</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  <span className="text-sm font-semibold text-slate-900">
+                    {dashboardData.approvedRegistrationsSize}
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-lg border border-slate-100 bg-white/70 p-2.5">
+                <p className="text-[11px] text-muted-foreground">Pending</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
+                  <span className="text-sm font-semibold text-slate-900">
+                    {dashboardData.unApprovedRegistrationsSize}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-slate-100 shadow-sm bg-[radial-gradient(circle_at_30%_20%,rgba(14,116,144,0.08),transparent_40%),radial-gradient(circle_at_100%_10%,rgba(34,197,235,0.07),transparent_45%)]">
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-600">
+                <CreditCard className="w-4 h-4" />
+                <span className="text-sm font-medium">Payments</span>
+              </div>
+              <Link href="/payments" className="text-xs text-emerald-700 hover:underline">
+                View
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs text-slate-700">
+              <div className="flex items-center gap-2 rounded-lg bg-slate-50 p-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                Tuition
+              </div>
+              <div className="flex items-center gap-2 rounded-lg bg-slate-50 p-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                Registration
+              </div>
+              <div className="flex items-center gap-2 rounded-lg bg-slate-50 p-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                Exams
+              </div>
+              <div className="flex items-center gap-2 rounded-lg bg-slate-50 p-2">
+                <span className="h-2 w-2 rounded-full bg-slate-300" />
+                Receipts
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-slate-100 shadow-sm">
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-600">
+                <Calendar className="w-4 h-4" />
+                <span className="text-sm font-medium">Schedule</span>
+              </div>
+              <Link href="/calendar" className="text-xs text-emerald-700 hover:underline">
+                Open
+              </Link>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-700">
+              <Clock className="w-4 h-4 text-emerald-600" />
+              Current semester dates
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-700">
+              <Bell className="w-4 h-4 text-emerald-600" />
+              Latest announcements
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-2 border border-slate-100 shadow-sm bg-[radial-gradient(circle_at_15%_15%,rgba(20,184,166,0.06),transparent_35%),radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.05),transparent_40%)]">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-slate-700">
+                <BarChart3 className="w-4 h-4" />
+                <CardTitle className="text-base">Course results</CardTitle>
+              </div>
+              <Link href="/results" className="text-xs text-emerald-700 hover:underline">
+                View all
+              </Link>
             </div>
           </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">Need assistance?</h3>
-              <p className="text-sm opacity-80">
-                Our support team is here to help you with any questions or
-                issues.
-              </p>
-              <div className="grid grid-cols-3 gap-2">
+          <CardContent className="space-y-2">
+            {dashboardData.allStudentResult && dashboardData.allStudentResult.length > 0 ? (
+              dashboardData.allStudentResult.slice(0, 2).map((studentresult) => (
+                <div
+                  key={studentresult.id}
+                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/70 p-3"
+                >
+                  <div>
+                    <p className="font-semibold text-slate-900">
+                      {studentresult.student_course?.course?.code || "N/A"}
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      {studentresult.student_course?.course?.title || "Course title"}
+                    </p>
+                  </div>
+                  <div className="text-right space-y-1">
+                    <Badge variant="outline" className="border-emerald-200 text-emerald-700">
+                      {studentresult.score}
+                      {studentresult.grade?.name || ""}
+                    </Badge>
+                    <p className="text-[11px] text-slate-500">
+                      {studentresult.student_course?.course?.units || 0} units
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-lg border border-dashed border-slate-200 p-4 text-sm text-slate-500">
+                No results available yet.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border border-slate-100 shadow-sm">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2 text-slate-700">
+              <MessageSquare className="w-4 h-4" />
+              <CardTitle className="text-base">Community & support</CardTitle>
+            </div>
+            <div className="space-y-2 text-sm text-slate-700">
+              <Link
+                href="/connect"
+                className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2 hover:border-emerald-200"
+              >
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4 text-emerald-600" />
+                  <span>Join discussions</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </Link>
+              <Link
+                href="/oer"
+                className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2 hover:border-emerald-200"
+              >
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-emerald-600" />
+                  <span>OER library</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </Link>
+              <div className="grid grid-cols-3 gap-2 text-xs text-slate-700">
                 <a
                   href="https://wa.me/2348167667864"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-col items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors cursor-pointer"
+                  className="flex flex-col items-center rounded-md border border-slate-100 px-2 py-2 hover:border-emerald-200"
                 >
-                  <MessageCircle className="w-6 h-6 mb-1" />
-                  <span className="text-xs">WhatsApp</span>
+                  <MessageCircle className="w-4 h-4 mb-1 text-emerald-600" />
+                  WhatsApp
                 </a>
                 <a
                   href="tel:+2348167667864"
-                  className="flex flex-col items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors cursor-pointer"
+                  className="flex flex-col items-center rounded-md border border-slate-100 px-2 py-2 hover:border-emerald-200"
                 >
-                  <Phone className="w-6 h-6 mb-1" />
-                  <span className="text-xs">Call</span>
+                  <Phone className="w-4 h-4 mb-1 text-emerald-600" />
+                  Call
                 </a>
                 <a
                   href={`mailto:${
-                    process.env.NEXT_PUBLIC_SUPPORT_EMAIL ||
-                    "support@hyperlearn.ng"
+                    process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@hyperlearn.ng"
                   }`}
-                  className="flex flex-col items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors cursor-pointer"
+                  className="flex flex-col items-center rounded-md border border-slate-100 px-2 py-2 hover:border-emerald-200"
                 >
-                  <Mail className="w-6 h-6 mb-1" />
-                  <span className="text-xs">Email</span>
+                  <Mail className="w-4 h-4 mb-1 text-emerald-600" />
+                  Email
                 </a>
               </div>
             </div>
-            <Link href="/help">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="w-full bg-white/20 hover:bg-white/30 text-white border-0 mt-4"
-              >
-                Contact Support
-              </Button>
-            </Link>
           </CardContent>
         </Card>
-
-        {/* Announcements Card */}
-        <Card className="bg-gradient-to-br from-purple-500 to-pink-600 text-white border-0 shadow-xl animate-in slide-in-from-right duration-700 delay-100">
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4" />
-                <span className="text-xs font-medium opacity-90">
-                  ANNOUNCEMENTS
-                </span>
-              </div>
-              <h3 className="text-lg font-bold">Everything you need to know</h3>
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                <FileText className="w-6 h-6 text-white/70" />
-              </div>
-            </div>
-            <Link href="/notifications">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-white/20 hover:bg-white/30 text-white border-0 mt-3 text-xs"
-              >
-                Read More
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* Academic Calendar Card */}
-        <Card className="bg-gradient-to-br from-teal-500 to-cyan-600 text-white border-0 shadow-xl animate-in slide-in-from-right duration-700 delay-200">
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span className="text-xs font-medium opacity-90">
-                  ACADEMIC CALENDAR
-                </span>
-              </div>
-              <h3 className="text-lg font-bold">
-                School calendar for the current semester
-              </h3>
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                <Clock className="w-6 h-6 text-white/70" />
-              </div>
-            </div>
-            <Link href="/calendar">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-white/20 hover:bg-white/30 text-white border-0 mt-3 text-xs"
-              >
-                View Calendar
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      </section>
     </div>
   );
 }

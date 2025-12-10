@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { createSecureCookieData } from "@/lib/api-auth";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const JWTSECRET = process.env.JWTSECRET || "fallback-secret-key";
 
@@ -194,20 +195,37 @@ export async function POST(req: NextRequest) {
       path: "/",
     });
 
-    // Set user data cookies with signatures for additional security
-    const secureCookieData = createSecureCookieData({
+    // Create userData cookie with all fields (matching old setAuthCookies format)
+    const userDataForCookie = {
       id: userData.id,
-      role: userData.role as any,
       institution_id: userData.institution_id || 0,
-      email: userData.email,
       username: userData.username,
       first_name: userData.first_name,
       last_name: userData.last_name,
+      email: userData.email,
+      role: userData.role,
+      avatar: userData.avatar || "",
+      student_id: studentData?.id?.toString() || "",
+      fee_plan: (studentData as any)?.fee_plan || "",
+      staff_id: staffData?.id?.toString() || "",
+      // Additional fields for compatibility
       programme_id: studentData?.programme_id,
       department_id: staffData?.department_id,
-    });
+    };
 
-    cookieStore.set("userData", secureCookieData.userData, {
+    // Create signatures for security
+    const userDataString = JSON.stringify(userDataForCookie);
+    const AUTH_SECRET = process.env.JWTSECRET || "fallback-secret-key";
+    const userSignature = crypto
+      .createHmac("sha256", AUTH_SECRET)
+      .update(userDataString)
+      .digest("hex");
+    const roleSignature = crypto
+      .createHmac("sha256", AUTH_SECRET)
+      .update(userData.role)
+      .digest("hex");
+
+    cookieStore.set("userData", userDataString, {
       httpOnly: false, // Accessible to client-side JS
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -215,7 +233,7 @@ export async function POST(req: NextRequest) {
       path: "/",
     });
 
-    cookieStore.set("userSignature", secureCookieData.userSignature, {
+    cookieStore.set("userSignature", userSignature, {
       httpOnly: true, // Signature is httpOnly for security
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -223,7 +241,7 @@ export async function POST(req: NextRequest) {
       path: "/",
     });
 
-    cookieStore.set("role", secureCookieData.role, {
+    cookieStore.set("role", userData.role, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -231,8 +249,25 @@ export async function POST(req: NextRequest) {
       path: "/",
     });
 
-    cookieStore.set("roleSignature", secureCookieData.roleSignature, {
+    cookieStore.set("roleSignature", roleSignature, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+      path: "/",
+    });
+
+    // Set additional cookies for backward compatibility with client code
+    cookieStore.set("userId", userData.id, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+      path: "/",
+    });
+
+    cookieStore.set("institutionId", String(userData.institution_id || ""), {
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 365,

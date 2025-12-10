@@ -83,8 +83,8 @@ export default function ApplicantNavLayout({
     }
   }, [userData]);
 
-  const handleLogout = () => {
-    clearAuthCookies();
+  const handleLogout = async () => {
+    await clearAuthCookies();
     router.push("/signin?logout=1");
   };
 

@@ -46,9 +46,9 @@ export function NotificationBell() {
     try {
       const response = await fetch("/api/schoolAnnouncement/unread-count", {
         method: "GET",
+        credentials: "include", // Automatically sends cookies securely
         headers: {
           "Content-Type": "application/json",
-          Cookie: document.cookie,
         },
       });
 
@@ -79,9 +79,9 @@ export function NotificationBell() {
     try {
       const response = await fetch("/api/schoolAnnouncement?pgsize=5&pg=1", {
         method: "GET",
+        credentials: "include", // Automatically sends cookies securely
         headers: {
           "Content-Type": "application/json",
-          Cookie: document.cookie,
         },
       });
 

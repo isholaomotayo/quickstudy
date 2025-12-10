@@ -1,22 +1,22 @@
 "use client";
 
 import {
-    BookOpen,
-    Calendar,
-    Camera,
-    CreditCard,
-    Download,
-    Edit3,
-    Eye,
-    EyeOff,
-    Mail,
-    MapPin,
-    Phone,
-    Save,
-    Shield,
-    TrendingUp,
-    User,
-    X,
+  BookOpen,
+  Calendar,
+  Camera,
+  CreditCard,
+  Download,
+  Edit3,
+  Eye,
+  EyeOff,
+  Mail,
+  MapPin,
+  Phone,
+  Save,
+  Shield,
+  TrendingUp,
+  User,
+  X,
 } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -36,6 +36,7 @@ export default function UserProfile() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const [profileData, setProfileData] = useState({
     firstName: "",
     lastName: "",
@@ -64,6 +65,8 @@ export default function UserProfile() {
   });
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [wantsPasswordChange, setWantsPasswordChange] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
   const [showIDCard, setShowIDCard] = useState(false);
   const [institutionData, setInstitutionData] = useState<any>(null);
   const [studentData, setStudentData] = useState<any>(null);
@@ -111,6 +114,7 @@ export default function UserProfile() {
       // Set institution data for ID card
       setInstitutionData(data.institution || null);
       setStudentData(data || null);
+      setUserId(data.user?.id?.toString() || null);
       // Map API data to component state
       setProfileData({
         firstName: data.user?.first_name,
@@ -153,8 +157,8 @@ export default function UserProfile() {
 
   if (!mounted || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-muted-foreground/40 border-t-primary"></div>
       </div>
     );
   }
@@ -180,21 +184,9 @@ export default function UserProfile() {
         },
       };
 
-      // TODO: Handle password change separately
-      // if (passwordData.currentPassword && passwordData.newPassword && passwordData.confirmPassword) {
-      //   // Handle password change via separate endpoint
-      // }
-
       // Use the new unified profile endpoint with api-wrapper
       const response = await api.put("/api/profile", payload);
       toast.success(response.data.message || "Profile updated successfully");
-
-      // Reset password fields
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
 
       setIsEditing(false);
       await fetchProfileData(); // Refresh data
@@ -213,7 +205,55 @@ export default function UserProfile() {
       newPassword: "",
       confirmPassword: "",
     });
+    setWantsPasswordChange(false);
     await fetchProfileData(); // Reset form data
+  };
+
+  const handlePasswordUpdate = async () => {
+    if (!passwordData.currentPassword) {
+      toast.error("Enter your current password first.");
+      return;
+    }
+
+    if (!passwordData.newPassword || !passwordData.confirmPassword) {
+      toast.error("Enter and confirm your new password.");
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error("New password and confirmation do not match.");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      toast.error("New password must be at least 8 characters.");
+      return;
+    }
+
+    if (!userId) {
+      toast.error("Unable to update password. Please reload and try again.");
+      return;
+    }
+
+    try {
+      setPasswordSaving(true);
+      await api.post(`/api/changePassword/${userId}`, {
+        old_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword,
+      });
+      toast.success("Password updated successfully");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setWantsPasswordChange(false);
+    } catch (error) {
+      console.error("Error updating password:", error);
+      toast.error("Failed to update password");
+    } finally {
+      setPasswordSaving(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -314,26 +354,31 @@ export default function UserProfile() {
   };
 
   return (
-    <>
-      {/* Edit Profile Button - moved to top right */}
-      <div className="flex justify-end mb-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">Profile</h1>
+          <p className="text-sm text-muted-foreground">
+            Keep your QuickStudy details aligned across devices.
+          </p>
+        </div>
         <div className="flex items-center gap-2">
           {isEditing ? (
             <>
               <Button
                 onClick={handleSave}
                 size="sm"
-                className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+                className="gap-2"
                 disabled={saving}
               >
                 <Save className="w-4 h-4" />
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? "Saving..." : "Save changes"}
               </Button>
               <Button
                 onClick={handleCancel}
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="gap-2 bg-transparent"
+                className="gap-2"
                 disabled={saving}
               >
                 <X className="w-4 h-4" />
@@ -348,26 +393,26 @@ export default function UserProfile() {
               className="gap-2"
             >
               <Edit3 className="w-4 h-4" />
-              Edit Profile
+              Edit profile
             </Button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         {/* Left Column - Profile Info */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="space-y-4">
           {/* Profile Picture & Basic Info */}
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-left duration-700">
-            <CardContent className="p-6">
-              <div className="flex flex-col items-center space-y-4">
+          <Card className="border border-border bg-card shadow-sm">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center gap-4">
                 <div className="relative group">
-                  <Avatar className="w-40 h-40 border-4 border-white/20 backdrop-blur-sm shadow-2xl">
+                  <Avatar className="h-20 w-20 border border-border/80 shadow-sm">
                     <AvatarImage
                       src={profileData.avatar || "/images/student-avatar.png"}
                       alt="Profile"
                     />
-                    <AvatarFallback className="bg-white/10 backdrop-blur-md text-blue-700 text-2xl font-bold border border-white/20">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
                       {profileData.firstName?.[0]}
                       {profileData.lastName?.[0]}
                     </AvatarFallback>
@@ -375,27 +420,16 @@ export default function UserProfile() {
 
                   {/* Upload Progress Overlay */}
                   {isUploadingAvatar && (
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md rounded-full flex flex-col items-center justify-center text-white animate-in fade-in duration-300">
-                      <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mb-2"></div>
-                      <div className="text-xs font-medium mb-2 animate-pulse">
-                        Uploading...
-                      </div>
-                      <div className="w-16 h-1 bg-white/30 rounded-full overflow-hidden mb-1">
-                        <div
-                          className="h-full bg-gradient-to-r from-blue-400 to-emerald-400 transition-all duration-300 ease-out rounded-full"
-                          style={{ width: `${uploadProgress}%` }}
-                        ></div>
-                      </div>
-                      <div className="text-xs font-bold text-emerald-300">
-                        {uploadProgress}%
-                      </div>
+                    <div className="absolute inset-0 bg-black/50 rounded-full flex flex-col items-center justify-center text-white">
+                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mb-1"></div>
+                      <div className="text-[11px] font-medium">{uploadProgress}%</div>
                     </div>
                   )}
 
                   {isEditing && !isUploadingAvatar && (
                     <>
-                      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center cursor-pointer">
-                        <Camera className="w-8 h-8 text-white drop-shadow-lg" />
+                      <div className="absolute inset-0 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center justify-center cursor-pointer">
+                        <Camera className="w-5 h-5 text-white" />
                       </div>
                       <input
                         type="file"
@@ -407,72 +441,64 @@ export default function UserProfile() {
                     </>
                   )}
                 </div>
-                <div className="text-center space-y-2">
-                  <h2 className="text-2xl font-bold text-gray-900">
+
+                <div className="flex-1 space-y-1">
+                  <h2 className="text-lg font-semibold text-foreground">
                     {profileData.firstName} {profileData.lastName}
                   </h2>
-                  <p className="text-blue-600 font-medium">
+                  <p className="text-sm text-muted-foreground">
                     {profileData.program}
                   </p>
-                  <Badge className="bg-emerald-100 text-emerald-700">
+                  <Badge variant="outline" className="border-primary/20 text-primary">
                     {profileData.studentId}
                   </Badge>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground">Registered</p>
+                  <p className="text-base font-semibold text-foreground">
+                    {profileData.registeredCourses || "0"}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground">Approved</p>
+                  <p className="text-base font-semibold text-foreground">
+                    {profileData.approvedCourses || "0"}
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Course Registration Stats */}
-          <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0 shadow-xl animate-in slide-in-from-left duration-700 delay-100">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5" />
-                Course Registration
+          <Card className="border border-border bg-card shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                <BookOpen className="w-4 h-4 text-primary" />
+                Course registration
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-2xl font-bold">
-                        {profileData.registeredCourses || "0"}
-                      </div>
-                      <div className="text-sm opacity-90">
-                        Total Courses Registered
-                      </div>
-                      <div className="text-xs opacity-75 mt-1">
-                        Courses you've enrolled in this semester
-                      </div>
-                    </div>
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <BookOpen className="w-6 h-6" />
-                    </div>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-lg border border-border/70 bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground">Registered</p>
+                  <div className="text-xl font-semibold text-foreground">
+                    {profileData.registeredCourses || "0"}
                   </div>
                 </div>
-
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-2xl font-bold">
-                        {profileData.approvedCourses || "0"}
-                      </div>
-                      <div className="text-sm opacity-90">Courses Approved</div>
-                      <div className="text-xs opacity-75 mt-1">
-                        Courses confirmed by academic office
-                      </div>
-                    </div>
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6" />
-                    </div>
+                <div className="rounded-lg border border-border/70 bg-muted/40 p-3">
+                  <p className="text-xs text-muted-foreground">Approved</p>
+                  <div className="text-xl font-semibold text-foreground">
+                    {profileData.approvedCourses || "0"}
                   </div>
                 </div>
               </div>
 
-              {/* Progress indicator */}
-              <div className="pt-2 border-t border-white/20">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span>Registration Progress</span>
+              <div className="pt-1">
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                  <span>Approval progress</span>
                   <span>
                     {(() => {
                       const registered = parseInt(
@@ -491,9 +517,9 @@ export default function UserProfile() {
                     })()}
                   </span>
                 </div>
-                <div className="w-full bg-white/20 rounded-full h-2">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div
-                    className="bg-white rounded-full h-2 transition-all duration-300"
+                    className="bg-primary rounded-full h-2 transition-all duration-300"
                     style={{
                       width: (() => {
                         const registered = parseInt(
@@ -519,403 +545,329 @@ export default function UserProfile() {
             </CardContent>
           </Card>
 
-          {/* ID Card Download - Beautiful Gradient Card */}
-          <Card className="bg-gradient-to-br from-purple-500 to-indigo-600 text-white border-0 shadow-xl animate-in slide-in-from-left duration-700 delay-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5" />
-                Student ID Card
+          {/* ID Card Download */} 
+          <Card className="border border-border bg-card shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                <CreditCard className="w-4 h-4 text-primary" />
+                Student ID card
                 {!hasIDCardSetup() && (
-                  <Badge className="ml-2 bg-red-500/80 text-white text-xs">
-                    Setup Required
+                  <Badge className="ml-2 bg-destructive/10 text-destructive text-xs border border-destructive/30">
+                    Setup required
                   </Badge>
                 )}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm opacity-90 mb-2">
-                      {hasIDCardSetup()
-                        ? "Download your official student ID card"
-                        : "ID Card setup not available"}
-                    </div>
-                    <div className="text-xs opacity-75">
-                      {hasIDCardSetup()
-                        ? "Print-ready format with your photo and details"
-                        : "Institution hasn't configured ID card templates"}
-                    </div>
-                  </div>
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <CreditCard className="w-6 h-6" />
-                  </div>
-                </div>
-
-                {hasIDCardSetup() ? (
-                  <button
-                    className="w-full mt-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-3 py-2 rounded-lg text-sm flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105"
-                    onClick={printIDCardFn}
-                    type="button"
-                  >
-                    <Download className="w-4 h-4" />
-                    Print ID Card
-                  </button>
-                ) : (
-                  <Button
-                    className="w-full mt-4 bg-gray-500/50 hover:bg-gray-400/50 text-white border border-gray-300/20 cursor-not-allowed transition-all duration-300"
-                    size="sm"
-                    disabled
-                    onClick={() =>
-                      toast.error(
-                        "ID Card templates not configured by institution"
-                      )
-                    }
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    ID Card Not Available
-                  </Button>
-                )}
-              </div>
+            <CardContent className="space-y-3 text-sm">
+              <p className="text-muted-foreground">
+                {hasIDCardSetup()
+                  ? "Download a print-ready copy of your ID."
+                  : "Your institution has not configured ID templates yet."}
+              </p>
+              {hasIDCardSetup() ? (
+                <Button onClick={printIDCardFn} size="sm" className="gap-2">
+                  <Download className="w-4 h-4" />
+                  Print ID card
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" disabled>
+                  <Download className="w-4 h-4" />
+                  Unavailable
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>
 
         {/* Right Column - Detailed Information */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="xl:col-span-2 space-y-4">
           {/* Personal Information */}
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-right duration-700">
+          <Card className="border border-border bg-card shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
-                <User className="w-5 h-5" />
-                Personal Information
+              <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                <User className="w-4 h-4 text-primary" />
+                Personal information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  {isEditing ? (
-                    <Input
-                      id="firstName"
-                      value={profileData.firstName}
-                      onChange={(e) =>
-                        handleInputChange("firstName", e.target.value)
-                      }
-                    />
-                  ) : (
-                    <div className="p-3 bg-gray-50 rounded-md">
-                      {profileData.firstName || "Not set"}
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  {isEditing ? (
-                    <Input
-                      id="lastName"
-                      value={profileData.lastName}
-                      onChange={(e) =>
-                        handleInputChange("lastName", e.target.value)
-                      }
-                    />
-                  ) : (
-                    <div className="p-3 bg-gray-50 rounded-md">
-                      {profileData.lastName || "Not set"}
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-gray-500" />
-                    {isEditing ? (
-                      <Input
-                        id="email"
-                        type="email"
-                        value={profileData.email}
-                        readOnly
-                        disabled
-                        className="flex-1 bg-gray-100"
-                      />
-                    ) : (
-                      <div className="p-3 bg-gray-50 rounded-md flex-1">
-                        {profileData.email || "Not set"}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-500" />
-                    {isEditing ? (
-                      <Input
-                        id="phone"
-                        value={profileData.phone}
-                        onChange={(e) =>
-                          handleInputChange("phone", e.target.value)
-                        }
-                        className="flex-1"
-                      />
-                    ) : (
-                      <div className="p-3 bg-gray-50 rounded-md flex-1">
-                        {profileData.phone || "Not set"}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-gray-500" />
-                    {isEditing ? (
-                      <Input
-                        id="address"
-                        value={profileData.address}
-                        onChange={(e) =>
-                          handleInputChange("address", e.target.value)
-                        }
-                        className="flex-1"
-                      />
-                    ) : (
-                      <div className="p-3 bg-gray-50 rounded-md flex-1">
-                        {profileData.address}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-500" />
-                    {isEditing ? (
-                      <Input
-                        id="dateOfBirth"
-                        type="date"
-                        value={profileData.dateOfBirth}
-                        onChange={(e) =>
-                          handleInputChange("dateOfBirth", e.target.value)
-                        }
-                        className="flex-1"
-                      />
-                    ) : (
-                      <div className="p-3 bg-gray-50 rounded-md flex-1">
-                        {profileData.dateOfBirth
-                          ? new Date(
-                              profileData.dateOfBirth
-                            ).toLocaleDateString()
-                          : "Not set"}
-                      </div>
-                    )}
-                  </div>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First name</Label>
+                <Input
+                  id="firstName"
+                  value={profileData.firstName || ""}
+                  onChange={(e) => handleInputChange("firstName", e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last name</Label>
+                <Input
+                  id="lastName"
+                  value={profileData.lastName || ""}
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="otherName">Other name</Label>
+                <Input
+                  id="otherName"
+                  value={profileData.otherName || ""}
+                  onChange={(e) => handleInputChange("otherName", e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={profileData.email || ""} disabled />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone</Label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
+                  <Input
+                    id="phone"
+                    className="pl-10"
+                    value={profileData.phone || ""}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                    disabled={!isEditing}
+                  />
                 </div>
               </div>
-              {/* <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  {isEditing ? (
-                    <Textarea
-                      id="bio"
-                      value={profileData.bio}
-                      onChange={(e) => handleInputChange("bio", e.target.value)}
-                      rows={4}
-                    />
-                  ) : (
-                    <div className="p-3 bg-gray-50 rounded-md">
-                      {profileData.bio}
-                    </div>
-                  )}
-                </div> */}
+              <div className="space-y-2">
+                <Label htmlFor="address">Address</Label>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
+                  <Input
+                    id="address"
+                    className="pl-10"
+                    value={profileData.address || ""}
+                    onChange={(e) => handleInputChange("address", e.target.value)}
+                    disabled={!isEditing}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dateOfBirth">Date of birth</Label>
+                <div className="relative">
+                  <Calendar className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    className="pl-10"
+                    value={profileData.dateOfBirth || ""}
+                    onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+                    disabled={!isEditing}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="gender">Gender</Label>
+                <Input
+                  id="gender"
+                  value={profileData.gender || ""}
+                  onChange={(e) => handleInputChange("gender", e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="maritalStatus">Marital status</Label>
+                <Input
+                  id="maritalStatus"
+                  value={profileData.maritalStatus || ""}
+                  onChange={(e) => handleInputChange("maritalStatus", e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="stateOrigin">State of origin</Label>
+                <Input
+                  id="stateOrigin"
+                  value={profileData.stateOrigin || ""}
+                  onChange={(e) => handleInputChange("stateOrigin", e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lgaOrigin">LGA of origin</Label>
+                <Input
+                  id="lgaOrigin"
+                  value={profileData.lgaOrigin || ""}
+                  onChange={(e) => handleInputChange("lgaOrigin", e.target.value)}
+                  disabled={!isEditing}
+                />
+              </div>
             </CardContent>
           </Card>
 
           {/* Academic Information */}
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-right duration-700 delay-100">
+          <Card className="border border-border bg-card shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
-                <BookOpen className="w-5 h-5" />
-                Academic Information
+              <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                <BookOpen className="w-4 h-4 text-primary" />
+                Academic information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label>Student ID</Label>
-                  <div className="p-3 bg-gray-50 rounded-md font-mono">
-                    {profileData.studentId}
-                  </div>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-1.5">
+                <Label>Student ID</Label>
+                <div className="p-3 bg-muted/60 rounded-md font-mono text-foreground">
+                  {profileData.studentId}
                 </div>
-                <div className="space-y-2">
-                  <Label>Program</Label>
-                  <div className="p-3 bg-gray-50 rounded-md">
-                    {profileData.program}
-                  </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Program</Label>
+                <div className="p-3 bg-muted/60 rounded-md text-foreground">
+                  {profileData.program}
                 </div>
-                <div className="space-y-2">
-                  <Label>Admitted Semester</Label>
-                  <div className="p-3 bg-gray-50 rounded-md">
-                    {profileData.semester}
-                  </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Current semester</Label>
+                <div className="p-3 bg-muted/60 rounded-md text-foreground">
+                  {profileData.semester}
                 </div>
-                <div className="space-y-2">
-                  <Label>Enrollment Date</Label>
-                  <div className="p-3 bg-gray-50 rounded-md">
-                    {profileData.enrollmentDate}
-                  </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Enrollment date</Label>
+                <div className="p-3 bg-muted/60 rounded-md text-foreground">
+                  {profileData.enrollmentDate}
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Security & Settings */}
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-right duration-700 delay-200">
+          <Card className="border border-border bg-card shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
-                <Shield className="w-5 h-5" />
-                Security & Settings
+              <CardTitle className="flex items-center gap-2 text-foreground text-base">
+                <Shield className="w-4 h-4 text-primary" />
+                Security
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Security Status Overview */}
+            <CardContent className="space-y-4">
               <div className="space-y-3">
-                <h4 className="font-medium text-gray-900 mb-3">
-                  Security Status
-                </h4>
-
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm">
-                        Password Protection
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm text-foreground">
+                          Password protection
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Keep your login secure
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="border-primary/30 text-primary">
+                        Active
+                      </Badge>
+                      {!wantsPasswordChange && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-2"
+                          onClick={() => setWantsPasswordChange(true)}
+                        >
+                          Change password
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <Badge
-                    variant="secondary"
-                    className="bg-green-100 text-green-800"
-                  >
-                    Active
-                  </Badge>
                 </div>
 
-                {/* <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Bell className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-sm">
-                          Email Notifications
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Course updates & announcements
-                        </div>
-                      </div>
-                    </div>
-                    <Badge
-                      variant="secondary"
-                      className="bg-blue-100 text-blue-800"
-                    >
-                      Enabled
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                        <Settings className="w-4 h-4 text-orange-600" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-sm">
-                          Account Settings
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Profile preferences & privacy
-                        </div>
+              {wantsPasswordChange && (
+                <div className="pt-2 border-t border-border">
+                  <h4 className="font-medium text-foreground mb-3">
+                    Change password
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="currentPassword">Current password</Label>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter current password"
+                          value={passwordData.currentPassword}
+                          onChange={(e) =>
+                            handlePasswordChange("currentPassword", e.target.value)
+                          }
+                          disabled={passwordSaving}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                          disabled={passwordSaving}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
                       </div>
                     </div>
-                    <Badge
-                      variant="secondary"
-                      className="bg-orange-100 text-orange-800"
-                    >
-                      Configured
-                    </Badge>
-                  </div> */}
-              </div>
-
-              {/* Password Change Section */}
-              <div className="pt-4 border-t">
-                <h4 className="font-medium text-gray-900 mb-4">
-                  Change Password
-                </h4>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Current Password</Label>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter current password"
-                        value={passwordData.currentPassword}
-                        onChange={(e) =>
-                          handlePasswordChange(
-                            "currentPassword",
-                            e.target.value
-                          )
-                        }
-                        disabled={!isEditing}
-                      />
+                    {passwordData.currentPassword && (
+                      <>
+                        <div className="space-y-2">
+                          <Label htmlFor="newPassword">New password</Label>
+                          <Input
+                            type="password"
+                            placeholder="Enter new password"
+                            value={passwordData.newPassword}
+                            onChange={(e) =>
+                              handlePasswordChange("newPassword", e.target.value)
+                            }
+                            disabled={passwordSaving}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="confirmPassword">Confirm new password</Label>
+                          <Input
+                            type="password"
+                            placeholder="Confirm new password"
+                            value={passwordData.confirmPassword}
+                            onChange={(e) =>
+                              handlePasswordChange("confirmPassword", e.target.value)
+                            }
+                            disabled={passwordSaving}
+                          />
+                        </div>
+                      </>
+                    )}
+                    <div className="flex items-center gap-2 pt-1">
                       <Button
-                        type="button"
-                        variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                        disabled={!isEditing}
+                        onClick={handlePasswordUpdate}
+                        disabled={passwordSaving}
+                        className="gap-2"
                       >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
+                        {passwordSaving ? "Updating..." : "Save password"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setWantsPasswordChange(false);
+                          setPasswordData({
+                            currentPassword: "",
+                            newPassword: "",
+                            confirmPassword: "",
+                          });
+                        }}
+                        disabled={passwordSaving}
+                      >
+                        Cancel
                       </Button>
                     </div>
                   </div>
-                  {isEditing && (
-                    <>
-                      <div className="space-y-2">
-                        <Label htmlFor="newPassword">New Password</Label>
-                        <Input
-                          type="password"
-                          placeholder="Enter new password"
-                          value={passwordData.newPassword}
-                          onChange={(e) =>
-                            handlePasswordChange("newPassword", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">
-                          Confirm New Password
-                        </Label>
-                        <Input
-                          type="password"
-                          placeholder="Confirm new password"
-                          value={passwordData.confirmPassword}
-                          onChange={(e) =>
-                            handlePasswordChange(
-                              "confirmPassword",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </div>
-                    </>
-                  )}
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -947,6 +899,6 @@ export default function UserProfile() {
           })}
         </div>
       )}
-    </>
+    </div>
   );
 }

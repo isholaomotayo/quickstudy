@@ -238,7 +238,7 @@ export async function GET(req: NextRequest) {
           },
         },
         orderBy: {
-          created_at: 'desc',
+          created_at: "desc",
         },
       });
 

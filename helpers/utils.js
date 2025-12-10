@@ -2,6 +2,7 @@ import Router from "next/router";
 import fetch from "isomorphic-unfetch";
 import { getCookies, setCookies } from "cookies-next";
 import toast from "react-hot-toast";
+import crypto from "crypto";
 
 export const getRequestOrigin = (req) => {
   const host = req ? req.headers.host : window.location.host;
@@ -91,36 +92,6 @@ export const protectPage = (
   return { token, role, userId, userData };
 };
 
-export const setAuthCookies = (user, ctx = null) => {
-  const cookieExpiry = 1000 * 60 * 60 * 24 * 365;
-
-  setCookies(
-    ctx,
-    "userData",
-    {
-      id: user.id,
-      institution_id: user.institution_id,
-      username: user.username,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar || "",
-      student_id: (user.student && user.student.id) || "",
-      fee_plan: (user.student && user.student.fee_plan) || "",
-      staff_id: (user.staff && user.staff.id) || "",
-    },
-    { path: "/", expires: cookieExpiry }
-  );
-  setCookies(ctx, "role", user.role, { path: "/", expires: cookieExpiry });
-  setCookies(ctx, "userId", user.id, { path: "/", expires: cookieExpiry });
-  setCookies(ctx, "token", user.token, { path: "/", expires: cookieExpiry });
-  setCookies(ctx, "institutionId", user.institution_id, {
-    path: "/",
-    expires: cookieExpiry,
-  });
-};
-
 export const setAffiliateCookies = (username, ctx = null) => {
   const cookieExpiry = 1000 * 60 * 60 * 24 * 90;
   setCookies({ res: ctx }, "referrerCode", username, {
@@ -156,7 +127,46 @@ export const codeLogin = async (
     const user = await svrResponse.json();
     if (!(user && user.email)) bounceToPage(failBounceTo, res);
 
-    setAuthCookies(user, { res });
+    // Set auth cookies with signatures (same as /api/login route)
+    const cookieExpiry = 1000 * 60 * 60 * 24 * 365;
+    const AUTH_SECRET = process.env.JWTSECRET || "fallback-secret-key";
+
+    // Create userData cookie value
+    const userDataValue = JSON.stringify({
+      id: user.id,
+      institution_id: user.institution_id,
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar || "",
+      student_id: (user.student && user.student.id) || "",
+      fee_plan: (user.student && user.student.fee_plan) || "",
+      staff_id: (user.staff && user.staff.id) || "",
+    });
+
+    // Create signatures
+    const userSignature = crypto
+      .createHmac("sha256", AUTH_SECRET)
+      .update(userDataValue)
+      .digest("hex");
+
+    const roleSignature = crypto
+      .createHmac("sha256", AUTH_SECRET)
+      .update(user.role)
+      .digest("hex");
+
+    // Set cookies with signatures
+    const ctx = { res };
+    setCookies(ctx, "userData", userDataValue, { path: "/", expires: cookieExpiry });
+    setCookies(ctx, "userSignature", userSignature, { path: "/", expires: cookieExpiry });
+    setCookies(ctx, "role", user.role, { path: "/", expires: cookieExpiry });
+    setCookies(ctx, "roleSignature", roleSignature, { path: "/", expires: cookieExpiry });
+    setCookies(ctx, "userId", user.id, { path: "/", expires: cookieExpiry });
+    setCookies(ctx, "token", user.token, { path: "/", expires: cookieExpiry });
+    setCookies(ctx, "institutionId", user.institution_id, { path: "/", expires: cookieExpiry });
+
     bounceToPage(pathname, res);
   }
 

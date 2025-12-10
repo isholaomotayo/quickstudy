@@ -10,6 +10,7 @@ import {
     useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import { removeCookies } from "cookies-next";
 
 interface UserData {
   id: number;
@@ -128,6 +129,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               hasInitiallyLoaded.current = true;
             }
             setUserData(parsedUserData);
+
+            // Expose userData to window for roleDecorators and other client-side checks
+            // Note: Server-side signature verification is the source of truth
+            if (typeof window !== 'undefined') {
+              (window as any).__APP_USER_DATA = parsedUserData;
+            }
+
             retryCount.current = 0; // Reset retry count on success
           } else {
             console.warn(
@@ -174,25 +182,40 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [loadUserData]);
 
-  const clearAuthCookies = useCallback(() => {
+  const clearAuthCookies = useCallback(async () => {
+    try {
+      // Call backend API to delete httpOnly cookies (userSignature, roleSignature, token)
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Failed to logout on server');
+      }
+    } catch (error) {
+      console.error('Error calling logout API:', error);
+    }
+
+    // Clear client-side cookies
     if (typeof document !== "undefined") {
-      // Clear all authentication cookies
-      document.cookie =
-        "userData=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie =
-        "userId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie =
-        "institutionId=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie =
-        "userSignature=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie =
-        "roleSignature=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      
+      const cookieOptions = { path: "/" };
+
+      removeCookies(null, "userData", cookieOptions);
+      removeCookies(null, "role", cookieOptions);
+      removeCookies(null, "userId", cookieOptions);
+      removeCookies(null, "institutionId", cookieOptions);
+
       // Clear the userData state
       setUserData(null);
-      
+
+      // Clear window.__APP_USER_DATA
+      if (typeof window !== 'undefined') {
+        (window as any).__APP_USER_DATA = null;
+      }
+
       // Reset retry count
       retryCount.current = 0;
     }

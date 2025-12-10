@@ -79,9 +79,9 @@ export function EditAnnouncementDialog({
     try {
       const response = await fetch(`/api/schoolAnnouncement/${announcementId}`, {
         method: "PUT",
+        credentials: "include", // Automatically sends cookies securely
         headers: {
           "Content-Type": "application/json",
-          "Cookie": document.cookie,
         },
         body: JSON.stringify({
           title: title,
