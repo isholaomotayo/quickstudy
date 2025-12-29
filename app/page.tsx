@@ -53,25 +53,25 @@ export default function LandingPage() {
             <div className="hidden lg:flex items-center space-x-8">
               <a
                 href="#programs"
-                className="text-slate-600 hover:text-[color:var(--lms-teal)] font-medium transition-colors"
+                className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-500 hover:text-[color:var(--lms-teal)] transition-colors"
               >
                 Programs
               </a>
               <a
                 href="#about"
-                className="text-slate-600 hover:text-[color:var(--lms-teal)] font-medium transition-colors"
+                className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-500 hover:text-[color:var(--lms-teal)] transition-colors"
               >
                 About Us
               </a>
               <a
                 href="#testimonials"
-                className="text-slate-600 hover:text-[color:var(--lms-teal)] font-medium transition-colors"
+                className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-500 hover:text-[color:var(--lms-teal)] transition-colors"
               >
                 Testimonials
               </a>
               <a
                 href="#contact"
-                className="text-slate-600 hover:text-[color:var(--lms-teal)] font-medium transition-colors"
+                className="text-xs uppercase tracking-[0.2em] font-semibold text-slate-500 hover:text-[color:var(--lms-teal)] transition-colors"
               >
                 Contact
               </a>
@@ -169,59 +169,59 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-black/45" />
           <div className="absolute inset-y-0 left-0 w-full sm:w-[62%] lg:w-[52%] bg-[linear-gradient(90deg,rgba(15,118,110,0.92),rgba(15,118,110,0.7),rgba(15,118,110,0.1),transparent)]" />
 
-          <div className="relative z-10 h-full flex items-center">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
-              <div className="max-w-2xl space-y-6">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold">
+          <div className="relative z-10 h-full">
+            <div className="absolute bottom-8 left-4 sm:bottom-10 sm:left-8 lg:bottom-12 lg:left-12 text-white">
+              <div className="max-w-xl space-y-5">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-semibold">
                   <Globe size={16} className="text-white" />
                   <span>Accredited, career-ready, globally connected.</span>
                 </div>
 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight">
                   Build leadership skill with accredited programs and a modern
                   digital campus.
                 </h1>
 
-                <p className="text-lg text-white/90 leading-relaxed">
+                <p className="text-base text-white/90 leading-relaxed">
                   U.K. degree pathways, executive education, and professional
                   certifications for ambitious professionals across Nigeria and
                   Africa.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <div className="flex flex-col sm:flex-row gap-3 pt-1.5">
                   <Button
                     asChild
                     size="lg"
-                    className="bg-[color:var(--lms-teal)] text-white text-base px-7 h-12 rounded-xl shadow-lg hover:opacity-90 transition-all w-full sm:w-auto"
+                    className="bg-[color:var(--lms-teal)] text-white text-sm px-6 h-11 rounded-xl shadow-lg hover:opacity-90 transition-all w-full sm:w-auto"
                   >
                     <Link href="/apply">
-                      Apply Now <ChevronRight className="ml-2" size={18} />
+                      Apply Now <ChevronRight className="ml-2" size={16} />
                     </Link>
                   </Button>
                   <Button
                     asChild
                     size="lg"
                     variant="outline"
-                    className="border border-white/70 text-white hover:bg-white/10 text-base px-7 h-12 rounded-xl transition-all w-full sm:w-auto bg-transparent"
+                    className="border border-white/70 text-white hover:bg-white/10 text-sm px-6 h-11 rounded-xl transition-all w-full sm:w-auto bg-transparent"
                   >
                     <Link href="/signin">Sign In</Link>
                   </Button>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-8 pt-6 text-white/90">
+                <div className="flex flex-wrap items-center gap-6 pt-4 text-white/90">
                   <div>
-                    <p className="text-3xl font-semibold">500+</p>
-                    <p className="text-sm">Professionals Upskilled</p>
+                    <p className="text-2xl font-semibold">500+</p>
+                    <p className="text-xs">Professionals Upskilled</p>
                   </div>
                   <div className="h-10 w-px bg-white/30"></div>
                   <div>
-                    <p className="text-3xl font-semibold">UK</p>
-                    <p className="text-sm">Accredited Pathways</p>
+                    <p className="text-2xl font-semibold">UK</p>
+                    <p className="text-xs">Accredited Pathways</p>
                   </div>
                   <div className="h-10 w-px bg-white/30"></div>
                   <div>
-                    <p className="text-3xl font-semibold">100%</p>
-                    <p className="text-sm">Career-focused delivery</p>
+                    <p className="text-2xl font-semibold">100%</p>
+                    <p className="text-xs">Career-focused delivery</p>
                   </div>
                 </div>
               </div>
