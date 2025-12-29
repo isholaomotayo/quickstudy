@@ -77,14 +77,48 @@ function ApplyComponent() {
   React.useEffect(() => {
     const loadInstitution = async () => {
       try {
-        const institution = await getInstituionByParams({ id: "1" }, {});
-        setState((prev) => ({
-          ...prev,
-          institution,
-          institution_id: institution.id,
-        }));
+        // Get current URL from window location
+        const currentUrl = typeof window !== "undefined" ? window.location.origin : "";
+        
+        // Try to fetch by URL first, fallback to ID if URL fails
+        let institution = null;
+        if (currentUrl) {
+          try {
+            institution = await getInstituionByParams({ url: currentUrl }, {});
+          } catch (urlError) {
+            console.warn("Failed to fetch institution by URL, trying ID:", urlError);
+          }
+        }
+        
+        // Fallback to ID if URL lookup failed or returned empty
+        if (!institution || (typeof institution === "object" && !institution.id)) {
+          institution = await getInstituionByParams({ id: "1" }, {});
+        }
+        
+        // Ensure we have a valid institution object
+        if (institution && typeof institution === "object" && institution.id) {
+          setState((prev) => ({
+            ...prev,
+            institution,
+            institution_id: String(institution.id || "1"),
+          }));
+        } else {
+          console.error("Invalid institution data received:", institution);
+          // Set default values to prevent crashes
+          setState((prev) => ({
+            ...prev,
+            institution: { id: 1, name: "quickStudy" },
+            institution_id: "1",
+          }));
+        }
       } catch (error) {
         console.error("Error loading institution:", error);
+        // Set default values to prevent crashes
+        setState((prev) => ({
+          ...prev,
+          institution: { id: 1, name: "quickStudy" },
+          institution_id: "1",
+        }));
       }
     };
 
@@ -218,7 +252,7 @@ function ApplyComponent() {
               {state.institution?.logo && (
                 <img
                   className="h-14 w-auto"
-                  src={state.institution.logo}
+                  src={state.institution?.logo}
                   alt="Institution Logo"
                 />
               )}

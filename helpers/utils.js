@@ -10,6 +10,48 @@ export const getRequestOrigin = (req) => {
 
   return `${protocol}://${host}`;
 };
+
+/**
+ * Normalizes a URL for comparison by:
+ * - Removing www. prefix
+ * - Removing trailing slashes
+ * - Converting to lowercase
+ * - Ensuring https protocol
+ * @param {string} url - The URL to normalize
+ * @returns {string} - The normalized URL
+ */
+export const normalizeUrl = (url) => {
+  if (!url || typeof url !== "string") return "";
+  
+  try {
+    // Remove whitespace
+    let normalized = url.trim();
+    
+    // Add protocol if missing
+    if (!normalized.match(/^https?:\/\//i)) {
+      normalized = `https://${normalized}`;
+    }
+    
+    // Parse URL
+    const urlObj = new URL(normalized);
+    
+    // Remove www. from hostname
+    let hostname = urlObj.hostname.toLowerCase();
+    if (hostname.startsWith("www.")) {
+      hostname = hostname.substring(4);
+    }
+    
+    // Reconstruct URL with normalized hostname and https
+    return `https://${hostname}${urlObj.pathname.replace(/\/$/, "")}`;
+  } catch (e) {
+    // If URL parsing fails, try simple string manipulation
+    let normalized = url.trim().toLowerCase();
+    normalized = normalized.replace(/^https?:\/\//i, "");
+    normalized = normalized.replace(/^www\./i, "");
+    normalized = normalized.replace(/\/$/, "");
+    return normalized ? `https://${normalized}` : "";
+  }
+};
 // Redeployment comment
 
 export const showToastAlert = (

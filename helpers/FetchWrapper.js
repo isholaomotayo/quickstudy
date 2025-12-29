@@ -1137,13 +1137,29 @@ export async function getInstituionByParams(data, ctx) {
       }),
     });
 
-    institution = institution.status === 200 ? await institution.json() : [];
+    if (institution.status === 200) {
+      const jsonData = await institution.json();
+      // Check if response has error
+      if (jsonData && jsonData.error) {
+        console.warn("Institution API returned error:", jsonData.error);
+        institution = null;
+      } else {
+        institution = jsonData;
+      }
+    } else {
+      console.warn(`Institution API returned status ${institution.status}`);
+      institution = null;
+    }
   } catch (e) {
-    console.log(e);
+    console.error("Error fetching institution:", e);
+    institution = null;
   }
 
-  const institutionId = typeof institution === "object" ? institution.id : 1;
-  setCookies(ctx, "institutionId", institutionId);
+  // Only set cookie if we have a valid institution with an ID
+  if (institution && typeof institution === "object" && institution.id) {
+    const institutionId = institution.id;
+    setCookies(ctx, "institutionId", institutionId);
+  }
 
   return institution;
 }
