@@ -4,22 +4,17 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import {
-  Clock,
   CheckSquare,
-  Circle,
-  Check,
-  ArrowLeft,
+  Circle, ArrowLeft,
   ArrowRight,
   Flag,
   Eye,
   RotateCcw,
   AlertTriangle,
-  CheckCircle,
-  X,
-  Brain,
+  CheckCircle, Brain,
   Lightbulb,
   Target,
-  TrendingUp,
+  TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -133,14 +128,22 @@ export default function PracticeTestClient({
 
       if (response.ok) {
         const data = await response.json();
-        setExistingQuestions(data.questions || []);
+        const fetchedQuestions = data.questions || [];
+        setExistingQuestions(fetchedQuestions);
+        
+        // If we have existing questions and no current questions loaded, use them immediately
+        if (fetchedQuestions.length > 0 && questions.length === 0) {
+          console.log("Found existing questions, loading them immediately");
+          setQuestions(fetchedQuestions);
+          setCurrentScreen("instructions");
+        }
       }
     } catch (error) {
       console.error("Error fetching existing questions:", error);
     } finally {
       setLoadingExisting(false);
     }
-  }, [userData?.id, memoizedConfig.lessonId]);
+  }, [userData?.id, memoizedConfig.lessonId, questions.length]);
 
   const retakeExistingQuestions = useCallback(
     (questionsToRetake: PracticeQuestion[]) => {
@@ -266,14 +269,23 @@ export default function PracticeTestClient({
     }
 
     // Only auto-generate if we have no existing questions and no current questions
+    // This check now happens after fetchExistingQuestions completes
     if (
       existingQuestions.length === 0 &&
       questions.length === 0 &&
-      currentScreen === "loading"
+      currentScreen === "loading" &&
+      !loadingExisting // Ensure we've finished loading existing questions
     ) {
       console.log("No existing questions found, auto-generating new questions");
       setHasAttemptedGeneration(true);
       generateQuestions();
+    }
+    
+    // If we have questions loaded but screen is still loading, switch to instructions
+    if (questions.length > 0 && currentScreen === "loading") {
+      console.log("Questions available, switching to instructions screen");
+      setCurrentScreen("instructions");
+      setHasAttemptedGeneration(true);
     }
   }, [
     userData?.id,
@@ -407,13 +419,13 @@ export default function PracticeTestClient({
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/40";
       case "medium":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-400/40";
       case "hard":
-        return "bg-red-100 text-red-800";
+        return "bg-destructive/10 text-destructive border border-destructive/30";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted/30 text-foreground border border-border/60";
     }
   };
 
@@ -429,14 +441,14 @@ export default function PracticeTestClient({
   // Loading screen
   if (currentScreen === "loading" || isGenerating) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border border-border bg-card">
           <CardContent className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold mb-2">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted/40 border-t-primary mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold mb-2 text-foreground">
               Generating Practice Questions
             </h2>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               AI is creating {memoizedConfig.questionCount} personalized
               questions for you...
             </p>
@@ -449,17 +461,17 @@ export default function PracticeTestClient({
   // Instructions screen
   if (currentScreen === "instructions") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-4xl">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-4xl border border-border bg-card">
           <CardContent className="p-8">
             <div className="text-center mb-8">
               <div className="flex items-center justify-center mb-4">
-                <Brain className="h-12 w-12 text-blue-600 mr-3" />
+                <Brain className="h-12 w-12 text-primary mr-3" />
                 <div>
-                  <h1 className="text-4xl font-bold text-gray-900">
+                  <h1 className="text-4xl font-bold text-foreground">
                     AI Practice Test
                   </h1>
-                  <p className="text-xl text-gray-600 mt-2">
+                  <p className="text-xl text-muted-foreground mt-2">
                     {lessonInfo?.name || "Lesson Practice"}
                   </p>
                 </div>
@@ -469,16 +481,16 @@ export default function PracticeTestClient({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold flex items-center">
-                  <Target className="h-5 w-5 mr-2 text-blue-600" />
+                  <Target className="h-5 w-5 mr-2 text-primary" />
                   Test Information
                 </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Questions:</span>
+                    <span className="text-muted-foreground">Questions:</span>
                     <span className="font-medium">{questions.length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Difficulty:</span>
+                    <span className="text-muted-foreground">Difficulty:</span>
                     <Badge
                       className={getDifficultyColor(memoizedConfig.difficulty)}
                     >
@@ -487,7 +499,7 @@ export default function PracticeTestClient({
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Question Types:</span>
+                    <span className="text-muted-foreground">Question Types:</span>
                     <div className="flex gap-1">
                       {memoizedConfig.questionTypes.map((type) => (
                         <Badge key={type} variant="outline" className="text-xs">
@@ -497,7 +509,7 @@ export default function PracticeTestClient({
                     </div>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Time Limit:</span>
+                    <span className="text-muted-foreground">Time Limit:</span>
                     <span className="font-medium">No limit</span>
                   </div>
                 </div>
@@ -505,10 +517,10 @@ export default function PracticeTestClient({
 
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold flex items-center">
-                  <Lightbulb className="h-5 w-5 mr-2 text-amber-600" />
+                  <Lightbulb className="h-5 w-5 mr-2 text-primary" />
                   How It Works
                 </h3>
-                <div className="text-gray-700 space-y-2 text-sm">
+                <div className="text-muted-foreground space-y-2 text-sm">
                   <p>• AI-generated questions based on your lesson content</p>
                   <p>• Get detailed explanations for each answer</p>
                   <p>• No grades recorded - pure practice!</p>
@@ -518,14 +530,14 @@ export default function PracticeTestClient({
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="bg-muted/30 border border-border/60 rounded-lg p-4 mb-6">
               <div className="flex items-start">
-                <TrendingUp className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
+                <TrendingUp className="h-5 w-5 text-primary mr-3 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-blue-900">
+                  <h4 className="font-medium text-foreground">
                     Practice Benefits
                   </h4>
-                  <p className="text-sm text-blue-700 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     These AI-generated questions help reinforce your learning
                     and identify areas that need more attention. Take your time
                     and focus on understanding the concepts.
@@ -535,22 +547,22 @@ export default function PracticeTestClient({
             </div>
 
             {/* Question Source Info */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div className="bg-muted/30 border border-border/60 rounded-lg p-4 mb-6">
               <div className="flex items-start">
-                <Brain className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                <Brain className="h-5 w-5 text-primary mr-3 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-medium text-green-900 text-sm">
+                  <h4 className="font-medium text-foreground text-sm">
                     {memoizedConfig.retake
                       ? "Retaking Previous Questions"
                       : "Questions Ready"}
                   </h4>
-                  <p className="text-sm text-green-800 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {memoizedConfig.retake
                       ? `You are retaking ${questions.length} previously generated questions. Practice these questions again to reinforce your learning.`
                       : `You have ${questions.length} ${memoizedConfig.difficulty} questions ready to practice. These questions are based on your lesson content and will help you master the material.`}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs text-green-700">
+                    <span className="text-xs text-muted-foreground">
                       Question types:
                     </span>
                     {memoizedConfig.questionTypes.map((type) => (
@@ -565,16 +577,16 @@ export default function PracticeTestClient({
 
             {/* Existing Questions Section - Show selection options even in retake mode */}
             {existingQuestions.length > 0 && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+              <div className="bg-muted/30 border border-border/60 rounded-lg p-4 mb-6">
                 <div className="flex items-start">
-                  <RotateCcw className="h-5 w-5 text-gray-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <RotateCcw className="h-5 w-5 text-muted-foreground mr-3 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 text-sm">
+                    <h4 className="font-medium text-foreground text-sm">
                       {memoizedConfig.retake
                         ? "Select Questions to Practice"
                         : "Retake Previous Questions"}
                     </h4>
-                    <p className="text-sm text-gray-700 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {memoizedConfig.retake
                         ? `Choose how many of the ${existingQuestions.length} available questions you want to practice.`
                         : `You have ${existingQuestions.length} previously generated questions available for this lesson.`}
@@ -632,7 +644,7 @@ export default function PracticeTestClient({
                             onClick={() =>
                               retakeExistingQuestions(existingQuestions)
                             }
-                            className="text-xs bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100"
+                            className="text-xs bg-primary/10 border-primary/30 text-primary hover:bg-primary/15"
                           >
                             All {existingQuestions.length} Questions
                           </Button>
@@ -648,10 +660,10 @@ export default function PracticeTestClient({
 
             {/* Show message when no questions selected in retake mode */}
             {memoizedConfig.retake && questions.length === 0 && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+              <div className="bg-amber-500/10 border border-amber-400/40 rounded-lg p-3 mb-4">
                 <div className="flex items-center">
-                  <AlertTriangle className="h-4 w-4 text-amber-600 mr-2" />
-                  <p className="text-sm text-amber-800">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-300 mr-2" />
+                  <p className="text-sm text-amber-700 dark:text-amber-200">
                     Please select how many questions you want to practice from
                     the options above.
                   </p>
@@ -668,7 +680,7 @@ export default function PracticeTestClient({
               <Button
                 onClick={startPracticeTest}
                 disabled={questions.length === 0}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Start Practice Test
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -683,13 +695,13 @@ export default function PracticeTestClient({
   // Results screen
   if (currentScreen === "results" && sessionResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="max-w-6xl mx-auto">
-          <Card className="mb-6">
+          <Card className="mb-6 border border-border bg-card">
             <CardHeader>
-              <CardTitle className="text-center">
+              <CardTitle className="text-center text-foreground">
                 <div className="flex items-center justify-center mb-2">
-                  <CheckCircle className="h-8 w-8 text-green-600 mr-3" />
+                  <CheckCircle className="h-8 w-8 text-emerald-500 mr-3" />
                   Practice Test Completed!
                 </div>
               </CardTitle>
@@ -697,39 +709,39 @@ export default function PracticeTestClient({
             <CardContent>
               {/* Score Overview */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="text-3xl font-bold text-green-600">
+                <div className="text-center p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
+                  <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-300">
                     {sessionResults.score}/{sessionResults.totalQuestions}
                   </div>
-                  <div className="text-sm text-gray-600">Score</div>
+                  <div className="text-sm text-muted-foreground">Score</div>
                 </div>
-                <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="text-3xl font-bold text-blue-600">
+                <div className="text-center p-4 bg-primary/10 rounded-lg border border-primary/30">
+                  <div className="text-3xl font-bold text-primary">
                     {sessionResults.percentage}%
                   </div>
-                  <div className="text-sm text-gray-600">Accuracy</div>
+                  <div className="text-sm text-muted-foreground">Accuracy</div>
                 </div>
-                <div className="text-center p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                  <div className="text-3xl font-bold text-emerald-600">
+                <div className="text-center p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
+                  <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-300">
                     {sessionResults.correctAnswers}
                   </div>
-                  <div className="text-sm text-gray-600">Correct</div>
+                  <div className="text-sm text-muted-foreground">Correct</div>
                 </div>
-                <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
-                  <div className="text-3xl font-bold text-red-600">
+                <div className="text-center p-4 bg-destructive/10 rounded-lg border border-destructive/30">
+                  <div className="text-3xl font-bold text-destructive">
                     {sessionResults.incorrectAnswers}
                   </div>
-                  <div className="text-sm text-gray-600">Incorrect</div>
+                  <div className="text-sm text-muted-foreground">Incorrect</div>
                 </div>
               </div>
 
               {/* Progress bar */}
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">
+                  <span className="text-sm font-medium text-foreground">
                     Overall Performance
                   </span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-muted-foreground">
                     {sessionResults.percentage}%
                   </span>
                 </div>
@@ -737,20 +749,20 @@ export default function PracticeTestClient({
               </div>
 
               {/* Question Info */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="bg-muted/30 border border-border/60 rounded-lg p-4 mb-6">
                 <div className="flex items-start">
-                  <Brain className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <Brain className="h-5 w-5 text-primary mr-3 mt-0.5 flex-shrink-0" />
                   <div>
-                    <h4 className="font-medium text-blue-900 text-sm">
+                    <h4 className="font-medium text-foreground text-sm">
                       Current Questions
                     </h4>
-                    <p className="text-sm text-blue-800 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       You just completed {questions.length}{" "}
                       {memoizedConfig.difficulty} questions. You can retake
                       these same questions or generate new ones.
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-xs text-blue-700">Types:</span>
+                      <span className="text-xs text-muted-foreground">Types:</span>
                       {memoizedConfig.questionTypes.map((type) => (
                         <Badge key={type} variant="outline" className="text-xs">
                           {type.replace("_", " ")}
@@ -765,7 +777,7 @@ export default function PracticeTestClient({
               <div className="flex justify-center gap-4 mb-8">
                 <Button
                   onClick={retakeTest}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                  className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-primary-foreground hover:opacity-90"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Retake Test
@@ -779,7 +791,7 @@ export default function PracticeTestClient({
                     setHasAttemptedGeneration(false);
                     generateQuestions();
                   }}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  className="bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground hover:opacity-90"
                 >
                   <Brain className="h-4 w-4 mr-2" />
                   Generate New Questions
@@ -793,9 +805,9 @@ export default function PracticeTestClient({
           </Card>
 
           {/* Detailed Results */}
-          <Card>
+          <Card className="border border-border bg-card">
             <CardHeader>
-              <CardTitle className="flex items-center">
+              <CardTitle className="flex items-center text-foreground">
                 <Eye className="h-5 w-5 mr-2" />
                 Detailed Results & Explanations
               </CardTitle>
@@ -805,15 +817,15 @@ export default function PracticeTestClient({
                 {sessionResults.detailedResults.map((result, index) => (
                   <div
                     key={result.questionId}
-                    className="border rounded-lg p-4"
+                    className="border border-border/60 rounded-lg p-4 bg-card"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center">
                         <div
                           className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium mr-3 ${
                             result.isCorrect
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                              ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-200"
+                              : "bg-destructive/15 text-destructive"
                           }`}
                         >
                           {index + 1}
@@ -826,48 +838,52 @@ export default function PracticeTestClient({
                           {questions[index]?.difficulty_level || "medium"}
                         </Badge>
                       </div>
-                      <div className="flex items-center">
+                      <div className="flex items-center text-muted-foreground">
                         {getQuestionIcon(result.questionType)}
-                        <span className="ml-2 text-sm text-gray-600 capitalize">
+                        <span className="ml-2 text-sm capitalize">
                           {result.questionType.replace("_", " ")}
                         </span>
                       </div>
                     </div>
 
-                    <h3 className="font-medium mb-3">{result.questionText}</h3>
+                    <h3 className="font-medium mb-3 text-foreground">
+                      {result.questionText}
+                    </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
-                        <p className="text-sm font-medium text-gray-600 mb-1">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">
                           Your Answer:
                         </p>
                         <p
                           className={`font-medium ${
-                            result.isCorrect ? "text-green-700" : "text-red-700"
+                            result.isCorrect
+                              ? "text-emerald-600 dark:text-emerald-300"
+                              : "text-destructive"
                           }`}
                         >
                           {result.userAnswer || "No answer"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-600 mb-1">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">
                           Correct Answer:
                         </p>
-                        <p className="font-medium text-green-700">
+                        <p className="font-medium text-emerald-600 dark:text-emerald-300">
                           {result.correctAnswer}
                         </p>
                       </div>
                     </div>
 
                     {result.explanation && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="bg-muted/30 border border-border/60 rounded-lg p-3">
                         <div className="flex items-start">
-                          <Lightbulb className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                          <Lightbulb className="h-4 w-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
                           <div>
-                            <h4 className="font-medium text-blue-900 text-sm">
+                            <h4 className="font-medium text-foreground text-sm">
                               Explanation
                             </h4>
-                            <p className="text-sm text-blue-800 mt-1">
+                            <p className="text-sm text-muted-foreground mt-1">
                               {result.explanation}
                             </p>
                           </div>
@@ -889,16 +905,16 @@ export default function PracticeTestClient({
     const currentQ = questions[currentQuestion];
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-4xl">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-4xl border border-border bg-card">
           <CardContent className="p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <Brain className="h-6 w-6 text-blue-600" />
+                <Brain className="h-6 w-6 text-primary" />
                 <div>
-                  <h2 className="text-lg font-semibold">Practice Test</h2>
-                  <p className="text-sm text-gray-600">
+                  <h2 className="text-lg font-semibold text-foreground">Practice Test</h2>
+                  <p className="text-sm text-muted-foreground">
                     {lessonInfo?.name || "Current Lesson"}
                   </p>
                 </div>
@@ -911,8 +927,8 @@ export default function PracticeTestClient({
                   onClick={toggleFlag}
                   className={
                     flaggedQuestions.has(currentQuestion)
-                      ? "text-yellow-600"
-                      : "text-gray-600"
+                      ? "text-amber-500"
+                      : "text-muted-foreground"
                   }
                 >
                   <Flag className="h-4 w-4 mr-1" />
@@ -928,8 +944,8 @@ export default function PracticeTestClient({
             {/* Progress Bar */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">Progress</span>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm font-medium text-foreground">Progress</span>
+                <span className="text-sm text-muted-foreground">
                   {answeredCount}/{questions.length} answered (
                   {Math.round(progressPercentage)}%)
                 </span>
@@ -947,15 +963,15 @@ export default function PracticeTestClient({
                   onClick={() => goToQuestion(index)}
                   className={`w-8 h-8 p-0 relative ${
                     index === currentQuestion
-                      ? "bg-blue-100 border-blue-300 text-blue-700"
+                      ? "bg-primary/10 border-primary/30 text-primary"
                       : answers[questions[index].id] !== undefined
-                      ? "bg-green-100 border-green-300 text-green-700"
-                      : "bg-gray-100 border-gray-300 text-gray-700"
+                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-300"
+                      : "bg-muted/40 border-border text-muted-foreground"
                   }`}
                 >
                   {index + 1}
                   {flaggedQuestions.has(index) && (
-                    <Flag className="h-2 w-2 absolute -top-1 -right-1 text-yellow-600" />
+                    <Flag className="h-2 w-2 absolute -top-1 -right-1 text-amber-500" />
                   )}
                 </Button>
               ))}
@@ -964,7 +980,7 @@ export default function PracticeTestClient({
             {/* Question Content */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-foreground">
                   {currentQ?.question_text}
                 </h2>
                 <Badge
@@ -978,11 +994,11 @@ export default function PracticeTestClient({
 
               {/* Question Type Indicator & Answer Options */}
               <div className="mb-6">
-                <div className="flex items-center gap-2 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-4 p-3 bg-muted/30 border border-border/60 rounded-lg text-foreground">
                   {getQuestionIcon(
                     currentQ?.question_type || "multiple_choice"
                   )}
-                  <span className="font-medium capitalize">
+                  <span className="font-medium capitalize text-foreground">
                     {currentQ?.question_type?.replace("_", " ") ||
                       "Multiple Choice"}
                   </span>
@@ -998,22 +1014,22 @@ export default function PracticeTestClient({
                           onClick={() => handleAnswerSelect(key)}
                           className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                             currentQuestionAnswer === key
-                              ? "bg-blue-50 border-blue-300"
-                              : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                              ? "bg-primary/10 border-primary/40"
+                              : "bg-muted/30 border-border hover:bg-muted/40"
                           }`}
                         >
                           <div
                             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                               currentQuestionAnswer === key
-                                ? "border-blue-500 bg-blue-500"
-                                : "border-gray-300"
+                                ? "border-primary bg-primary"
+                                : "border-border"
                             }`}
                           >
                             {currentQuestionAnswer === key && (
-                              <div className="w-2 h-2 bg-white rounded-full" />
+                              <div className="w-2 h-2 bg-primary-foreground rounded-full" />
                             )}
                           </div>
-                          <span className="text-lg flex-1">
+                          <span className="text-lg flex-1 text-foreground">
                             <strong>{key}.</strong> {option.text}
                           </span>
                         </div>
@@ -1030,22 +1046,22 @@ export default function PracticeTestClient({
                           onClick={() => handleAnswerSelect(key)}
                           className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                             currentQuestionAnswer === key
-                              ? "bg-blue-50 border-blue-300"
-                              : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                              ? "bg-primary/10 border-primary/40"
+                              : "bg-muted/30 border-border hover:bg-muted/40"
                           }`}
                         >
                           <div
                             className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                               currentQuestionAnswer === key
-                                ? "border-blue-500 bg-blue-500"
-                                : "border-gray-300"
+                                ? "border-primary bg-primary"
+                                : "border-border"
                             }`}
                           >
                             {currentQuestionAnswer === key && (
-                              <div className="w-2 h-2 bg-white rounded-full" />
+                              <div className="w-2 h-2 bg-primary-foreground rounded-full" />
                             )}
                           </div>
-                          <span className="text-lg flex-1">
+                          <span className="text-lg flex-1 text-foreground">
                             <strong>{key}.</strong> {option.text}
                           </span>
                         </div>
@@ -1067,7 +1083,7 @@ export default function PracticeTestClient({
               </Button>
 
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-muted-foreground">
                   {answeredCount}/{questions.length} answered
                 </span>
               </div>
@@ -1077,7 +1093,7 @@ export default function PracticeTestClient({
                   <Button
                     onClick={submitPracticeTest}
                     disabled={isSubmitting || answeredCount === 0}
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-primary-foreground hover:opacity-90"
                   >
                     {isSubmitting ? "Submitting..." : "Submit Test"}
                     <CheckCircle className="h-4 w-4 ml-2" />
@@ -1098,11 +1114,11 @@ export default function PracticeTestClient({
 
   // Fallback loading
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border border-border bg-card">
         <CardContent className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted/40 border-t-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
         </CardContent>
       </Card>
     </div>

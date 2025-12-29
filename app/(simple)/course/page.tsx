@@ -238,13 +238,13 @@ function CoursePageContent() {
 
   if (!courseId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 max-w-md w-full mx-4">
           <div className="text-center">
-            <h3 className="text-sm font-medium text-red-800">
+            <h3 className="text-sm font-medium text-destructive">
               Missing Course ID
             </h3>
-            <p className="text-sm text-red-700 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               No course ID provided in URL parameters.
             </p>
             <div className="mt-3">
@@ -252,7 +252,7 @@ function CoursePageContent() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-red-700 border-red-300"
+                  className="text-destructive border-destructive/40"
                 >
                   Back to Courses
                 </Button>
@@ -266,11 +266,11 @@ function CoursePageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-card rounded-lg border border-border p-6 max-w-md w-full mx-4">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h3 className="text-sm font-medium text-gray-800">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted/40 border-t-primary mx-auto mb-4"></div>
+            <h3 className="text-sm font-medium text-foreground">
               Loading Course...
             </h3>
           </div>
@@ -281,10 +281,10 @@ function CoursePageContent() {
 
   if (isError || !courseData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 max-w-md w-full mx-4">
           <div className="flex items-center">
-            <div className="text-red-600">
+            <div className="text-destructive">
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -294,10 +294,10 @@ function CoursePageContent() {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
+              <h3 className="text-sm font-medium text-destructive">
                 Error loading course
               </h3>
-              <p className="text-sm text-red-700 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Failed to fetch course data. Please try again.
               </p>
               <div className="mt-3">
@@ -305,7 +305,7 @@ function CoursePageContent() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-red-700 border-red-300"
+                    className="text-destructive border-destructive/40"
                   >
                     Back to Courses
                   </Button>
@@ -332,30 +332,30 @@ function CoursePageContent() {
   // Helper functions
   const getPublishStatusColor = (published: boolean) => {
     return published
-      ? "bg-green-100 text-green-700 border-green-200"
-      : "bg-red-100 text-red-700 border-red-200";
+      ? "bg-primary/10 text-primary border-primary/30"
+      : "bg-destructive/10 text-destructive border-destructive/30";
   };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage >= 100) return "bg-green-500";
-    if (percentage >= 50) return "bg-yellow-500";
-    return "bg-blue-500";
+    if (percentage >= 100) return "bg-emerald-500";
+    if (percentage >= 50) return "bg-amber-400";
+    return "bg-primary";
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Course Info Section */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-6 mb-8">
+        <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-6 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl font-bold text-foreground mb-3">
                 Course Overview
               </h2>
-              <p className="text-gray-600 mb-6">{courseData!.description}</p>
+              <p className="text-muted-foreground mb-6">{courseData!.description}</p>
 
               {/* Quick Actions */}
               <div className="flex flex-wrap gap-3">
@@ -376,7 +376,7 @@ function CoursePageContent() {
                 >
                   <Button
                     variant="outline"
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                    className="bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground"
                     size="sm"
                   >
                     <VideoIcon className="h-4 w-4 mr-2" />
@@ -393,7 +393,7 @@ function CoursePageContent() {
                 >
                   <Button
                     variant="outline"
-                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                    className="border-border text-foreground hover:bg-muted/40"
                     size="sm"
                   >
                     <MessageSquareIcon className="h-4 w-4 mr-2" />
@@ -411,7 +411,7 @@ function CoursePageContent() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                    className="border-border text-foreground hover:bg-muted/40"
                   >
                     <UsersIcon className="h-4 w-4 mr-2" />
                     Forum
@@ -422,29 +422,29 @@ function CoursePageContent() {
 
             {/* Course Stats */}
             <div className="space-y-4">
-              <div className="bg-blue-50 rounded-lg p-4">
-                <div className="text-sm text-blue-600 font-medium">
+              <div className="bg-muted/30 rounded-lg p-4 border border-border/60">
+                <div className="text-sm text-muted-foreground font-medium">
                   Course Code
                 </div>
-                <div className="text-lg font-bold text-blue-900">
+                <div className="text-lg font-bold text-foreground">
                   {courseData!.code}
                 </div>
               </div>
 
-              <div className="bg-emerald-50 rounded-lg p-4">
-                <div className="text-sm text-emerald-600 font-medium">
+              <div className="bg-muted/30 rounded-lg p-4 border border-border/60">
+                <div className="text-sm text-muted-foreground font-medium">
                   Total Modules
                 </div>
-                <div className="text-lg font-bold text-emerald-900">
+                <div className="text-lg font-bold text-foreground">
                   {courseModules.length}
                 </div>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-4">
-                <div className="text-sm text-purple-600 font-medium">
+              <div className="bg-muted/30 rounded-lg p-4 border border-border/60">
+                <div className="text-sm text-muted-foreground font-medium">
                   Completed
                 </div>
-                <div className="text-lg font-bold text-purple-900">
+                <div className="text-lg font-bold text-foreground">
                   {
                     courseModules.filter(
                       (m) => m.completed || (m.progress_percentage || 0) >= 100
@@ -460,10 +460,10 @@ function CoursePageContent() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-foreground mb-2">
                 Course Modules
               </h2>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Work through the course modules in order
               </p>
             </div>
@@ -472,7 +472,7 @@ function CoursePageContent() {
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white"
+                className="bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground"
                 onClick={() => {
                   setEditingModule(null);
                   setShowModuleCreator(true);
@@ -486,37 +486,37 @@ function CoursePageContent() {
           </div>
 
           {/* Course Modules Table - Server-rendered */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg">
-            <div className="p-6 border-b border-gray-200/50">
-              <h2 className="text-xl font-semibold text-gray-900">
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border shadow-lg">
+            <div className="p-6 border-b border-border/60">
+              <h2 className="text-xl font-semibold text-foreground">
                 Course Modules
               </h2>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="bg-card rounded-lg shadow-sm overflow-hidden">
+              <table className="min-w-full divide-y divide-border/60">
+                <thead className="bg-muted/40">
                   <tr>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Order
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Module Name
                     </th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Progress
                     </th>
                     {isAdmin && (
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Status
                       </th>
                     )}
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       {isAdmin ? "Management" : "Actions"}
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-card divide-y divide-border/60">
                   {courseModules.map((module) => {
                     const progressPercentage = module.progress_percentage || 0;
                     const isCompleted =
@@ -531,42 +531,42 @@ function CoursePageContent() {
 
                     let buttonText = "Launch";
                     let buttonClass =
-                      "bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white";
+                      "bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground";
                     let isDisabled = !isPublished && !isAdmin;
 
                     if (!isPublished && !isAdmin) {
                       buttonText = "Not Available";
-                      buttonClass = "bg-gray-400 text-white cursor-not-allowed";
+                      buttonClass = "bg-muted text-muted-foreground cursor-not-allowed";
                     } else if (isCompleted) {
                       buttonText = "Review";
                       buttonClass =
-                        "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white";
+                        "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:brightness-110 text-primary-foreground";
                     }
 
                     return (
-                      <tr key={module.id} className="hover:bg-gray-50">
+                      <tr key={module.id} className="hover:bg-muted/30">
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <Badge
                             variant="outline"
-                            className="bg-blue-50 text-blue-700 border-blue-200"
+                            className="bg-primary/10 text-primary border-primary/30"
                           >
                             {module.order}
                           </Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
-                            <div className="font-semibold text-gray-900">
+                            <div className="font-semibold text-foreground">
                               {module.name}
                             </div>
                             {module.description &&
                               module.description.trim() && (
-                                <div className="text-xs text-gray-500 mt-1 truncate max-w-xs">
+                                <div className="text-xs text-muted-foreground mt-1 truncate max-w-xs">
                                   {module.description}
                                 </div>
                               )}
                             {module.course_lessons &&
                               module.course_lessons.length > 0 && (
-                                <div className="text-xs text-gray-400 mt-1">
+                                <div className="text-xs text-muted-foreground mt-1">
                                   {module.course_lessons.length} lesson
                                   {module.course_lessons.length > 1 ? "s" : ""}
                                 </div>
@@ -580,7 +580,7 @@ function CoursePageContent() {
                                 ? `${completedLessons}/${totalLessons}`
                                 : "No lessons"}
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                            <div className="w-full bg-muted rounded-full h-2 mt-1">
                               <div
                                 className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(
                                   progressPercentage
@@ -588,7 +588,7 @@ function CoursePageContent() {
                                 style={{ width: `${progressPercentage}%` }}
                               />
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">
+                            <div className="text-xs text-muted-foreground mt-1">
                               {progressPercentage}%
                             </div>
                           </div>
@@ -633,7 +633,7 @@ function CoursePageContent() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    className="border-border text-foreground hover:bg-muted/40"
                                   >
                                     <SettingsIcon className="h-3 w-3" />
                                   </Button>
@@ -650,7 +650,7 @@ function CoursePageContent() {
                                     onClick={() =>
                                       handleDeleteModule(module.id)
                                     }
-                                    className="flex items-center gap-2 text-red-600"
+                                    className="flex items-center gap-2 text-destructive"
                                   >
                                     <TrashIcon className="h-4 w-4" />
                                     Delete Module
@@ -671,24 +671,24 @@ function CoursePageContent() {
 
         {/* Progress Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 text-center">
+            <div className="text-2xl font-bold text-primary">
               {courseModules.length}
             </div>
-            <div className="text-sm text-gray-600">Total Modules</div>
+            <div className="text-sm text-muted-foreground">Total Modules</div>
           </div>
-          <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 text-center">
+            <div className="text-2xl font-bold text-emerald-500">
               {
                 courseModules.filter(
                   (m) => m.completed || (m.progress_percentage || 0) >= 100
                 ).length
               }
             </div>
-            <div className="text-sm text-gray-600">Completed</div>
+            <div className="text-sm text-muted-foreground">Completed</div>
           </div>
-          <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 text-center">
+            <div className="text-2xl font-bold text-amber-500">
               {
                 courseModules.filter(
                   (m) =>
@@ -698,17 +698,17 @@ function CoursePageContent() {
                 ).length
               }
             </div>
-            <div className="text-sm text-gray-600">In Progress</div>
+            <div className="text-sm text-muted-foreground">In Progress</div>
           </div>
-          <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-            <div className="text-2xl font-bold text-gray-600">
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 text-center">
+            <div className="text-2xl font-bold text-muted-foreground">
               {
                 courseModules.filter(
                   (m) => !m.completed && (m.progress_percentage || 0) === 0
                 ).length
               }
             </div>
-            <div className="text-sm text-gray-600">Not Started</div>
+            <div className="text-sm text-muted-foreground">Not Started</div>
           </div>
         </div>
       </main>
@@ -736,11 +736,11 @@ export default function CoursePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="bg-card rounded-lg border border-border p-6 max-w-md w-full mx-4">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <h3 className="text-sm font-medium text-gray-800">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted/40 border-t-primary mx-auto mb-4"></div>
+              <h3 className="text-sm font-medium text-foreground">
                 Loading Course...
               </h3>
             </div>

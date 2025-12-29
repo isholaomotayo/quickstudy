@@ -3,9 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export default function CourseViewerSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header Skeleton */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-card border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -23,7 +23,7 @@ export default function CourseViewerSkeleton() {
 
       <div className="max-w-7xl mx-auto flex">
         {/* Sidebar Skeleton */}
-        <div className="w-80 bg-white border-r border-gray-200 p-6">
+        <div className="w-80 bg-card border-r border-border p-6">
           {/* Progress Section */}
           <div className="mb-8">
             <Skeleton className="h-4 w-32 mb-3" />
@@ -41,7 +41,7 @@ export default function CourseViewerSkeleton() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+                className="flex items-center space-x-3 p-3 bg-muted/30 rounded-lg"
               >
                 <Skeleton className="h-4 w-4 rounded-full" />
                 <div className="flex-1 space-y-2">

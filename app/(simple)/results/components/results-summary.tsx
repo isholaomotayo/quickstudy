@@ -99,17 +99,17 @@ export function ResultsSummary({ results, gpas }: ResultsSummaryProps) {
   const getGradeColor = (grade: string) => {
     switch (grade) {
       case "A":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50";
       case "B":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary/10 text-primary border border-primary/40";
       case "C":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50";
       case "D":
-        return "bg-orange-100 text-orange-800";
+        return "bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-400/50";
       case "E":
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted/30 text-muted-foreground border border-border/60";
       case "F":
-        return "bg-red-100 text-red-800";
+        return "bg-destructive/10 text-destructive border border-destructive/40";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -117,20 +117,20 @@ export function ResultsSummary({ results, gpas }: ResultsSummaryProps) {
 
   const getClassOfDegree = (cgpa: number) => {
     if (cgpa >= 4.5)
-      return { class: "First Class", color: "bg-green-100 text-green-800" };
+    return { class: "First Class", color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50" };
     if (cgpa >= 3.5)
       return {
         class: "Second Class Upper",
-        color: "bg-blue-100 text-blue-800",
+        color: "bg-primary/10 text-primary border border-primary/40",
       };
     if (cgpa >= 2.5)
       return {
         class: "Second Class Lower",
-        color: "bg-yellow-100 text-yellow-800",
+        color: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50",
       };
     if (cgpa >= 1.5)
-      return { class: "Third Class", color: "bg-orange-100 text-orange-800" };
-    return { class: "Pass", color: "bg-gray-100 text-gray-800" };
+      return { class: "Third Class", color: "bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-400/50" };
+    return { class: "Pass", color: "bg-muted/30 text-muted-foreground border border-border/60" };
   };
 
   const degreeClass = stats.latestGpa
@@ -140,36 +140,36 @@ export function ResultsSummary({ results, gpas }: ResultsSummaryProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {/* Total Courses */}
-      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+      <Card className="bg-card border border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center space-x-2 text-blue-900">
+          <CardTitle className="flex items-center space-x-2 text-foreground">
             <BookOpen className="h-5 w-5" />
             <span className="text-sm">Total Courses</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-blue-900">
+          <div className="text-2xl font-bold text-foreground">
             {stats.totalCourses}
           </div>
-          <div className="text-xs text-blue-700 mt-1">
+          <div className="text-xs text-muted-foreground mt-1">
             {stats.totalUnits} Units
           </div>
         </CardContent>
       </Card>
 
       {/* Average Score */}
-      <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+      <Card className="bg-card border border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center space-x-2 text-green-900">
+          <CardTitle className="flex items-center space-x-2 text-foreground">
             <Target className="h-5 w-5" />
             <span className="text-sm">Average Score</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-green-900">
+          <div className="text-2xl font-bold text-foreground">
             {stats.averageScore}%
           </div>
-          <div className="text-xs text-green-700 mt-1">
+          <div className="text-xs text-muted-foreground mt-1">
             {stats.averageScore >= 70
               ? "Excellent"
               : stats.averageScore >= 60
@@ -184,18 +184,18 @@ export function ResultsSummary({ results, gpas }: ResultsSummaryProps) {
       </Card>
 
       {/* Pass Rate */}
-      <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+      <Card className="bg-card border border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center space-x-2 text-emerald-900">
+          <CardTitle className="flex items-center space-x-2 text-foreground">
             <TrendingUp className="h-5 w-5" />
             <span className="text-sm">Pass Rate</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-emerald-900">
+          <div className="text-2xl font-bold text-foreground">
             {stats.passRate}%
           </div>
-          <div className="text-xs text-emerald-700 mt-1">
+          <div className="text-xs text-muted-foreground mt-1">
             {stats.passedCourses} passed, {stats.failedCourses} failed
           </div>
           <Progress value={stats.passRate} className="mt-2 h-2" />
@@ -203,9 +203,9 @@ export function ResultsSummary({ results, gpas }: ResultsSummaryProps) {
       </Card>
 
       {/* CGPA */}
-      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+      <Card className="bg-card border border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center space-x-2 text-purple-900">
+          <CardTitle className="flex items-center space-x-2 text-foreground">
             <Award className="h-5 w-5" />
             <span className="text-sm">CGPA</span>
           </CardTitle>
@@ -213,7 +213,7 @@ export function ResultsSummary({ results, gpas }: ResultsSummaryProps) {
         <CardContent>
           {stats.latestGpa ? (
             <>
-              <div className="text-2xl font-bold text-purple-900">
+              <div className="text-2xl font-bold text-foreground">
                 {parseFloat(String(stats.latestGpa.cumulative_gpa) || "0").toFixed(2)}
               </div>
               <Badge className={`mt-1 ${degreeClass?.color}`}>
@@ -221,7 +221,7 @@ export function ResultsSummary({ results, gpas }: ResultsSummaryProps) {
               </Badge>
             </>
           ) : (
-            <div className="text-sm text-purple-700">No GPA data available</div>
+            <div className="text-sm text-muted-foreground">No GPA data available</div>
           )}
         </CardContent>
       </Card>

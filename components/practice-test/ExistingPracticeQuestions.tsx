@@ -179,26 +179,28 @@ export default function ExistingPracticeQuestions({
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/40";
       case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-400/40";
       case "hard":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-destructive/10 text-destructive border border-destructive/30";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-muted/30 text-foreground border border-border/60";
     }
   };
 
   if (loading) {
     return (
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-center py-8">
-            <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+    <Card className="mb-6 bg-card border border-border">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-center py-8">
+          <RefreshCw className="h-5 w-5 animate-spin mr-2 text-primary" />
+          <span className="text-muted-foreground">
             Loading existing practice questions...
-          </div>
-        </CardContent>
-      </Card>
+          </span>
+        </div>
+      </CardContent>
+    </Card>
     );
   }
 
@@ -207,13 +209,13 @@ export default function ExistingPracticeQuestions({
   }
 
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 bg-card border border-border">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
+          <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors">
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-purple-600" />
+                <BarChart3 className="h-5 w-5 text-primary" />
                 <span>Existing Practice Questions</span>
                 <Badge variant="outline">{questions.length} questions</Badge>
               </div>
@@ -252,8 +254,8 @@ export default function ExistingPracticeQuestions({
             {/* Summary Statistics */}
             {summary && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2">By Type</h4>
+                <div className="p-3 bg-muted/30 border border-border/60 rounded-lg">
+                  <h4 className="font-medium text-foreground mb-2">By Type</h4>
                   <div className="space-y-1 text-sm">
                     {summary.byType.multiple_choice > 0 && (
                       <div className="flex justify-between">
@@ -291,8 +293,8 @@ export default function ExistingPracticeQuestions({
                   </div>
                 </div>
 
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <h4 className="font-medium text-green-900 mb-2">
+                <div className="p-3 bg-muted/30 border border-border/60 rounded-lg">
+                  <h4 className="font-medium text-foreground mb-2">
                     By Difficulty
                   </h4>
                   <div className="space-y-1 text-sm">
@@ -340,7 +342,7 @@ export default function ExistingPracticeQuestions({
 
                 <Button
                   onClick={handleRetakeTest}
-                  className="gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                  className="gap-2 bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground"
                 >
                   <Play className="h-4 w-4" />
                   Retake Test
@@ -356,7 +358,7 @@ export default function ExistingPracticeQuestions({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="gap-2 text-red-600"
+                        className="gap-2 text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
                         Clear My Questions
@@ -389,11 +391,11 @@ export default function ExistingPracticeQuestions({
               {questions.map((question, index) => (
                 <div
                   key={question.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border border-border rounded-lg p-4 hover:bg-muted/30 transition-colors"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-medium">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-medium">
                         {index + 1}
                       </div>
                       <Badge
@@ -403,7 +405,7 @@ export default function ExistingPracticeQuestions({
                       >
                         {question.difficulty_level}
                       </Badge>
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         {getQuestionTypeIcon(question.question_type)}
                         <span className="capitalize">
                           {question.question_type.replace("_", " ")}
@@ -412,12 +414,12 @@ export default function ExistingPracticeQuestions({
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="text-xs text-gray-500 flex items-center gap-1">
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
                         <User className="h-3 w-3" />
                         {question.generated_by.first_name}{" "}
                         {question.generated_by.last_name}
                       </div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1">
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         {new Date(question.created_at).toLocaleDateString()}
                       </div>
@@ -429,7 +431,7 @@ export default function ExistingPracticeQuestions({
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                className="h-6 w-6 p-0 text-destructive hover:text-destructive/80"
                                 disabled={deleting === question.id}
                               >
                                 {deleting === question.id ? (
@@ -468,7 +470,7 @@ export default function ExistingPracticeQuestions({
                   <h3 className="font-medium mb-3">{question.question_text}</h3>
 
                   {/* Show question details */}
-                  <div className="text-sm text-gray-600 space-y-2">
+                  <div className="text-sm text-muted-foreground space-y-2">
                     {question.question_type === "multiple_choice" &&
                       question.options && (
                         <div className="ml-4">
@@ -479,14 +481,14 @@ export default function ExistingPracticeQuestions({
                                 key={key}
                                 className={`flex items-center gap-2 ${
                                   option.is_correct
-                                    ? "text-green-700 font-medium"
+                                    ? "text-emerald-600 dark:text-emerald-300 font-medium"
                                     : ""
                                 }`}
                               >
                                 <span className="font-medium">{key}.</span>
                                 <span>{option.text}</span>
                                 {option.is_correct && (
-                                  <Badge className="bg-green-100 text-green-800 text-xs">
+                                  <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-400/40 text-xs">
                                     Correct
                                   </Badge>
                                 )}
@@ -499,18 +501,18 @@ export default function ExistingPracticeQuestions({
                     {question.question_type !== "multiple_choice" && (
                       <div className="ml-4">
                         <span className="font-medium">Answer: </span>
-                        <span className="text-green-700 font-medium">
+                        <span className="text-emerald-600 dark:text-emerald-300 font-medium">
                           {question.correct_answer}
                         </span>
                       </div>
                     )}
 
                     {question.explanation && (
-                      <div className="ml-4 mt-3 p-2 bg-blue-50 border border-blue-200 rounded">
-                        <span className="font-medium text-blue-900">
+                      <div className="ml-4 mt-3 p-2 bg-muted/30 border border-border/60 rounded">
+                        <span className="font-medium text-foreground">
                           Explanation:{" "}
                         </span>
-                        <span className="text-blue-800">
+                        <span className="text-muted-foreground">
                           {question.explanation}
                         </span>
                       </div>

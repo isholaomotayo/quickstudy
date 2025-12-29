@@ -5,16 +5,16 @@ import { BookOpen, ArrowLeft } from 'lucide-react'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6">
-      <Card className="max-w-md w-full text-center">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <Card className="max-w-md w-full text-center border border-border bg-card">
         <CardHeader>
-          <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
-            <BookOpen className="h-8 w-8 text-blue-600" />
+          <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+            <BookOpen className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-gray-900">Page Not Found</CardTitle>
+          <CardTitle className="text-foreground">Page Not Found</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             The course registration page you're looking for doesn't exist or has been moved.
           </p>
           <div className="flex flex-col gap-2">

@@ -95,19 +95,19 @@ export default function OERPage() {
       case "Academic & Research Tools":
         return "from-indigo-500 to-indigo-600";
       default:
-        return "from-gray-500 to-gray-600";
+        return "from-muted-foreground/50 to-muted-foreground";
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
+    <div className="min-h-screen bg-background">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12 animate-in fade-in duration-700">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-foreground mb-4">
             Discover Free Learning Resources
           </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
             Access thousands of free, high-quality educational resources from
             top universities and institutions worldwide. Enhance your learning
             with open courseware, research repositories, virtual labs, and
@@ -118,21 +118,21 @@ export default function OERPage() {
         {/* Search and Filter Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Search */}
-          <Card className="lg:col-span-2 bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-top duration-700">
+          <Card className="lg:col-span-2 border border-border bg-card shadow-lg animate-in slide-in-from-top duration-700">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
-                <Search className="w-5 h-5 text-emerald-600" />
+                <Search className="w-5 h-5 text-primary" />
                 Search Resources
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   placeholder="Search for courses, tools, simulations, or topics..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white/50 backdrop-blur-sm border-gray-200"
+                  className="pl-10 bg-background border border-border/60"
                 />
                 {searchQuery && (
                   <Button
@@ -149,10 +149,10 @@ export default function OERPage() {
           </Card>
 
           {/* Category Filter */}
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg animate-in slide-in-from-top duration-700">
+          <Card className="border border-border bg-card shadow-lg animate-in slide-in-from-top duration-700">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
-                <Filter className="w-5 h-5 text-emerald-600" />
+                <Filter className="w-5 h-5 text-primary" />
                 Filter by Category
               </CardTitle>
             </CardHeader>
@@ -161,7 +161,7 @@ export default function OERPage() {
                 value={selectedCategory}
                 onValueChange={setSelectedCategory}
               >
-                <SelectTrigger className="bg-white/50 backdrop-blur-sm border-gray-200">
+                <SelectTrigger className="bg-background border border-border/60">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,7 +178,7 @@ export default function OERPage() {
 
         {/* Results Summary */}
         <div className="mb-6">
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Showing {filteredResources.length} resource
             {filteredResources.length !== 1 ? "s" : ""}
             {searchQuery && ` for "${searchQuery}"`}
@@ -195,7 +195,7 @@ export default function OERPage() {
             return (
               <Card
                 key={resource.name}
-                className="bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer animate-in slide-in-from-bottom group"
+                className="border border-border bg-card shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer animate-in slide-in-from-bottom group"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <CardContent className="p-6">
@@ -206,20 +206,20 @@ export default function OERPage() {
                       <CategoryIcon className="w-6 h-6" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors duration-200 mb-2">
+                      <h4 className="font-bold text-foreground group-hover:text-primary transition-colors duration-200 mb-2">
                         {resource.name}
                       </h4>
                       <Badge variant="secondary" className="text-xs mb-3">
                         {resource.category}
                       </Badge>
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
                         {resource.summary}
                       </p>
                       <a
                         href={resource.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors duration-200"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:opacity-80 transition-colors duration-200"
                         onClick={(e) => e.stopPropagation()}
                       >
                         Visit Resource
@@ -236,13 +236,13 @@ export default function OERPage() {
         {/* No Results */}
         {filteredResources.length === 0 && (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-gray-400" />
+            <div className="w-16 h-16 bg-muted/40 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-foreground mb-2">
               No resources found
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               Try adjusting your search terms or category filter
             </p>
             <Button
@@ -259,7 +259,7 @@ export default function OERPage() {
 
         {/* Category Overview */}
         <div className="mt-16">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">
+          <h3 className="text-2xl font-bold text-foreground mb-6">
             Resource Categories
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -272,7 +272,7 @@ export default function OERPage() {
               return (
                 <Card
                   key={category}
-                  className="bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer animate-in slide-in-from-left"
+                  className="border border-border bg-card shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer animate-in slide-in-from-left"
                   style={{ animationDelay: `${index * 200}ms` }}
                   onClick={() => setSelectedCategory(category)}
                 >
@@ -284,16 +284,16 @@ export default function OERPage() {
                         <CategoryIcon className="w-6 h-6" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-gray-900 truncate">
+                        <h4 className="font-bold text-foreground truncate">
                           {category}
                         </h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {categoryResources.length} resource
                           {categoryResources.length !== 1 ? "s" : ""}
                         </p>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       {category === "Open Courseware & MOOCs" &&
                         "Free university courses and materials from top institutions"}
                       {category === "Research & Open Access" &&

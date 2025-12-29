@@ -22,7 +22,7 @@ export default function NotificationsError({
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-destructive via-amber-500 to-primary bg-clip-text text-transparent">
           Something went wrong
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -33,19 +33,19 @@ export default function NotificationsError({
       {/* Error Card */}
       <GlassCard className="text-center py-12">
         <div className="max-w-md mx-auto space-y-6">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-            <AlertCircle className="w-8 h-8 text-red-600" />
+          <div className="w-16 h-16 bg-destructive/15 rounded-full flex items-center justify-center mx-auto">
+            <AlertCircle className="w-8 h-8 text-destructive" />
           </div>
           
           <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-foreground">
               Failed to load notifications
             </h2>
             <p className="text-muted-foreground">
               {error.message || "An unexpected error occurred while fetching your notifications."}
             </p>
             {error.digest && (
-              <p className="text-xs text-gray-400 font-mono">
+              <p className="text-xs text-muted-foreground font-mono">
                 Error ID: {error.digest}
               </p>
             )}

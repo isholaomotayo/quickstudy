@@ -115,28 +115,28 @@ export function CourseResults({
   const getGradeBadgeClass = (grade: string) => {
     switch (grade) {
       case "A":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50";
       case "B":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary/10 text-primary border border-primary/40";
       case "C":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50";
       case "D":
-        return "bg-orange-100 text-orange-800";
+        return "bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-400/50";
       case "E":
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted/30 text-muted-foreground border border-border/60";
       case "F":
-        return "bg-red-100 text-red-800";
+        return "bg-destructive/10 text-destructive border border-destructive/40";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted/30 text-muted-foreground border border-border/60";
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 70) return "text-green-600";
-    if (score >= 60) return "text-blue-600";
-    if (score >= 50) return "text-yellow-600";
-    if (score >= 40) return "text-orange-600";
-    return "text-red-600";
+    if (score >= 70) return "text-emerald-600 dark:text-emerald-300";
+    if (score >= 60) return "text-primary";
+    if (score >= 50) return "text-amber-600 dark:text-amber-300";
+    if (score >= 40) return "text-orange-600 dark:text-orange-300";
+    return "text-destructive";
   };
 
   const getStatusIcon = (score: number) => {
@@ -150,14 +150,14 @@ export function CourseResults({
 
   if (results.length === 0) {
     return (
-      <Card>
+      <Card className="border border-border bg-card">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
-            <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900">
+            <BookOpen className="mx-auto h-12 w-12 text-muted-foreground" />
+            <h3 className="text-lg font-medium text-foreground">
               No Course Results Available
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Your course results will appear here once they are published by
               your instructors.
             </p>
@@ -173,9 +173,9 @@ export function CourseResults({
   return (
     <div className="space-y-6">
       {/* Grading Scale Reference */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+      <Card className="bg-muted/30 border border-border/60">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-blue-900">
+          <CardTitle className="flex items-center space-x-2 text-foreground">
             <Award className="h-5 w-5" />
             <span>Grading Scale</span>
           </CardTitle>
@@ -183,28 +183,28 @@ export function CourseResults({
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
             <div className="flex items-center space-x-2">
-              <Badge className="bg-green-100 text-green-800">A</Badge>
-              <span className="text-gray-600">70-100 (Excellent)</span>
+              <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50">A</Badge>
+              <span className="text-muted-foreground">70-100 (Excellent)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge className="bg-blue-100 text-blue-800">B</Badge>
-              <span className="text-gray-600">60-69 (Very Good)</span>
+              <Badge className="bg-primary/10 text-primary border border-primary/40">B</Badge>
+              <span className="text-muted-foreground">60-69 (Very Good)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge className="bg-yellow-100 text-yellow-800">C</Badge>
-              <span className="text-gray-600">50-59 (Good)</span>
+              <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50">C</Badge>
+              <span className="text-muted-foreground">50-59 (Good)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge className="bg-orange-100 text-orange-800">D</Badge>
-              <span className="text-gray-600">45-49 (Fair)</span>
+              <Badge className="bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-400/50">D</Badge>
+              <span className="text-muted-foreground">45-49 (Fair)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge className="bg-gray-100 text-gray-800">E</Badge>
-              <span className="text-gray-600">40-44 (Pass)</span>
+              <Badge className="bg-muted/30 text-muted-foreground border border-border/60">E</Badge>
+              <span className="text-muted-foreground">40-44 (Pass)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge className="bg-red-100 text-red-800">F</Badge>
-              <span className="text-gray-600">0-39 (Fail)</span>
+              <Badge className="bg-destructive/10 text-destructive border border-destructive/40">F</Badge>
+              <span className="text-muted-foreground">0-39 (Fail)</span>
             </div>
           </div>
         </CardContent>
@@ -229,15 +229,15 @@ export function CourseResults({
         const calculatedGPA = totalUnits > 0 ? totalPoints / totalUnits : 0;
 
         return (
-          <Card key={semesterKey} className="overflow-hidden">
+          <Card key={semesterKey} className="overflow-hidden border border-border bg-card">
             <CardHeader
-              className="cursor-pointer hover:bg-gray-50 transition-colors"
+              className="cursor-pointer hover:bg-muted/40 transition-colors"
               onClick={() => toggleSemester(semesterKey)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <Calendar className="h-5 w-5 text-primary" />
                     <CardTitle className="text-lg">
                       {semesterData.level} - {semesterData.semester}
                     </CardTitle>
@@ -249,8 +249,8 @@ export function CourseResults({
                 <div className="flex items-center space-x-4">
                   {semesterGpa && (
                     <div className="text-right">
-                      <div className="text-sm text-gray-500">Semester GPA</div>
-                      <div className="text-lg font-bold text-blue-600">
+                      <div className="text-sm text-muted-foreground">Semester GPA</div>
+                      <div className="text-lg font-bold text-primary">
                         {semesterGpa.current_gpa
                           ? parseFloat(String(semesterGpa.current_gpa) || "0").toFixed(2)
                           : calculatedGPA.toFixed(2)}
@@ -258,9 +258,9 @@ export function CourseResults({
                     </div>
                   )}
                   {isExpanded ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
                   )}
                 </div>
               </div>
@@ -271,26 +271,26 @@ export function CourseResults({
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      <tr className="border-b border-border/60">
+                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">
                           Course Code
                         </th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-700">
+                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">
                           Course Title
                         </th>
-                        <th className="text-center py-3 px-4 font-medium text-gray-700">
+                        <th className="text-center py-3 px-4 font-medium text-muted-foreground">
                           Units
                         </th>
-                        <th className="text-center py-3 px-4 font-medium text-gray-700">
+                        <th className="text-center py-3 px-4 font-medium text-muted-foreground">
                           Score
                         </th>
-                        <th className="text-center py-3 px-4 font-medium text-gray-700">
+                        <th className="text-center py-3 px-4 font-medium text-muted-foreground">
                           Grade
                         </th>
-                        <th className="text-center py-3 px-4 font-medium text-gray-700">
+                        <th className="text-center py-3 px-4 font-medium text-muted-foreground">
                           Points
                         </th>
-                        <th className="text-center py-3 px-4 font-medium text-gray-700">
+                        <th className="text-center py-3 px-4 font-medium text-muted-foreground">
                           Status
                         </th>
                       </tr>
@@ -299,15 +299,15 @@ export function CourseResults({
                       {semesterData.results.map((result) => (
                         <tr
                           key={result.id}
-                          className="border-b border-gray-100 hover:bg-gray-50"
+                          className="border-b border-border/40 hover:bg-muted/30"
                         >
-                          <td className="py-3 px-4 font-mono text-sm text-gray-900">
+                          <td className="py-3 px-4 font-mono text-sm text-foreground">
                             {result.studentcourse.course.code}
                           </td>
-                          <td className="py-3 px-4 text-sm text-gray-900">
+                          <td className="py-3 px-4 text-sm text-foreground">
                             {result.studentcourse.course.name}
                           </td>
-                          <td className="py-3 px-4 text-center text-sm text-gray-600">
+                          <td className="py-3 px-4 text-center text-sm text-muted-foreground">
                             {result.studentcourse.course.units}
                           </td>
                           <td className="py-3 px-4 text-center">
@@ -328,7 +328,7 @@ export function CourseResults({
                               {result.grade.name}
                             </Badge>
                           </td>
-                          <td className="py-3 px-4 text-center text-sm font-medium text-gray-900">
+                          <td className="py-3 px-4 text-center text-sm font-medium text-foreground">
                             {(
                               result.studentcourse.course.units *
                               (result.grade.point || 0)
@@ -340,8 +340,8 @@ export function CourseResults({
                               <span
                                 className={`text-xs font-medium ${
                                   result.score >= 40
-                                    ? "text-green-600"
-                                    : "text-red-600"
+                                    ? "text-emerald-600 dark:text-emerald-300"
+                                    : "text-destructive"
                                 }`}
                               >
                                 {result.score >= 40 ? "PASS" : "FAIL"}

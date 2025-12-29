@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
     const level = searchParams.get("level");
     const status = searchParams.get("status");
     const limit = searchParams.get("limit");
+    const page = searchParams.get("page");
 
     console.log("Courses API params:", {
       search,
@@ -34,20 +35,27 @@ export async function GET(request: NextRequest) {
       level,
       status,
       limit,
+      page,
     });
 
-    const courses = await getCoursesData(
+    const result = await getCoursesData(
       search || undefined,
       faculty || undefined,
       department || undefined,
       programme || undefined,
       level || undefined,
       status || undefined,
-      limit ? parseInt(limit) : 50
+      limit ? parseInt(limit) : 50,
+      page ? parseInt(page) : 1
     );
 
-    console.log("Courses fetched successfully, count:", courses.length);
-    return createSuccessResponse(courses, user);
+    console.log(
+      "Courses fetched successfully, count:",
+      result.courses.length,
+      "total:",
+      result.total
+    );
+    return createSuccessResponse(result, user);
   } catch (error) {
     console.error("Error in courses API:", error);
     return NextResponse.json(

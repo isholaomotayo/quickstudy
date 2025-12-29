@@ -61,7 +61,13 @@ export async function GET(request: NextRequest, context: RouteParams) {
       return createAuthErrorResponse("Course test not found", 404);
     }
 
-    return createSuccessResponse(test, user);
+    // Transform field name for frontend compatibility
+    const transformedTest = {
+      ...test,
+      course_questions: test.course_question || [],
+    };
+
+    return createSuccessResponse(transformedTest, user);
   } catch (error) {
     console.error("Error fetching course test:", error);
     return NextResponse.json(

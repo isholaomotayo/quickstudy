@@ -16,11 +16,11 @@ interface PracticeTestPageProps {
 
 function PracticeTestSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-4xl border border-border bg-card">
         <CardContent className="p-8 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading practice test...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted/40 border-t-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading practice test...</p>
         </CardContent>
       </Card>
     </div>

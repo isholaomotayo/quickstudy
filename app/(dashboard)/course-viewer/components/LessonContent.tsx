@@ -106,19 +106,19 @@ const LessonContent = forwardRef<HTMLDivElement, LessonContentProps>(
       <div
         ref={ref}
         className={cn(
-          "prose prose-gray max-w-none select-text",
-          "prose-headings:text-gray-900 prose-headings:font-semibold",
+          "prose prose-neutral max-w-none select-text",
+          "prose-headings:text-foreground prose-headings:font-semibold",
           "prose-h1:text-2xl prose-h1:font-bold prose-h1:mb-6",
           "prose-h2:text-xl prose-h2:font-semibold prose-h2:mb-4",
           "prose-h3:text-lg prose-h3:font-medium prose-h3:mb-3",
-          "prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4",
-          "prose-ul:text-gray-700 prose-ol:text-gray-700",
+          "prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-4",
+          "prose-ul:text-muted-foreground prose-ol:text-muted-foreground",
           "prose-li:mb-2",
-          "prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600",
-          "prose-strong:text-gray-900 prose-strong:font-semibold",
-          "prose-em:text-gray-800 prose-em:italic",
-          "prose-a:text-blue-600 prose-a:no-underline prose-a:font-medium hover:prose-a:text-blue-800",
-          "prose-hr:border-gray-200 prose-hr:my-8",
+          "prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-muted-foreground",
+          "prose-strong:text-foreground prose-strong:font-semibold",
+          "prose-em:text-foreground prose-em:italic",
+          "prose-a:text-primary prose-a:no-underline prose-a:font-medium hover:prose-a:underline",
+          "prose-hr:border-border prose-hr:my-8",
           className
         )}
         style={{ userSelect: 'text', WebkitUserSelect: 'text' }}

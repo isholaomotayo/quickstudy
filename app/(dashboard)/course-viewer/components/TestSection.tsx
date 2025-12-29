@@ -14,6 +14,8 @@ import {
     Plus,
     Edit,
     Trash2,
+    Eye,
+    EyeOff,
 } from "lucide-react";
 import { AssignmentCreatorModal } from "./AssignmentCreatorModal";
 import { AssignmentEditorModal } from "./AssignmentEditorModal";
@@ -277,13 +279,13 @@ export default function TestSection({
   const getTestColor = (test: Test) => {
     switch (test.format?.toLowerCase()) {
       case "quiz":
-        return "bg-blue-50 border-blue-200 text-blue-800";
+        return "bg-primary/10 border border-primary/30 text-primary";
       case "exam":
-        return "bg-red-50 border-red-200 text-red-800";
+        return "bg-destructive/10 border border-destructive/30 text-destructive";
       case "assignment":
-        return "bg-green-50 border-green-200 text-green-800";
+        return "bg-emerald-500/10 border border-emerald-400/40 text-emerald-600 dark:text-emerald-300";
       default:
-        return "bg-gray-50 border-gray-200 text-gray-800";
+        return "bg-muted/30 border border-border/60 text-foreground";
     }
   };
 
@@ -310,7 +312,7 @@ export default function TestSection({
 
     try {
       await api.delete(`/api/coursetest/${assignmentToDelete.id}`);
-      
+
       toast.success("Assignment deleted successfully!");
       if (onRefresh) {
         onRefresh();
@@ -321,13 +323,32 @@ export default function TestSection({
     }
   };
 
+  const handleTogglePublished = async (test: Test) => {
+    try {
+      const newPublishedStatus = !test.published;
+      await api.put(`/api/coursetest/${test.id}`, {
+        published: newPublishedStatus,
+      });
+
+      toast.success(
+        `Test ${newPublishedStatus ? "published" : "unpublished"} successfully!`
+      );
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error: any) {
+      console.error("Error toggling test published status:", error);
+      toast.error(error.message || "Failed to update test");
+    }
+  };
+
   return (
     <>
-      <Card className="mb-6">
+      <Card className="mb-6 bg-card border border-border">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
-              <FileText className="h-5 w-5 text-gray-600" />
+              <FileText className="h-5 w-5 text-muted-foreground" />
               <span>Lesson Assessments</span>
               <Badge variant="outline" className="ml-2">
                 {tests.length} test{tests.length > 1 ? "s" : ""}
@@ -356,7 +377,7 @@ export default function TestSection({
             {tests.map((test, index) => (
               <div
                 key={test.id || index}
-                className={`p-4 rounded-lg border ${getTestColor(test)}`}
+                className={`p-4 rounded-lg ${getTestColor(test)}`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3 flex-1">
@@ -374,9 +395,31 @@ export default function TestSection({
                         >
                           {test.format?.toUpperCase() || "TEST"}
                         </Badge>
+                        {canCreateAssignments && (
+                          <Badge
+                            variant={test.published ? "default" : "outline"}
+                            className={`text-xs ${
+                              test.published
+                                ? "bg-emerald-500/10 border-emerald-400/40 text-emerald-600 dark:text-emerald-300"
+                                : "bg-amber-500/10 border-amber-400/40 text-amber-600 dark:text-amber-300"
+                            }`}
+                          >
+                            {test.published ? (
+                              <>
+                                <Eye className="h-3 w-3 mr-1" />
+                                Published
+                              </>
+                            ) : (
+                              <>
+                                <EyeOff className="h-3 w-3 mr-1" />
+                                Draft
+                              </>
+                            )}
+                          </Badge>
+                        )}
                       </div>
 
-                      <div className="flex items-center space-x-4 text-xs text-gray-600">
+                      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                         <span className="flex items-center">
                           <Clock className="h-3 w-3 mr-1" />
                           {test.duration_mins} min
@@ -393,13 +436,13 @@ export default function TestSection({
                       </div>
 
                       {test.instructions && (
-                        <div className="mt-2 text-xs text-gray-500">
+                        <div className="mt-2 text-xs text-muted-foreground">
                           <strong>Instructions:</strong> {test.instructions}
                         </div>
                       )}
 
                       {test.deadline && (
-                        <div className="mt-1 text-xs text-gray-500">
+                        <div className="mt-1 text-xs text-muted-foreground">
                           <strong>Deadline:</strong>{" "}
                           {new Date(test.deadline).toLocaleDateString()}
                         </div>
@@ -428,6 +471,28 @@ export default function TestSection({
 
                     {canCreateAssignments && (
                       <>
+                        {/* Publish/Unpublish Toggle */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleTogglePublished(test)}
+                          className={`flex-shrink-0 gap-1 ${
+                            test.published
+                              ? "text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                              : "text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                          }`}
+                          title={
+                            test.published
+                              ? "Click to unpublish (hide from students)"
+                              : "Click to publish (show to students)"
+                          }
+                        >
+                          {test.published ? (
+                            <EyeOff className="h-3 w-3" />
+                          ) : (
+                            <Eye className="h-3 w-3" />
+                          )}
+                        </Button>
                         {test.format === "assignment" ? (
                           <>
                             <Button
@@ -450,7 +515,7 @@ export default function TestSection({
                               variant="outline"
                               size="sm"
                               onClick={() => handleDeleteAssignment(test)}
-                              className="flex-shrink-0 text-red-500 hover:text-red-700"
+                              className="flex-shrink-0 text-destructive hover:text-destructive/80"
                             >
                               <Trash2 className="h-3 w-3" />
                             </Button>
@@ -469,7 +534,7 @@ export default function TestSection({
                               variant="outline"
                               size="sm"
                               onClick={() => handleDeleteQuiz(test)}
-                              className="flex-shrink-0 text-red-500 hover:text-red-700"
+                              className="flex-shrink-0 text-destructive hover:text-destructive/80"
                             >
                               <Trash2 className="h-3 w-3" />
                             </Button>
@@ -484,8 +549,8 @@ export default function TestSection({
           </div>
 
           <div className="space-y-3 mt-4">
-            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-800">
+            <div className="p-3 bg-muted/30 rounded-lg border border-border/60">
+              <p className="text-sm text-muted-foreground">
                 <strong>Tip:</strong> Complete these assessments to reinforce
                 your understanding of the lesson material and track your
                 progress.

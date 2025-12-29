@@ -18,7 +18,7 @@ const MinimalEditor = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-32 bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
+      <div className="h-32 bg-muted/40 animate-pulse rounded-lg flex items-center justify-center">
         Loading editor...
       </div>
     ),
@@ -174,7 +174,7 @@ export function ModuleCreator({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-blue-600" />
+            <BookOpen className="h-5 w-5 text-primary" />
             {isEditing ? "Edit Module" : "Create New Module"}
           </DialogTitle>
         </DialogHeader>
@@ -183,28 +183,28 @@ export function ModuleCreator({
           {/* Module Name */}
           <div className="space-y-2">
             <Label htmlFor="module-name">
-              Module Name <span className="text-red-500">*</span>
+              Module Name <span className="text-destructive">*</span>
             </Label>
             <Input
               id="module-name"
               value={moduleData.name}
               onChange={(e) => updateField("name", e.target.value)}
               placeholder="Enter module name..."
-              className={errors.name ? "border-red-500" : ""}
+              className={errors.name ? "border-destructive" : ""}
             />
             {errors.name && (
-              <p className="text-sm text-red-500">{errors.name}</p>
+              <p className="text-sm text-destructive">{errors.name}</p>
             )}
           </div>
 
           {/* Module Description */}
           <div className="space-y-2">
             <Label>
-              Description <span className="text-red-500">*</span>
+              Description <span className="text-destructive">*</span>
             </Label>
             <div
               className={`border rounded-lg ${
-                errors.description ? "border-red-500" : "border-gray-300"
+                errors.description ? "border-destructive" : "border-border"
               }`}
             >
               <MinimalEditor
@@ -219,7 +219,7 @@ export function ModuleCreator({
               />
             </div>
             {errors.description && (
-              <p className="text-sm text-red-500">{errors.description}</p>
+              <p className="text-sm text-destructive">{errors.description}</p>
             )}
           </div>
 
@@ -232,10 +232,10 @@ export function ModuleCreator({
               min="1"
               value={moduleData.order}
               onChange={(e) => updateField("order", parseInt(e.target.value))}
-              className={errors.order ? "border-red-500" : ""}
+              className={errors.order ? "border-destructive" : ""}
             />
             {errors.order && (
-              <p className="text-sm text-red-500">{errors.order}</p>
+              <p className="text-sm text-destructive">{errors.order}</p>
             )}
           </div>
 
@@ -243,7 +243,7 @@ export function ModuleCreator({
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="module-published">Publish Module</Label>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Make this module visible to students
               </p>
             </div>
@@ -257,8 +257,8 @@ export function ModuleCreator({
                 variant={moduleData.published ? "default" : "secondary"}
                 className={
                   moduleData.published
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-600"
+                    ? "bg-primary/10 text-primary border border-primary/30"
+                    : "bg-muted/40 text-muted-foreground border border-border"
                 }
               >
                 {moduleData.published ? "Published" : "Draft"}
@@ -281,7 +281,7 @@ export function ModuleCreator({
             type="button"
             onClick={handleSave}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-primary hover:brightness-110 text-primary-foreground"
           >
             <Save className="h-4 w-4 mr-2" />
             {loading

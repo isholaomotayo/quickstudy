@@ -216,8 +216,8 @@ export function CgpaClient({
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your academic records...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-muted/40 border-t-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your academic records...</p>
         </div>
       </div>
     );
@@ -232,7 +232,7 @@ export function CgpaClient({
   if (!data) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600">No data available</p>
+        <p className="text-muted-foreground">No data available</p>
       </div>
     );
   }

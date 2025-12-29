@@ -424,7 +424,7 @@ export default function NotificationsClient() {
   if (error) {
     return (
       <GlassCard className="text-center py-12">
-        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+        <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
         <h3 className="text-lg font-semibold mb-2">
           Error Loading Notifications
         </h3>
@@ -443,36 +443,36 @@ export default function NotificationsClient() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <GlassCard variant="gradient-blue">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-lg">
+            <div className="p-2 bg-primary/10 text-primary rounded-lg">
               <Bell className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm opacity-90">Total</p>
-              <p className="text-2xl font-bold">{stats.total}</p>
+              <p className="text-sm text-muted-foreground">Total</p>
+              <p className="text-2xl font-bold text-foreground">{stats.total}</p>
             </div>
           </div>
         </GlassCard>
 
         <GlassCard variant="gradient-amber">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-lg">
+            <div className="p-2 bg-amber-400/20 text-amber-600 dark:text-amber-300 rounded-lg">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm opacity-90">Unread</p>
-              <p className="text-2xl font-bold">{stats.unread}</p>
+              <p className="text-sm text-muted-foreground">Unread</p>
+              <p className="text-2xl font-bold text-foreground">{stats.unread}</p>
             </div>
           </div>
         </GlassCard>
 
         <GlassCard variant="gradient-emerald">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-lg">
+            <div className="p-2 bg-primary/10 text-primary rounded-lg">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm opacity-90">This Week</p>
-              <p className="text-2xl font-bold">{stats.thisWeek}</p>
+              <p className="text-sm text-muted-foreground">This Week</p>
+              <p className="text-2xl font-bold text-foreground">{stats.thisWeek}</p>
             </div>
           </div>
         </GlassCard>
@@ -483,7 +483,7 @@ export default function NotificationsClient() {
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               placeholder="Search notifications..."
               value={searchQuery}
@@ -562,12 +562,12 @@ export default function NotificationsClient() {
       <div className="space-y-4">
         {loading ? (
           <div className="text-center py-12">
-            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
             <p className="text-muted-foreground">Loading notifications...</p>
           </div>
         ) : filteredNotifications.length === 0 ? (
           <GlassCard className="text-center py-12">
-            <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">
               No notifications found
             </h3>

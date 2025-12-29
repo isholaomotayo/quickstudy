@@ -50,13 +50,13 @@ export function ConfirmDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-yellow-500" />
+            <AlertTriangle className="h-5 w-5 text-primary" />
             {title}
           </DialogTitle>
         </DialogHeader>
 
         <div className="py-4">
-          <p className="text-sm text-gray-600">{message}</p>
+          <p className="text-sm text-muted-foreground">{message}</p>
         </div>
 
         <div className="flex items-center justify-end space-x-2">

@@ -8,7 +8,7 @@ export default function ConnectPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-emerald-500 bg-clip-text text-transparent">
           Connect & Collaborate
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -39,7 +39,7 @@ function ForumSkeleton() {
       {/* Forum Posts Skeleton */}
       <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="p-6 rounded-lg border border-gray-200">
+          <div key={i} className="p-6 rounded-lg border border-border bg-card">
             <div className="space-y-4">
               <div className="flex items-start gap-4">
                 <Skeleton className="h-12 w-12 rounded-full" />

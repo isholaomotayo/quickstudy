@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
-    useModuleProgress,
-    useUpdateModuleProgress,
+  useModuleProgress,
+  useUpdateModuleProgress,
 } from "@/lib/hooks/useCourseData";
 import { useUserData } from "@/hooks/useUserData";
 import { usePreloadChatHistory } from "@/hooks/use-preload-chat-history";
@@ -14,13 +14,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-    ChevronLeft,
-    ChevronRight, CheckCircle,
-    Circle,
-    BookOpen,
-    MessageCircle,
-    Users,
-    Sparkles, ArrowLeft
+  ChevronLeft,
+  ChevronRight, CheckCircle,
+  Circle,
+  BookOpen,
+  MessageCircle,
+  Users,
+  Sparkles, ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -168,10 +168,19 @@ export default function CourseViewerClient({
     [activeLesson]
   );
   const [showAssistant, setShowAssistant] = useState(false);
+  const [selectedText, setSelectedText] = useState<string>("");
+  const [initialPrompt, setInitialPrompt] = useState<string>("");
+  const contentRef = useRef<HTMLDivElement>(null);
+  
+  // Track if initial preload has run to prevent duplicate calls
+  const hasInitialPreloadRef = useRef(false);
+  const lastActiveLessonIdRef = useRef<number | null>(null);
 
-  // Preload chat history and guardrails when component mounts and when lessons change
+  // Preload chat history and guardrails when component mounts (once)
   useEffect(() => {
-    if (userData?.id && courseLessons.length > 0) {
+    if (userData?.id && courseLessons.length > 0 && !hasInitialPreloadRef.current) {
+      hasInitialPreloadRef.current = true;
+      
       // Preload history for the first few lessons to improve performance
       const contextsToPreload = courseLessons.slice(0, 3).map((lesson) => ({
         lessonId: lesson.id,
@@ -184,70 +193,16 @@ export default function CourseViewerClient({
       const lessonsToPreload = courseLessons.slice(0, 3);
       preloadMultipleGuardrails(courseData, lessonsToPreload);
     }
-  }, [
-    userData?.id,
-    courseLessons,
-    courseModuleData.id,
-    courseData,
-    preloadMultipleHistories,
-    preloadMultipleGuardrails,
-  ]);
+  }, [userData?.id, courseLessons.length, courseModuleData.id]);
 
   // Preload history and guardrails when active lesson changes
   useEffect(() => {
-    if (userData?.id && activeLesson) {
+    if (userData?.id && activeLesson && activeLesson.id !== lastActiveLessonIdRef.current) {
+      lastActiveLessonIdRef.current = activeLesson.id;
       preloadHistory(userData.id, activeLesson.id, courseModuleData.id);
       preloadGuardrails(courseData, activeLesson);
     }
-  }, [
-    userData?.id,
-    activeLesson,
-    courseModuleData.id,
-    courseData,
-    preloadHistory,
-    preloadGuardrails,
-  ]);
-  const [selectedText, setSelectedText] = useState<string>("");
-  const [initialPrompt, setInitialPrompt] = useState<string>("");
-  const [preloadedConversations, setPreloadedConversations] = useState<
-    Map<number, any[]>
-  >(new Map());
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  // Preload conversation history for the current lesson
-  const preloadConversationHistory = useCallback(
-    async (lessonId: number) => {
-      if (!userData?.id || preloadedConversations.has(lessonId)) {
-        return; // Already preloaded or no user data
-      }
-
-      try {
-        const response = await fetch(
-          `/api/ai-chat?userId=${userData.id.toString()}&lessonId=${lessonId}`,
-          { method: "GET" }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setPreloadedConversations((prev) => {
-            const newMap = new Map(prev);
-            newMap.set(lessonId, data.conversations || []);
-            return newMap;
-          });
-        }
-      } catch (err) {
-        console.error("Failed to preload conversation history:", err);
-      }
-    },
-    [userData?.id, preloadedConversations]
-  );
-
-  // Preload conversation history when lesson changes
-  useEffect(() => {
-    if (activeLesson?.id && userData?.id) {
-      preloadConversationHistory(activeLesson.id);
-    }
-  }, [activeLesson?.id, userData?.id, preloadConversationHistory]);
+  }, [userData?.id, activeLesson?.id, courseModuleData.id]);
 
   // Use SWR for progress management
   const {
@@ -277,15 +232,17 @@ export default function CourseViewerClient({
   // Use local progress for UI, fallback to SWR data
   const progress = localProgress;
 
-  // Initialize with first lesson or last viewed lesson
+  // Initialize with first lesson or last viewed lesson (only once)
+  const hasInitializedLessonRef = useRef(false);
   useEffect(() => {
-    if (courseLessons.length > 0) {
+    if (courseLessons.length > 0 && !hasInitializedLessonRef.current) {
+      hasInitializedLessonRef.current = true;
       const lastViewed = courseLessons.find(
         (lesson) => lesson.id === progress.lastLessonId
       );
       setActiveLesson(lastViewed || courseLessons[0]);
     }
-  }, [courseLessons, progress.lastLessonId]);
+  }, [courseLessons.length, progress.lastLessonId]);
 
   // Debug: Monitor courseLessons state changes
   useEffect(() => {
@@ -452,9 +409,9 @@ export default function CourseViewerClient({
   const canGoNext = currentLessonIndex < courseLessons.length - 1;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="bg-card border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -462,7 +419,7 @@ export default function CourseViewerClient({
                 variant="ghost"
                 size="sm"
                 onClick={() => router.back()}
-                className="text-gray-600 hover:text-gray-900"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
@@ -471,11 +428,11 @@ export default function CourseViewerClient({
               <div>
                 <Link
                   href={`/course?course_id=${courseModuleData.course_id}`}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  className="text-sm text-primary hover:text-primary font-medium"
                 >
                   Course
                 </Link>
-                <h1 className="text-xl font-semibold text-gray-900 mt-1">
+                <h1 className="text-xl font-semibold text-foreground mt-1">
                   {courseModuleData.name}
                 </h1>
               </div>
@@ -510,7 +467,7 @@ export default function CourseViewerClient({
                 variant="default"
                 size="sm"
                 onClick={() => setShowAssistant(true)}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                className="bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground"
               >
                 <Sparkles className="h-4 w-4 mr-2" />
                 AI Assistant
@@ -549,7 +506,7 @@ export default function CourseViewerClient({
 
           {activeLesson ? (
             <>
-              <Card className="mb-6">
+              <Card className="mb-6 border border-border bg-card">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
@@ -558,7 +515,7 @@ export default function CourseViewerClient({
                         Lesson {currentLessonIndex + 1} of{" "}
                         {courseLessons.length}
                       </Badge>
-                      <CardTitle className="text-2xl font-bold text-gray-900">
+                      <CardTitle className="text-2xl font-bold text-foreground">
                         {activeLesson.name}
                       </CardTitle>
                     </div>
@@ -597,11 +554,11 @@ export default function CourseViewerClient({
                   </div>
 
                   {activeLesson.description && (
-                    <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h4 className="font-semibold text-blue-900 mb-2">
+                    <div className="mt-6 p-4 bg-muted/30 rounded-lg border border-border/60">
+                      <h4 className="font-semibold text-foreground mb-2">
                         Lesson Summary
                       </h4>
-                      <p className="text-blue-800">
+                      <p className="text-muted-foreground">
                         {activeLesson.description}
                       </p>
                     </div>
@@ -609,17 +566,18 @@ export default function CourseViewerClient({
                 </CardContent>
               </Card>
               {/* Tests Section - Show tests for active lesson */}
-              {activeLesson && (activeLesson.course_tests || []).length > 0 && (
-                <TestSection
-                  tests={activeLesson.course_tests || []}
-                  courseId={courseModuleData.course_id}
-                  courseModuleId={courseModuleData.id}
-                  courseLessonId={activeLesson.id}
-                  userRole={userData?.role}
-                  lessonName={activeLesson.name}
-                  onRefresh={handleRefresh}
-                />
-              )}
+              {activeLesson &&
+                ((activeLesson.course_tests || []).length > 0 || isAdmin) && (
+                  <TestSection
+                    tests={activeLesson.course_tests || []}
+                    courseId={courseModuleData.course_id}
+                    courseModuleId={courseModuleData.id}
+                    courseLessonId={activeLesson.id}
+                    userRole={userData?.role}
+                    lessonName={activeLesson.name}
+                    onRefresh={handleRefresh}
+                  />
+                )}
 
               {/* Practice Test Section - Show AI practice questions for active lesson */}
               {activeLesson && (
@@ -630,14 +588,14 @@ export default function CourseViewerClient({
                 />
               )}
               {/* Navigation Footer */}
-              <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex items-center justify-between bg-card rounded-lg border border-border p-4">
                 <Button
                   variant="outline"
                   onClick={toggleLessonComplete}
                   disabled={!activeLesson}
                   className={
                     isCurrentLessonCompleted
-                      ? "bg-green-50 border-green-200 text-green-700"
+                      ? "bg-emerald-500/15 border border-emerald-400/40 text-emerald-600 dark:text-emerald-300"
                       : ""
                   }
                 >
@@ -667,7 +625,7 @@ export default function CourseViewerClient({
                     variant="default"
                     onClick={() => navigateLesson("next")}
                     disabled={!canGoNext}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-primary hover:brightness-110 text-primary-foreground"
                   >
                     Next
                     <ChevronRight className="h-4 w-4 ml-2" />
@@ -678,11 +636,11 @@ export default function CourseViewerClient({
           ) : (
             <Card>
               <CardContent className="p-12 text-center">
-                <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   Select a Lesson
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   Choose a lesson from the sidebar to begin learning.
                 </p>
               </CardContent>

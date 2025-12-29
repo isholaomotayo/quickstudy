@@ -148,8 +148,12 @@ async function request<T = any>(
     };
   }
 
+  // Unwrap the data property if it exists (for Next.js API routes)
+  // This handles responses like { success: true, data: {...} }
+  const unwrappedData = (data as any)?.data !== undefined ? (data as any).data : data;
+
   return {
-    data,
+    data: unwrappedData,
     status: response.status,
     statusText: response.statusText,
     headers: response.headers,
@@ -161,49 +165,59 @@ async function request<T = any>(
  */
 export const api = {
   /**
-   * GET request
+   * GET request - returns just the data
    */
-  get: <T = any>(endpoint: string, options?: ApiRequestOptions) =>
-    request<T>(endpoint, { ...options, method: "GET" }),
+  get: async <T = any>(endpoint: string, options?: ApiRequestOptions): Promise<T> => {
+    const response = await request<T>(endpoint, { ...options, method: "GET" });
+    return response.data;
+  },
 
   /**
-   * POST request
+   * POST request - returns just the data
    */
-  post: <T = any>(endpoint: string, data?: any, options?: ApiRequestOptions) =>
-    request<T>(endpoint, {
+  post: async <T = any>(endpoint: string, data?: any, options?: ApiRequestOptions): Promise<T> => {
+    const response = await request<T>(endpoint, {
       ...options,
       method: "POST",
       body: data ? JSON.stringify(data) : undefined,
-    }),
+    });
+    return response.data;
+  },
 
   /**
-   * PUT request
+   * PUT request - returns just the data
    */
-  put: <T = any>(endpoint: string, data?: any, options?: ApiRequestOptions) =>
-    request<T>(endpoint, {
+  put: async <T = any>(endpoint: string, data?: any, options?: ApiRequestOptions): Promise<T> => {
+    const response = await request<T>(endpoint, {
       ...options,
       method: "PUT",
       body: data ? JSON.stringify(data) : undefined,
-    }),
+    });
+    return response.data;
+  },
 
   /**
-   * PATCH request
+   * PATCH request - returns just the data
    */
-  patch: <T = any>(endpoint: string, data?: any, options?: ApiRequestOptions) =>
-    request<T>(endpoint, {
+  patch: async <T = any>(endpoint: string, data?: any, options?: ApiRequestOptions): Promise<T> => {
+    const response = await request<T>(endpoint, {
       ...options,
       method: "PATCH",
       body: data ? JSON.stringify(data) : undefined,
-    }),
+    });
+    return response.data;
+  },
 
   /**
-   * DELETE request
+   * DELETE request - returns just the data
    */
-  delete: <T = any>(endpoint: string, options?: ApiRequestOptions) =>
-    request<T>(endpoint, { ...options, method: "DELETE" }),
+  delete: async <T = any>(endpoint: string, options?: ApiRequestOptions): Promise<T> => {
+    const response = await request<T>(endpoint, { ...options, method: "DELETE" });
+    return response.data;
+  },
 
   /**
-   * Raw request method for custom configurations
+   * Raw request method for custom configurations - returns full response with status, headers
    */
   request,
 };

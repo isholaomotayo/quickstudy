@@ -74,11 +74,7 @@ export default function AppHeader({
               {userData.role}
             </Badge>
           )}
-          <Link href={homeLink}>
-            <Button variant="outline" size="sm" className="border-border">
-              Home
-            </Button>
-          </Link>
+ 
           <ThemeToggle />
         </div>
       </div>

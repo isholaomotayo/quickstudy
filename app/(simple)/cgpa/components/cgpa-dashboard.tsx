@@ -128,18 +128,25 @@ export function CgpaDashboard({
 }: CgpaDashboardProps) {
   const [selectedSemester, setSelectedSemester] = useState<string>("all");
 
+  const safeNumber = (value: any) => {
+    const num = parseFloat(value);
+    return Number.isFinite(num) ? num : null;
+  };
+  const formatGpa = (value: number | null) =>
+    value !== null && Number.isFinite(value) ? value.toFixed(2) : "N/A";
+
   // Calculate overall CGPA
   const overallCGPA = useMemo(() => {
-    if (!studentGpas || !studentGpas.length) return 0;
+    if (!studentGpas || !studentGpas.length) return null;
     const latestGpa = studentGpas[studentGpas.length - 1];
-    return parseFloat(latestGpa.cumulative_gpa.toString()) || 0;
+    return safeNumber(latestGpa.cumulative_gpa);
   }, [studentGpas]);
 
   // Calculate current semester GPA
   const currentGPA = useMemo(() => {
-    if (!studentGpas || !studentGpas.length) return 0;
+    if (!studentGpas || !studentGpas.length) return null;
     const currentGpa = studentGpas[studentGpas.length - 1];
-    return parseFloat(currentGpa.current_gpa.toString()) || 0;
+    return safeNumber(currentGpa.current_gpa);
   }, [studentGpas]);
 
   // Calculate GPA trend
@@ -147,7 +154,11 @@ export function CgpaDashboard({
     if (studentGpas.length < 2) return null;
 
     const recent = studentGpas.slice(-2);
-    const trend = recent[1].cumulative_gpa - recent[0].cumulative_gpa;
+    const prev = safeNumber(recent[0].cumulative_gpa);
+    const latest = safeNumber(recent[1].cumulative_gpa);
+
+    if (prev === null || latest === null) return null;
+    const trend = latest - prev;
 
     if (trend > 0.1)
       return { direction: "up", color: "success", icon: TrendingUp };
@@ -157,12 +168,13 @@ export function CgpaDashboard({
   }, [studentGpas]);
 
   // Get GPA status
-  const getGPAStatus = (gpa: number) => {
+  const getGPAStatus = (gpa: number | null) => {
+    if (gpa === null) return null;
     if (gpa >= 4.5)
       return {
         status: "First Class",
-        color: "bg-green-100 text-green-800",
-        bgColor: "bg-green-500",
+        color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50",
+        bgColor: "bg-emerald-500",
         icon: Trophy,
         description: "Excellent academic performance",
         badgeVariant: "default" as const,
@@ -170,8 +182,8 @@ export function CgpaDashboard({
     if (gpa >= 3.5)
       return {
         status: "Second Class Upper",
-        color: "bg-blue-100 text-blue-800",
-        bgColor: "bg-blue-500",
+        color: "bg-primary/10 text-primary border border-primary/40",
+        bgColor: "bg-primary",
         icon: Star,
         description: "Very good academic performance",
         badgeVariant: "default" as const,
@@ -179,7 +191,7 @@ export function CgpaDashboard({
     if (gpa >= 2.5)
       return {
         status: "Second Class Lower",
-        color: "bg-cyan-100 text-cyan-800",
+        color: "bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-400/50",
         bgColor: "bg-cyan-500",
         icon: Award,
         description: "Good academic performance",
@@ -188,19 +200,19 @@ export function CgpaDashboard({
     if (gpa >= 1.5)
       return {
         status: "Third Class",
-        color: "bg-yellow-100 text-yellow-800",
-        bgColor: "bg-yellow-500",
+        color: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50",
+        bgColor: "bg-amber-500",
         icon: AlertTriangle,
         description: "Satisfactory academic performance",
         badgeVariant: "outline" as const,
       };
     return {
-      status: "Pass",
-      color: "bg-red-100 text-red-800",
-      bgColor: "bg-red-500",
+      status: null,
+      color: "bg-muted/30 text-muted-foreground border border-border/60",
+      bgColor: "bg-muted",
       icon: AlertTriangle,
-      description: "Minimum academic performance",
-      badgeVariant: "destructive" as const,
+      description: "No CGPA available yet",
+      badgeVariant: "secondary" as const,
     };
   };
 
@@ -229,41 +241,46 @@ export function CgpaDashboard({
   const completionPercentage =
     totalCredits > 0 ? (passedCredits / totalCredits) * 100 : 0;
   const gpaStatus = getGPAStatus(overallCGPA);
+  const hasGpaData = overallCGPA !== null;
+  const hasResults = studentResults.length > 0;
+  const safeProgress = (value: number | null) =>
+    value !== null && Number.isFinite(value) ? value * 20 : 0;
+  const SummaryIcon = gpaStatus?.icon || AlertTriangle;
 
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white border-0">
+      <Card className="bg-card border border-border">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Avatar className="h-16 w-16 border-2 border-white/20">
+              <Avatar className="h-16 w-16 border-2 border-border">
                 <AvatarImage src={student?.user?.avatar} alt="Student Avatar" />
-                <AvatarFallback className="bg-white/20 text-white text-lg font-semibold">
+                <AvatarFallback className="bg-muted text-foreground text-lg font-semibold">
                   {student?.user?.first_name?.[0]}
                   {student?.user?.last_name?.[0]}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-2xl font-bold text-foreground">
                   {student?.user?.last_name}, {student?.user?.first_name}{" "}
                   {student?.user?.other_name}
                 </h2>
-                <p className="text-blue-100">Student ID: {student?.reg_no}</p>
-                <p className="text-blue-100 flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
-                  {student?.programme?.department?.name || "N/A"}
+                <p className="text-muted-foreground">Student ID: {student?.reg_no}</p>
+                <p className="text-muted-foreground flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4 text-primary" />
+                  {student?.programme?.department?.name || "Not available"}
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-blue-100 text-sm mb-2">Cumulative GPA</p>
+              <p className="text-muted-foreground text-sm mb-2">Cumulative GPA</p>
               <div className="flex items-center gap-2">
-                <span className="text-4xl font-bold">
-                  {overallCGPA.toFixed(2)}
+                <span className="text-4xl font-bold text-foreground">
+                  {formatGpa(overallCGPA)}
                 </span>
                 {gpaTrend && (
-                  <div className="flex items-center gap-1 text-sm">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <gpaTrend.icon className="h-4 w-4" />
                     <span>
                       {gpaTrend.direction === "up"
@@ -282,71 +299,75 @@ export function CgpaDashboard({
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-card border border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Current GPA</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {currentGPA.toFixed(2)}
+                <p className="text-sm font-medium text-muted-foreground">Current GPA</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {formatGpa(currentGPA)}
                 </p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                <BarChart3 className="h-5 w-5 text-green-600" />
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-card border border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-muted-foreground">
                   Total Credits
                 </p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-bold text-foreground">
                   {passedCredits}
                 </p>
-                <p className="text-xs text-gray-500">of {totalCredits}</p>
+                <p className="text-xs text-muted-foreground">of {totalCredits}</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <BookOpen className="h-5 w-5 text-blue-600" />
+              <div className="h-10 w-10 rounded-full bg-muted/30 flex items-center justify-center">
+                <BookOpen className="h-5 w-5 text-primary" />
               </div>
             </div>
             <Progress value={completionPercentage} className="mt-2" />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-card border border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-muted-foreground">
                   Academic Standing
                 </p>
-                <p className="text-lg font-bold text-yellow-600">
-                  {gpaStatus.status}
+                <p className="text-lg font-bold text-foreground">
+                  {gpaStatus?.status || "Not available"}
                 </p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
-                <gpaStatus.icon className="h-5 w-5 text-yellow-600" />
+              <div className="h-10 w-10 rounded-full bg-muted/30 flex items-center justify-center">
+                {gpaStatus?.icon ? (
+                  <gpaStatus.icon className="h-5 w-5 text-primary" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 text-primary" />
+                )}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-card border border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Semesters</p>
-                <p className="text-2xl font-bold text-gray-600">
+                <p className="text-sm font-medium text-muted-foreground">Semesters</p>
+                <p className="text-2xl font-bold text-foreground">
                   {studentGpas.length}
                 </p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-gray-600" />
+              <div className="h-10 w-10 rounded-full bg-muted/30 flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
@@ -381,7 +402,7 @@ export function CgpaDashboard({
                   {studentGpas && studentGpas.length > 0 ? (
                     studentGpas.map((studentgpa) => {
                       const semesterStatus = getGPAStatus(
-                        studentgpa.current_gpa || 0
+                        safeNumber(studentgpa.current_gpa)
                       );
                       return (
                         <TableRow key={studentgpa.id}>
@@ -394,38 +415,30 @@ export function CgpaDashboard({
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <span className="text-lg font-bold text-green-600">
-                              {studentgpa.current_gpa
-                                ? parseFloat(
-                                    studentgpa.current_gpa.toString()
-                                  ).toFixed(2)
-                                : "N/A"}
+                            <span className="text-lg font-bold text-foreground">
+                              {formatGpa(safeNumber(studentgpa.current_gpa))}
                             </span>
                           </TableCell>
                           <TableCell>
-                            <span className="text-lg font-bold text-blue-600">
-                              {studentgpa.cumulative_gpa
-                                ? parseFloat(
-                                    studentgpa.cumulative_gpa.toString()
-                                  ).toFixed(2)
-                                : "N/A"}
+                            <span className="text-lg font-bold text-foreground">
+                              {formatGpa(safeNumber(studentgpa.cumulative_gpa))}
                             </span>
                           </TableCell>
-                          <TableCell className="text-gray-600">
+                          <TableCell className="text-muted-foreground">
                             {studentgpa.current_tnu || 0}
                           </TableCell>
                           <TableCell>
                             {studentgpa.classdegree ? (
-                              <Badge variant={semesterStatus.badgeVariant}>
+                              <Badge variant={semesterStatus?.badgeVariant || "secondary"}>
                                 {studentgpa.classdegree.name}
                               </Badge>
                             ) : (
-                              <span className="text-gray-400">-</span>
+                              <span className="text-muted-foreground">-</span>
                             )}
                           </TableCell>
                           <TableCell>
-                            <Badge variant={semesterStatus.badgeVariant}>
-                              {semesterStatus.status}
+                            <Badge variant={semesterStatus?.badgeVariant || "secondary"}>
+                              {semesterStatus?.status || "N/A"}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -434,8 +447,8 @@ export function CgpaDashboard({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-8">
-                        <div className="text-gray-500">
-                          <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <div className="text-muted-foreground">
+                          <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground/60" />
                           <p>No GPA records found</p>
                           <p className="text-sm">
                             Results will appear here once your grades are
@@ -454,7 +467,7 @@ export function CgpaDashboard({
         {/* Sidebar */}
         <div className="space-y-4">
           {/* GPA Trend */}
-          <Card>
+          <Card className="bg-card border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
@@ -464,24 +477,24 @@ export function CgpaDashboard({
             <CardContent className="space-y-4">
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-muted-foreground">
                     Current Semester
                   </span>
-                  <span className="font-bold text-green-600">
-                    {currentGPA.toFixed(2)}
+                  <span className="font-bold text-foreground">
+                    {formatGpa(currentGPA)}
                   </span>
                 </div>
-                <Progress value={currentGPA * 20} className="h-2" />
+                <Progress value={safeProgress(currentGPA)} className="h-2" />
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">Cumulative GPA</span>
-                  <span className="font-bold text-blue-600">
-                    {overallCGPA.toFixed(2)}
+                  <span className="text-sm text-muted-foreground">Cumulative GPA</span>
+                  <span className="font-bold text-foreground">
+                    {formatGpa(overallCGPA)}
                   </span>
                 </div>
-                <Progress value={overallCGPA * 20} className="h-2" />
+                <Progress value={safeProgress(overallCGPA)} className="h-2" />
               </div>
             </CardContent>
           </Card>
@@ -513,26 +526,31 @@ export function CgpaDashboard({
       <GpaChart studentGpas={studentGpas} />
 
       {/* Academic Performance Summary */}
-      <Card>
+      <Card className="bg-card border border-border">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <gpaStatus.icon className="h-5 w-5" />
+            <SummaryIcon className="h-5 w-5 text-primary" />
             Academic Performance Summary
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className={`p-4 rounded-lg ${gpaStatus.color}`}>
+            <div
+              className={`p-4 rounded-lg ${
+                gpaStatus?.color || "bg-muted/30 text-muted-foreground border border-border/60"
+              }`}
+            >
               <h5 className="font-semibold mb-2">
-                {gpaStatus.status} - {gpaStatus.description}
+                {gpaStatus?.status || "No CGPA available"} -{" "}
+                {gpaStatus?.description || "No academic performance data yet."}
               </h5>
               <p className="text-sm">
                 Your academic journey so far:{" "}
                 <strong>{studentGpas.length}</strong> semesters completed with a
-                cumulative GPA of <strong>{overallCGPA.toFixed(2)}</strong>. You
+                cumulative GPA of <strong>{formatGpa(overallCGPA)}</strong>. You
                 have earned <strong>{passedCredits}</strong> credits out of{" "}
                 <strong>{totalCredits}</strong>
-                attempted ({completionPercentage.toFixed(1)}% completion rate).
+                attempted ({completionPercentage != null && isFinite(completionPercentage) ? completionPercentage.toFixed(1) : '0.0'}% completion rate).
               </p>
             </div>
           </div>

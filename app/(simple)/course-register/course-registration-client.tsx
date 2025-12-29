@@ -363,7 +363,7 @@ export function CourseRegistrationClient() {
   // Show loading if user authentication is still being checked
   if (userLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="space-y-2">
             <Skeleton className="h-8 w-64" />
@@ -407,16 +407,16 @@ export function CourseRegistrationClient() {
   // Show access denied for non-students
   if (userData.role !== "STUDENT") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <Card className="max-w-md w-full border border-border bg-card">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-red-600" />
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6 text-destructive" />
             </div>
-            <CardTitle className="text-red-800">Access Denied</CardTitle>
+            <CardTitle className="text-destructive">Access Denied</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Student access is required to view this page.
             </p>
             <Button onClick={() => router.push("/")}>Go to Dashboard</Button>
@@ -428,7 +428,7 @@ export function CourseRegistrationClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="space-y-2">
             <Skeleton className="h-8 w-64" />
@@ -465,16 +465,16 @@ export function CourseRegistrationClient() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <Card className="max-w-md w-full border border-border bg-card">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-red-600" />
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6 text-destructive" />
             </div>
-            <CardTitle className="text-red-800">Loading Error</CardTitle>
+            <CardTitle className="text-destructive">Loading Error</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {error || "Failed to load course registration data"}
             </p>
             <div className="flex flex-col gap-2">
@@ -493,17 +493,17 @@ export function CourseRegistrationClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">
+            <BookOpen className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold text-foreground">
               Course Registration
             </h1>
           </div>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Select courses for the current semester. Please ensure you only
             register for courses relevant to your current level.
           </p>
@@ -521,7 +521,7 @@ export function CourseRegistrationClient() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Available Courses */}
-          <Card>
+          <Card className="bg-card border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
@@ -535,7 +535,7 @@ export function CourseRegistrationClient() {
             </CardHeader>
             <CardContent>
               {Object.keys(coursesByLevel).length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No courses available for registration</p>
                 </div>
@@ -547,12 +547,12 @@ export function CourseRegistrationClient() {
                       <AccordionItem
                         key={levelId}
                         value={levelId}
-                        className="border rounded-lg"
+                        className="border border-border rounded-lg"
                       >
-                        <AccordionTrigger className="px-4 hover:no-underline hover:bg-gray-50 rounded-lg">
+                        <AccordionTrigger className="px-4 hover:no-underline hover:bg-muted/30 rounded-lg">
                           <div className="flex items-center gap-2">
                             <Badge variant="outline">Level {levelId}</Badge>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-muted-foreground">
                               ({courses.length} courses)
                             </span>
                           </div>
@@ -577,10 +577,10 @@ export function CourseRegistrationClient() {
                                     key={programmeCourse.course.id}
                                     className={`flex items-start gap-3 p-3 border rounded-md transition-colors ${
                                       isRegistered
-                                        ? "bg-gray-50 border-gray-200"
+                                        ? "bg-muted/30 border-border/60"
                                         : isSelected
-                                        ? "bg-blue-50 border-blue-200"
-                                        : "bg-white border-gray-200 hover:bg-gray-50"
+                                        ? "bg-primary/10 border-primary/30"
+                                        : "bg-card border-border hover:bg-muted/30"
                                     }`}
                                   >
                                     <Checkbox
@@ -602,8 +602,8 @@ export function CourseRegistrationClient() {
                                             htmlFor={`course-${programmeCourse.course.id}`}
                                             className={`text-sm font-medium cursor-pointer ${
                                               isRegistered
-                                                ? "text-gray-500"
-                                                : "text-gray-900"
+                                                ? "text-muted-foreground"
+                                                : "text-foreground"
                                             }`}
                                           >
                                             {programmeCourse.course.code}
@@ -611,8 +611,8 @@ export function CourseRegistrationClient() {
                                           <p
                                             className={`text-sm ${
                                               isRegistered
-                                                ? "text-gray-400"
-                                                : "text-gray-600"
+                                                ? "text-muted-foreground"
+                                                : "text-muted-foreground"
                                             }`}
                                           >
                                             {programmeCourse.course.name}
@@ -628,14 +628,14 @@ export function CourseRegistrationClient() {
                                           {isRegistered && (
                                             <Badge
                                               variant="outline"
-                                              className="text-xs text-gray-500"
+                                              className="text-xs text-muted-foreground"
                                             >
                                               Registered
                                             </Badge>
                                           )}
                                         </div>
                                       </div>
-                                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                         <Clock className="h-3 w-3" />
                                         <span>
                                           Semester{" "}
@@ -657,7 +657,7 @@ export function CourseRegistrationClient() {
           </Card>
 
           {/* Registered Courses */}
-          <Card>
+          <Card className="bg-card border border-border">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5" />
@@ -666,7 +666,7 @@ export function CourseRegistrationClient() {
             </CardHeader>
             <CardContent>
               {data.studentCourses.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No previously registered courses</p>
                 </div>
@@ -675,21 +675,21 @@ export function CourseRegistrationClient() {
                   {data.studentCourses.map((studentCourse, index) => (
                     <div
                       key={studentCourse.id}
-                      className="flex items-center justify-between p-3 border rounded-md bg-gray-50"
+                      className="flex items-center justify-between p-3 border border-border rounded-md bg-muted/30"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium text-foreground">
                             {studentCourse.course.code}
                           </span>
-                          <span className="text-xs text-gray-500">•</span>
-                          <span className="text-sm text-gray-600">
+                          <span className="text-xs text-muted-foreground">•</span>
+                          <span className="text-sm text-muted-foreground">
                             {studentCourse.course.name}
                           </span>
                         </div>
                         {studentCourse.level && (
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-muted-foreground">
                               {studentCourse.level.name}
                             </span>
                           </div>
@@ -699,7 +699,7 @@ export function CourseRegistrationClient() {
                         {studentCourse.approval_status ? (
                           <Badge
                             variant="default"
-                            className="bg-green-100 text-green-700 border-green-200"
+                            className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50"
                           >
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Approved
@@ -708,7 +708,7 @@ export function CourseRegistrationClient() {
                           <>
                             <Badge
                               variant="secondary"
-                              className="bg-yellow-100 text-yellow-700 border-yellow-200"
+                              className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50"
                             >
                               <Clock className="h-3 w-3 mr-1" />
                               Pending
@@ -724,7 +724,7 @@ export function CourseRegistrationClient() {
                                 )
                               }
                               disabled={deletingCourse === studentCourse.id}
-                              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+                              className="text-destructive border border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
                             >
                               {deletingCourse === studentCourse.id ? (
                                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -772,9 +772,9 @@ export function CourseRegistrationClient() {
         open={deleteDialog.isOpen}
         onOpenChange={(open) => !open && cancelDeleteCourse()}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-card">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-600">
+            <DialogTitle className="flex items-center gap-2 text-destructive">
               <AlertCircle className="h-5 w-5" />
               Delete Course Registration
             </DialogTitle>
@@ -784,26 +784,26 @@ export function CourseRegistrationClient() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="bg-gray-50 rounded-lg p-4 my-4">
+          <div className="bg-muted/30 rounded-lg p-4 my-4 border border-border/60">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <BookOpen className="h-5 w-5 text-blue-600" />
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <BookOpen className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-foreground">
                   {deleteDialog.courseCode}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   {deleteDialog.courseName}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <div className="bg-amber-500/10 border border-amber-400/50 rounded-lg p-3">
             <div className="flex items-start gap-2">
               <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
-              <p className="text-sm text-amber-800">
+              <p className="text-sm text-amber-700 dark:text-amber-300">
                 This action cannot be undone. You'll need to register again if
                 you change your mind.
               </p>

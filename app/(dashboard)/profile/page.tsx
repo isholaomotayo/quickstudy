@@ -8,15 +8,11 @@ import {
   Download,
   Edit3,
   Eye,
-  EyeOff,
-  Mail,
-  MapPin,
+  EyeOff, MapPin,
   Phone,
   Save,
-  Shield,
-  TrendingUp,
-  User,
-  X,
+  Shield, User,
+  X
 } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -420,7 +416,7 @@ export default function UserProfile() {
 
                   {/* Upload Progress Overlay */}
                   {isUploadingAvatar && (
-                    <div className="absolute inset-0 bg-black/50 rounded-full flex flex-col items-center justify-center text-white">
+                    <div className="absolute inset-0 rounded-full bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center text-foreground">
                       <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mb-1"></div>
                       <div className="text-[11px] font-medium">{uploadProgress}%</div>
                     </div>
@@ -428,8 +424,8 @@ export default function UserProfile() {
 
                   {isEditing && !isUploadingAvatar && (
                     <>
-                      <div className="absolute inset-0 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center justify-center cursor-pointer">
-                        <Camera className="w-5 h-5 text-white" />
+                      <div className="absolute inset-0 rounded-full bg-foreground/10 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center justify-center cursor-pointer backdrop-blur-[1px]">
+                        <Camera className="w-5 h-5 text-foreground" />
                       </div>
                       <input
                         type="file"
@@ -455,20 +451,7 @@ export default function UserProfile() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
-                  <p className="text-xs text-muted-foreground">Registered</p>
-                  <p className="text-base font-semibold text-foreground">
-                    {profileData.registeredCourses || "0"}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-border/60 bg-muted/40 p-3">
-                  <p className="text-xs text-muted-foreground">Approved</p>
-                  <p className="text-base font-semibold text-foreground">
-                    {profileData.approvedCourses || "0"}
-                  </p>
-                </div>
-              </div>
+         
             </CardContent>
           </Card>
 
@@ -482,13 +465,13 @@ export default function UserProfile() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg border border-border/70 bg-muted/40 p-3">
+                <div className="rounded-lg border border-border/70 bg-muted/30 p-3">
                   <p className="text-xs text-muted-foreground">Registered</p>
                   <div className="text-xl font-semibold text-foreground">
                     {profileData.registeredCourses || "0"}
                   </div>
                 </div>
-                <div className="rounded-lg border border-border/70 bg-muted/40 p-3">
+                <div className="rounded-lg border border-border/70 bg-muted/30 p-3">
                   <p className="text-xs text-muted-foreground">Approved</p>
                   <div className="text-xl font-semibold text-foreground">
                     {profileData.approvedCourses || "0"}
@@ -711,25 +694,25 @@ export default function UserProfile() {
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="space-y-1.5">
                 <Label>Student ID</Label>
-                <div className="p-3 bg-muted/60 rounded-md font-mono text-foreground">
+                <div className="p-3 bg-muted/40 rounded-md font-mono text-foreground">
                   {profileData.studentId}
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label>Program</Label>
-                <div className="p-3 bg-muted/60 rounded-md text-foreground">
+                <div className="p-3 bg-muted/40 rounded-md text-foreground">
                   {profileData.program}
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label>Current semester</Label>
-                <div className="p-3 bg-muted/60 rounded-md text-foreground">
+                <div className="p-3 bg-muted/40 rounded-md text-foreground">
                   {profileData.semester}
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label>Enrollment date</Label>
-                <div className="p-3 bg-muted/60 rounded-md text-foreground">
+                <div className="p-3 bg-muted/40 rounded-md text-foreground">
                   {profileData.enrollmentDate}
                 </div>
               </div>
@@ -746,37 +729,37 @@ export default function UserProfile() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Shield className="w-4 h-4 text-primary" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-sm text-foreground">
-                          Password protection
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Keep your login secure
-                        </div>
-                      </div>
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-primary" />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="border-primary/30 text-primary">
-                        Active
-                      </Badge>
-                      {!wantsPasswordChange && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="gap-2"
-                          onClick={() => setWantsPasswordChange(true)}
-                        >
-                          Change password
-                        </Button>
-                      )}
+                    <div>
+                      <div className="font-medium text-sm text-foreground">
+                        Password protection
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Keep your login secure
+                      </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="border-primary/30 text-primary">
+                      Active
+                    </Badge>
+                    {!wantsPasswordChange && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => setWantsPasswordChange(true)}
+                      >
+                        Change password
+                      </Button>
+                    )}
+                  </div>
                 </div>
+              </div>
 
               {wantsPasswordChange && (
                 <div className="pt-2 border-t border-border">

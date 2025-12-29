@@ -434,7 +434,7 @@ export function CalendarClient() {
   // Show loading if user authentication is still being checked or if not authenticated
   if (userLoading || !userData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="space-y-2">
             <Skeleton className="h-8 w-64" />
@@ -459,7 +459,7 @@ export function CalendarClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="space-y-2">
             <Skeleton className="h-8 w-64" />
@@ -484,16 +484,16 @@ export function CalendarClient() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6">
-        <Card className="max-w-md w-full">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <Card className="max-w-md w-full border border-border bg-card">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-red-600" />
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6 text-destructive" />
             </div>
-            <CardTitle className="text-red-800">Loading Error</CardTitle>
+            <CardTitle className="text-destructive">Loading Error</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {error || "Failed to load calendar data"}
             </p>
             <div className="flex flex-col gap-2">
@@ -509,14 +509,14 @@ export function CalendarClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Calendar className="h-8 w-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-900">
+              <Calendar className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold text-foreground">
                 School Calendar
               </h1>
             </div>
@@ -527,7 +527,7 @@ export function CalendarClient() {
                     variant="outline"
                     size="sm"
                     onClick={() => setDeleteDialog(true)}
-                    className="text-red-600 border-red-200 hover:bg-red-50"
+                    className="text-destructive border border-destructive/40 hover:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -545,23 +545,23 @@ export function CalendarClient() {
           {/* Institution and Status Info */}
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Academic calendar for <strong>{data.institution.name}</strong>
               </p>
               {data.institution.school_calendar && (
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge
                     variant="secondary"
-                    className="bg-green-100 text-green-700"
+                    className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50"
                   >
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Calendar Available
                   </Badge>
                   {data.institution.calendar_data && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-blue-100 text-blue-700"
-                    >
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/10 text-primary border border-primary/40"
+                  >
                       <Calendar className="h-3 w-3 mr-1" />
                       Smart Calendar
                     </Badge>
@@ -592,8 +592,8 @@ export function CalendarClient() {
           </div>
 
           {canUpload && (
-            <div className="pt-2 border-t border-gray-200">
-              <p className="text-xs text-gray-500">
+            <div className="pt-2 border-t border-border/60">
+              <p className="text-xs text-muted-foreground">
                 As a {userData.role.toLowerCase()}, you can upload and manage
                 the school calendar.
               </p>
@@ -602,7 +602,7 @@ export function CalendarClient() {
         </div>
 
         {/* Main calendar area - full width */}
-        <Card>
+        <Card className="border border-border bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
@@ -641,7 +641,7 @@ export function CalendarClient() {
                 ) : (
                   /* Show PDF view when no parsed data or in PDF mode */
                   <div
-                    className={`bg-gray-100 rounded-lg overflow-hidden ${
+                    className={`bg-muted/30 border border-border/60 rounded-lg overflow-hidden ${
                       previewMode === "fullscreen"
                         ? "h-screen"
                         : "aspect-[210/297] h-auto"
@@ -656,13 +656,13 @@ export function CalendarClient() {
                 )}
               </>
             ) : (
-              <div className="aspect-[210/297] bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+              <div className="aspect-[210/297] bg-muted/30 border-2 border-dashed border-border rounded-lg flex items-center justify-center">
                 <div className="text-center">
-                  <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 font-medium">
+                  <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground font-medium">
                     No calendar uploaded
                   </p>
-                  <p className="text-gray-500 text-sm mt-1">
+                  <p className="text-muted-foreground text-sm mt-1">
                     {canUpload
                       ? "Upload a PDF calendar to get started"
                       : "Contact your administrator to upload the calendar"}
@@ -675,7 +675,7 @@ export function CalendarClient() {
 
         {/* No Calendar Alert - shown only when no calendar exists */}
         {!data.institution.school_calendar && (
-          <Card>
+          <Card className="border border-border bg-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
@@ -722,9 +722,9 @@ export function CalendarClient() {
 
           {/* PDF.js Loading Status */}
           {!pdfjs && (
-            <div className="flex items-center gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <Loader2 className="h-4 w-4 animate-spin text-yellow-600" />
-              <span className="text-sm text-yellow-700">
+            <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-400/50 rounded-lg">
+              <Loader2 className="h-4 w-4 animate-spin text-amber-600" />
+              <span className="text-sm text-amber-700 dark:text-amber-300">
                 Loading PDF.js library...
               </span>
             </div>
@@ -732,19 +732,19 @@ export function CalendarClient() {
 
           {/* Parsing Status Indicator */}
           {parsingStatus === "parsing" && (
-            <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-              <span className="text-sm text-blue-700">
+            <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/40 rounded-lg">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <span className="text-sm text-primary">
                 Parsing PDF calendar...
               </span>
             </div>
           )}
 
           {parsingStatus === "success" && parsedCalendarData && (
-            <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-400/50 rounded-lg">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span className="text-sm text-green-700">
+                <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
+                <span className="text-sm text-emerald-700 dark:text-emerald-300">
                   PDF text extracted successfully! Ready for upload and AI
                   structuring.
                 </span>
@@ -753,9 +753,9 @@ export function CalendarClient() {
           )}
 
           {parsingStatus === "error" && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">
+            <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/40 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-destructive" />
+              <span className="text-sm text-destructive">
                 PDF parsed but LLM structuring failed. Please check your
                 OpenRouter API key configuration.
               </span>
@@ -799,9 +799,9 @@ export function CalendarClient() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialog} onOpenChange={setDeleteDialog}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg bg-card">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-600">
+            <DialogTitle className="flex items-center gap-2 text-destructive">
               <Trash2 className="h-5 w-5" />
               Remove School Calendar
             </DialogTitle>
@@ -812,16 +812,16 @@ export function CalendarClient() {
           </DialogHeader>
 
           {data?.institution.school_calendar && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="bg-destructive/10 border border-destructive/40 rounded-lg p-4">
               <div className="flex items-center gap-3">
-                <div className=" h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                  <FileText className="h-5 w-5 text-red-600" />
+                <div className=" h-10 rounded-lg bg-destructive/20 flex items-center justify-center flex-shrink-0">
+                  <FileText className="h-5 w-5 text-destructive" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-red-800">
+                  <p className="text-sm font-medium text-destructive">
                     Current Calendar
                   </p>
-                  <p className="text-xs text-red-600 ">
+                  <p className="text-xs text-destructive ">
                     {data.institution.name} Academic Calendar
                   </p>
                 </div>
@@ -829,12 +829,12 @@ export function CalendarClient() {
             </div>
           )}
 
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <div className="bg-amber-500/10 border border-amber-400/50 rounded-lg p-3">
             <div className="flex items-start gap-2">
               <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-amber-800">Warning</p>
-                <p className="text-xs text-amber-700 mt-1">
+                <p className="text-sm font-medium text-foreground">Warning</p>
+                <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
                   Students and staff will no longer be able to access the school
                   calendar until a new one is uploaded.
                 </p>

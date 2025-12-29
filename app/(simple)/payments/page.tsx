@@ -240,12 +240,14 @@ export default async function PaymentsPage({
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="text-red-600 text-xl font-semibold mb-4">
+          <div className="text-destructive text-xl font-semibold mb-4">
             Failed to Load Payment Data
           </div>
-          <p className="text-gray-600 mb-4">{paymentData.error}</p>
+          <p className="text-muted-foreground mb-4">{paymentData.error}</p>
           <Link href="/payments">
-            <Button className="bg-blue-600 hover:bg-blue-700">Retry</Button>
+            <Button className="bg-primary text-primary-foreground hover:opacity-90">
+              Retry
+            </Button>
           </Link>
         </div>
       </div>
@@ -281,7 +283,7 @@ export default async function PaymentsPage({
           defaultValue={iCanPay ? "payments" : "history"}
           className="space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-2 bg-white/70 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-2 bg-card border border-border">
             <TabsTrigger value="payments" className="gap-2">
               <Wallet className="w-4 h-4" />
               Make Payment
@@ -301,13 +303,13 @@ export default async function PaymentsPage({
                 payment_plan_options={payment_plan_options}
               />
             ) : (
-              <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+              <Card className="bg-card border border-border shadow-lg">
                 <CardContent className="p-12 text-center">
-                  <User className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                  <User className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     Payment Not Available
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     Payments are only available for students. Your current role:{" "}
                     <span className="font-semibold">{userData?.role}</span>
                   </p>
@@ -316,13 +318,13 @@ export default async function PaymentsPage({
             )}
           </TabsContent>
           <TabsContent value="history" className="space-y-6">
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+            <Card className="bg-card border border-border shadow-lg">
               <CardContent className="p-6">
                 {!paymentsHistory || paymentsHistory.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">
+                  <div className="text-center py-12 text-muted-foreground">
                     <History className="w-16 h-16 mx-auto mb-4 opacity-30" />
                     <p>No payment history found</p>
-                    <p className="text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Your completed payments will appear here
                     </p>
                   </div>
@@ -330,10 +332,10 @@ export default async function PaymentsPage({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           Found {paymentsHistory.length} payment(s)
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           Click on any payment to view details
                         </p>
                       </div>
@@ -358,13 +360,13 @@ export default async function PaymentsPage({
 
                       return (
                         <Collapsible key={payment.id || `payment-${i}`}>
-                          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border hover:from-gray-100 hover:to-blue-100 transition-colors">
+                          <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/40 transition-colors">
                             <div className="flex items-center gap-4">
                               <div
                                 className={`w-3 h-3 rounded-full ${
                                   paymentStatus
-                                    ? "bg-green-500"
-                                    : "bg-yellow-500"
+                                    ? "bg-emerald-500"
+                                    : "bg-amber-500"
                                 }`}
                               />
                               <div className="text-left">
@@ -375,7 +377,7 @@ export default async function PaymentsPage({
                                   {isHigherAccess &&
                                     payment.first_name &&
                                     payment.last_name && (
-                                      <span className="text-sm text-gray-600">
+                                      <span className="text-sm text-muted-foreground">
                                         • {payment.first_name}{" "}
                                         {payment.last_name}
                                         {payment.username &&
@@ -383,7 +385,7 @@ export default async function PaymentsPage({
                                       </span>
                                     )}
                                 </div>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-muted-foreground">
                                   {paymentDate
                                     ? paymentDate.toLocaleString("en-US", {
                                         year: "numeric",
@@ -404,8 +406,8 @@ export default async function PaymentsPage({
                                 }
                                 className={
                                   paymentStatus
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-yellow-100 text-yellow-800"
+                                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50"
+                                    : "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50"
                                 }
                               >
                                 {paymentStatus ? "Confirmed" : "Pending"}
@@ -414,7 +416,7 @@ export default async function PaymentsPage({
                             </div>
                           </CollapsibleTrigger>
                           <CollapsibleContent className="px-4 pb-4">
-                            <div className="bg-white rounded-lg border p-4 mt-2">
+                            <div className="bg-card rounded-lg border border-border p-4 mt-2">
                               <div className="space-y-4">
                                 {payment.cart &&
                                   Object.keys(payment.cart).length > 0 && (
@@ -427,13 +429,13 @@ export default async function PaymentsPage({
                                           ([itemId, item]: [string, any]) => (
                                             <div
                                               key={itemId}
-                                              className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                                              className="flex justify-between items-center p-2 bg-muted/30 rounded border border-border/60"
                                             >
                                               <div>
                                                 <p className="font-medium text-sm">
                                                   {item.name}
                                                 </p>
-                                                <p className="text-xs text-gray-600">
+                                                <p className="text-xs text-muted-foreground">
                                                   Qty: {item.quantity} • ₦
                                                   {parseFloat(
                                                     item.unit_price || "0"

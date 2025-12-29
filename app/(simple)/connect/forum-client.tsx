@@ -354,7 +354,7 @@ export default function ForumClient() {
 
       {/* Create Post Button */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-800">
+        <h2 className="text-xl font-semibold text-foreground">
           {currentScope.type === "institution" && "University Forum"}
           {currentScope.type === "course" &&
             (currentScope.course_id
@@ -375,7 +375,7 @@ export default function ForumClient() {
             <Button
               onClick={() => setShowCreatePost(true)}
               size="sm"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground hover:opacity-90"
             >
               <MessageSquarePlus className="w-3 h-3 mr-1" />
               New{" "}
@@ -387,7 +387,7 @@ export default function ForumClient() {
         {(currentScope.type === "course" ||
           currentScope.type === "timed_discussion") &&
           !currentScope.course_id && (
-            <div className="text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">
+            <div className="text-sm text-muted-foreground bg-muted/30 px-3 py-2 rounded-lg border border-border/60">
               Please select a course to create a{" "}
               {currentScope.type === "timed_discussion" ? "discussion" : "post"}
             </div>
@@ -396,7 +396,7 @@ export default function ForumClient() {
         {/* Show permission message for students trying to create timed discussions */}
         {currentScope.type === "timed_discussion" &&
           userData?.role === "STUDENT" && (
-            <div className="text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">
+            <div className="text-sm text-muted-foreground bg-muted/30 px-3 py-2 rounded-lg border border-border/60">
               Only faculty and staff can create timed discussions
             </div>
           )}

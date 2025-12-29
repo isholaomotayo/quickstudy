@@ -164,7 +164,7 @@ export function ForumNavigation({
   };
 
   return (
-    <GlassCard className="p-6">
+    <GlassCard className="p-6 bg-card border border-border">
       <div className="space-y-4">
         {/* Main Navigation Tabs */}
         <Tabs
@@ -177,13 +177,13 @@ export function ForumNavigation({
           <TabsList
             className={`grid w-full ${
               courseOnly ? "grid-cols-2" : "grid-cols-3"
-            } bg-white/50`}
+            } bg-muted/30 border border-border/60`}
           >
             {/* Always show University tab unless explicitly in course-only mode */}
             {!courseOnly && (
               <TabsTrigger
                 value="institution"
-                className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white"
+                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Globe className="w-4 h-4" />
                 University Forum
@@ -191,14 +191,14 @@ export function ForumNavigation({
             )}
             <TabsTrigger
               value="course"
-              className="flex items-center gap-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white"
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <BookOpen className="w-4 h-4" />
               Course Forum
             </TabsTrigger>
             <TabsTrigger
               value="timed_discussion"
-              className="flex items-center gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white"
+              className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-primary-foreground"
             >
               <Clock className="w-4 h-4" />
               Timed Discussions
@@ -212,8 +212,8 @@ export function ForumNavigation({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">
+                <Users className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">
                   {selectedCourse ? "Selected Course:" : "Select Course:"}
                 </span>
               </div>
@@ -225,7 +225,7 @@ export function ForumNavigation({
                     setSelectedCourse(null);
                     onScopeChange({ type: currentScope.type });
                   }}
-                  className="text-xs text-gray-500 hover:text-gray-700"
+                  className="text-xs text-muted-foreground hover:text-foreground"
                 >
                   Change Course
                 </Button>
@@ -260,12 +260,12 @@ export function ForumNavigation({
                     }}
                     className={`p-2 rounded-md border transition-all duration-200 text-left ${
                       selectedCourse?.id === course.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50"
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="font-medium text-xs text-gray-900 truncate">
+                      <div className="font-medium text-xs text-foreground truncate">
                         {course.name}
                       </div>
                       {hasCurrentContent && currentCount > 0 && (
@@ -278,7 +278,7 @@ export function ForumNavigation({
                       )}
                     </div>
                     {!hasCurrentContent && (
-                      <div className="text-xs text-gray-400 mt-1">
+                      <div className="text-xs text-muted-foreground mt-1">
                         No{" "}
                         {currentScope.type === "course"
                           ? "posts"
@@ -293,16 +293,16 @@ export function ForumNavigation({
         )}
 
         {/* Scope Description */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
+        <div className="bg-muted/30 border border-border/60 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <MessageSquare className="w-5 h-5 text-blue-600 mt-0.5" />
+            <MessageSquare className="w-5 h-5 text-primary mt-0.5" />
             <div>
               {currentScope.type === "institution" && (
                 <div>
-                  <h3 className="font-medium text-gray-900">
+                  <h3 className="font-medium text-foreground">
                     University-wide Forum
                   </h3>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Discuss topics that affect the entire university community.
                     Share announcements, general questions, and engage with
                     students from all departments.
@@ -312,10 +312,10 @@ export function ForumNavigation({
 
               {currentScope.type === "course" && (
                 <div>
-                  <h3 className="font-medium text-gray-900">
+                  <h3 className="font-medium text-foreground">
                     Course Discussion Forum
                   </h3>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {selectedCourse ? (
                       <>
                         Open-ended discussions for {selectedCourse.name}. Ask
@@ -334,10 +334,10 @@ export function ForumNavigation({
 
               {currentScope.type === "timed_discussion" && (
                 <div>
-                  <h3 className="font-medium text-gray-900">
+                  <h3 className="font-medium text-foreground">
                     Timed Course Discussions
                   </h3>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {selectedCourse ? (
                       <>
                         Time-limited discussions for {selectedCourse.name}

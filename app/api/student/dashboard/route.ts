@@ -269,17 +269,19 @@ export async function GET(req: NextRequest) {
           where: { is_active: true },
         });
 
+        // Always fetch the student's admitted session details
+        const studentSession = await prisma.session.findFirst({
+          where: {
+            id: student.session_admitted_id,
+          },
+        });
+
+        if (studentSession) {
+          admittedSession = studentSession;
+        }
+
         if (currentSession && student.session_admitted_id > currentSession.id) {
           isFutureStudent = true;
-          // Fetch the student's admitted session details
-          const studentSession = await prisma.session.findFirst({
-            where: {
-              id: student.session_admitted_id,
-            },
-          });
-          if (studentSession) {
-            admittedSession = studentSession;
-          }
         }
       } catch (error) {
         console.error("Error checking future student status:", error);

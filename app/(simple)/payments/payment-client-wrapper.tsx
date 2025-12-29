@@ -360,13 +360,13 @@ export default function PaymentClientWrapper({
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       {/* Payment Cart */}
       <div className="lg:col-span-4 space-y-6">
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl sticky top-24 py-0">
-          <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-t-lg">
+        <Card className="bg-card border border-border shadow-xl sticky top-24 py-0">
+          <CardHeader className="bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
               <ShoppingCart className="w-5 h-15" />
               Payment Cart
               {Object.keys(cartState).length > 0 && (
-                <span className="text-sm bg-white/20 px-2 py-1 rounded-full">
+                <span className="text-sm bg-primary-foreground/20 px-2 py-1 rounded-full">
                   {Object.keys(cartState).length} item
                   {Object.keys(cartState).length !== 1 ? "s" : ""}
                 </span>
@@ -376,7 +376,7 @@ export default function PaymentClientWrapper({
           <CardContent className="p-6">
             <div className="space-y-4">
               {Object.keys(cartState).length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   <ShoppingCart className="w-12 h-12 mx-auto mb-2 opacity-30" />
                   <p className="text-sm">Your cart is empty</p>
                   <p className="text-xs">Add items from the payment list</p>
@@ -387,13 +387,13 @@ export default function PaymentClientWrapper({
                     {Object.entries(cartState).map(([feeID, lineItem], i) => (
                       <div
                         key={`cart_item_${i}`}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/60"
                       >
                         <div className="flex-1">
                           <h4 className="font-medium text-sm">
                             {lineItem.name.split(":")[0]}
                           </h4>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             Qty: {lineItem.quantity} • Plan: {lineItem.fee_plan}
                           </p>
                         </div>
@@ -405,7 +405,7 @@ export default function PaymentClientWrapper({
                             variant="ghost"
                             size="sm"
                             onClick={() => removeFromCart(feeID)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
@@ -416,7 +416,7 @@ export default function PaymentClientWrapper({
                   <Separator />
                   <div className="flex justify-between items-center font-bold text-lg">
                     <span>Total:</span>
-                    <span className="text-emerald-600">
+                    <span className="text-emerald-600 dark:text-emerald-300">
                       ₦{cartSum.toLocaleString()}
                     </span>
                   </div>
@@ -424,7 +424,7 @@ export default function PaymentClientWrapper({
                     <Button
                       onClick={payWithPaystack}
                       disabled={!Object.keys(cartState).length}
-                      className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground hover:opacity-90 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       size="lg"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
@@ -449,16 +449,16 @@ export default function PaymentClientWrapper({
       {/* Payment Items */}
       <div className="lg:col-span-8 space-y-6">
         {/* Fixed Fees */}
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card border border-border shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-blue-600" />
+              <Receipt className="w-5 h-5 text-primary" />
               Fixed Fees
             </CardTitle>
           </CardHeader>
           <CardContent>
             {!fixedDues || fixedDues.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <Receipt className="w-12 h-12 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">No fixed fees available</p>
               </div>
@@ -470,11 +470,11 @@ export default function PaymentClientWrapper({
                   return (
                     <div
                       key={rowID}
-                      className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100"
+                      className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/60"
                     >
                       <div>
                         <h4 className="font-medium">{due.name}</h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           ₦{due.unit_price.toLocaleString()}
                         </p>
                       </div>
@@ -484,7 +484,7 @@ export default function PaymentClientWrapper({
                         variant={addedToCart ? "secondary" : "default"}
                         size="sm"
                         className={
-                          addedToCart ? "" : "bg-blue-600 hover:bg-blue-700"
+                          addedToCart ? "" : "bg-primary hover:opacity-90"
                         }
                       >
                         {addedToCart ? (
@@ -508,11 +508,11 @@ export default function PaymentClientWrapper({
         </Card>
 
         {/* Flexible Fees */}
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+        <Card className="bg-card border border-border shadow-lg">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-emerald-600" />
+                <Calendar className="w-5 h-5 text-primary" />
                 Flexible Fees
               </CardTitle>
               <Select value={activePayPlan} onValueChange={handlePlanChange}>
@@ -534,7 +534,7 @@ export default function PaymentClientWrapper({
           <CardContent>
             {!flexibleDues[activePayPlan] ||
             flexibleDues[activePayPlan].length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <Calendar className="w-12 h-12 mx-auto mb-2 opacity-30" />
                 <p className="text-sm">
                   No flexible fees available for{" "}
@@ -558,11 +558,11 @@ export default function PaymentClientWrapper({
                     return (
                       <div
                         key={rowID}
-                        className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg border border-emerald-100"
+                        className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/60"
                       >
                         <div>
                           <h4 className="font-medium">{due.name}</h4>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-muted-foreground">
                             ₦{due.unit_price.toLocaleString()}
                           </p>
                         </div>
@@ -574,7 +574,7 @@ export default function PaymentClientWrapper({
                           className={
                             addedToCart
                               ? ""
-                              : "bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50"
+                              : "bg-primary hover:opacity-90 disabled:opacity-50"
                           }
                         >
                           {addedToCart ? (

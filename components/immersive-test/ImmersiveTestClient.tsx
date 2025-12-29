@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import {
@@ -12,11 +12,9 @@ import {
   ArrowRight,
   Flag,
   Eye,
-  RotateCcw,
-  Paperclip,
-  AlertTriangle,
+  RotateCcw, AlertTriangle,
   CheckCircle,
-  X,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,7 +27,6 @@ import {
   useFinishTest,
 } from "@/lib/hooks/useImmersiveTest";
 import { useUserData } from "@/hooks/useUserData";
-import { translateCode } from "@/helpers/language/translate";
 import { AssignmentSubmission } from "@/app/(dashboard)/immersive-test/components/AssignmentSubmission";
 
 interface CourseTest {
@@ -235,11 +232,11 @@ export default function ImmersiveTestClient({
   // Show loading if any data is still loading
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border border-border bg-card">
           <CardContent className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading test data...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted/40 border-t-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading test data...</p>
           </CardContent>
         </Card>
       </div>
@@ -249,14 +246,14 @@ export default function ImmersiveTestClient({
   // Show error if data failed to load
   if (hasError || !courseTest) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border border-border bg-card">
           <CardContent className="p-8 text-center">
-            <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-foreground mb-2">
               Test Not Found
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               The requested test could not be loaded.
             </p>
             <Button onClick={() => router.back()}>Go Back</Button>
@@ -493,8 +490,8 @@ export default function ImmersiveTestClient({
   // Instructions Screen
   if (currentScreen === "instructions") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-4xl">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-4xl border border-border bg-card">
           <CardContent className="p-8">
             <div className="text-center mb-8">
               <h1 className="text-4xl font-bold mb-4 text-gray-900">
@@ -554,16 +551,7 @@ export default function ImmersiveTestClient({
             </div>
 
             <div className="flex justify-center gap-4">
-              <Button
-                variant="outline"
-                onClick={() =>
-                  router.push(
-                    `/lms/learning-test?course_test_id=${courseTest.id}`
-                  )
-                }
-              >
-                Use Legacy Version
-              </Button>
+              
 
               {!deadlinePassed && userData?.role === "STUDENT" && (
                 <>
@@ -603,11 +591,11 @@ export default function ImmersiveTestClient({
   // Completed Screen
   if (currentScreen === "completed" && bestAttempt) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         {/* Attempt History Modal */}
         {pastAttempts && pastAttempts.length > 0 && showAttemptHistory && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="w-full max-w-md">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md border border-border bg-card shadow-lg">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Attempt History</CardTitle>
                 <Button
@@ -623,9 +611,9 @@ export default function ImmersiveTestClient({
                   {pastAttempts.map((attempt, idx) => (
                     <div
                       key={attempt.id || idx}
-                      className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                      className="flex justify-between items-center p-2 bg-muted/30 rounded border border-border/60"
                     >
-                      <span>Attempt {idx + 1}</span>
+                      <span className="text-foreground">Attempt {idx + 1}</span>
                       <span>
                         {courseTest.format === "assignment" &&
                         !attempt.marked_by ? (
@@ -636,7 +624,7 @@ export default function ImmersiveTestClient({
                           `${attempt.score}/${courseTest.max_score}`
                         )}
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-muted-foreground">
                         {attempt.submitted_at
                           ? new Date(attempt.submitted_at).toLocaleString()
                           : "Not submitted"}
@@ -649,17 +637,17 @@ export default function ImmersiveTestClient({
           </div>
         )}
 
-        <Card className="w-full max-w-2xl">
+        <Card className="w-full max-w-2xl border border-border bg-card">
           <CardContent className="p-8 text-center">
-            <h1 className="text-4xl font-bold mb-8 text-gray-900">
+            <h1 className="text-4xl font-bold mb-8 text-foreground">
               {courseTest.format === "assignment" && !bestAttempt.marked_by
                 ? "Assignment Submitted"
                 : "Test Completed"}
             </h1>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-                <div className="text-3xl font-bold text-green-600">
+              <div className="bg-muted/30 border border-border/60 rounded-lg p-6">
+                <div className="text-3xl font-bold text-foreground">
                   {courseTest.format === "assignment" &&
                   !bestAttempt.marked_by ? (
                     <span className="text-amber-600 text-2xl">
@@ -669,15 +657,15 @@ export default function ImmersiveTestClient({
                     `${bestAttempt.score}/${courseTest.max_score}`
                   )}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   {courseTest.format === "assignment" && !bestAttempt.marked_by
                     ? "Status"
                     : "Your Score"}
                 </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <div className="text-3xl font-bold text-blue-600">
+              <div className="bg-muted/30 border border-border/60 rounded-lg p-6">
+                <div className="text-3xl font-bold text-foreground">
                   {courseTest.format === "assignment" &&
                   !bestAttempt.marked_by ? (
                     <span className="text-amber-600">--</span>
@@ -687,40 +675,40 @@ export default function ImmersiveTestClient({
                     )}%`
                   )}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   {courseTest.format === "assignment" && !bestAttempt.marked_by
                     ? "Grade"
                     : "Percentage"}
                 </div>
               </div>
 
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-                <div className="text-3xl font-bold text-purple-600">
+              <div className="bg-muted/30 border border-border/60 rounded-lg p-6">
+                <div className="text-3xl font-bold text-foreground">
                   {bestAttempt.submitted_at ? (
                     <CheckCircle className="h-8 w-8 mx-auto" />
                   ) : (
                     <X className="h-8 w-8 mx-auto" />
                   )}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   {bestAttempt.submitted_at ? "Submitted" : "Not Submitted"}
                 </div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <p className="text-green-600 font-semibold">
+              <p className="text-primary font-semibold">
                 {courseTest.format === "assignment" && !bestAttempt.marked_by
                   ? "Assignment submitted successfully!"
                   : "You submitted this test!"}
               </p>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 On:{" "}
                 {bestAttempt.submitted_at
                   ? new Date(bestAttempt.submitted_at).toLocaleString()
                   : "-"}
               </p>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 {courseTest.format === "assignment" &&
                 !bestAttempt.marked_by ? (
                   <span className="text-amber-600 font-medium">
@@ -777,52 +765,52 @@ export default function ImmersiveTestClient({
     );
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-4xl">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-4xl border border-border bg-card">
           <CardContent className="p-8">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-6 text-gray-900">
+              <h1 className="text-3xl font-bold mb-6 text-foreground">
                 Review Your Answers
               </h1>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-green-600">
+                <div className="bg-muted/30 border border-border/60 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-foreground">
                     {answeredCount}
                   </div>
-                  <div className="text-sm text-gray-600">Answered</div>
+                  <div className="text-sm text-muted-foreground">Answered</div>
                 </div>
 
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-red-600">
+                <div className="bg-muted/30 border border-border/60 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-foreground">
                     {questions.length - answeredCount}
                   </div>
-                  <div className="text-sm text-gray-600">Unanswered</div>
+                  <div className="text-sm text-muted-foreground">Unanswered</div>
                 </div>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-yellow-600">
+                <div className="bg-muted/30 border border-border/60 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-foreground">
                     {flaggedCount}
                   </div>
-                  <div className="text-sm text-gray-600">Flagged</div>
+                  <div className="text-sm text-muted-foreground">Flagged</div>
                 </div>
 
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-purple-600">
+                <div className="bg-muted/30 border border-border/60 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-foreground">
                     {formatTime(timeRemaining)}
                   </div>
-                  <div className="text-sm text-gray-600">Time Left</div>
+                  <div className="text-sm text-muted-foreground">Time Left</div>
                 </div>
               </div>
             </div>
 
             {unansweredQuestions.length > 0 && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
+              <div className="bg-destructive/10 border border-destructive/40 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-destructive mb-2 flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4" />
                   Unanswered Questions
                 </h3>
-                <p className="text-red-700">
+                <p className="text-destructive">
                   You have {unansweredQuestions.length} unanswered question(s).
                 </p>
               </div>
@@ -843,8 +831,8 @@ export default function ImmersiveTestClient({
                       onClick={() => goToQuestion(index)}
                       className={`h-12 relative ${
                         isAnswered
-                          ? "bg-green-50 border-green-200 text-green-700"
-                          : "bg-red-50 border-red-200 text-red-700"
+                          ? "bg-emerald-500/10 border-emerald-400/40 text-emerald-600 dark:text-emerald-300"
+                          : "bg-destructive/10 border-destructive/40 text-destructive"
                       }`}
                     >
                       Q{index + 1}

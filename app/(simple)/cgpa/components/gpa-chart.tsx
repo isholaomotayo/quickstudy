@@ -26,12 +26,17 @@ export function GpaChart({ studentGpas }: GpaChartProps) {
   const chartData = useMemo(() => {
     if (!studentGpas || studentGpas.length === 0) return [];
     
-    return studentGpas.map((gpa, index) => ({
-      semester: gpa.semester?.name || `Semester ${index + 1}`,
-      level: gpa.level?.name || "N/A",
-      currentGpa: parseFloat(gpa.current_gpa.toString()) || 0,
-      cumulativeGpa: parseFloat(gpa.cumulative_gpa.toString()) || 0,
-    }));
+    return studentGpas.map((gpa, index) => {
+      const currentGpaValue = gpa.current_gpa != null ? parseFloat(gpa.current_gpa.toString()) : 0;
+      const cumulativeGpaValue = gpa.cumulative_gpa != null ? parseFloat(gpa.cumulative_gpa.toString()) : 0;
+      
+      return {
+        semester: gpa.semester?.name || `Semester ${index + 1}`,
+        level: gpa.level?.name || "N/A",
+        currentGpa: isNaN(currentGpaValue) ? 0 : currentGpaValue,
+        cumulativeGpa: isNaN(cumulativeGpaValue) ? 0 : cumulativeGpaValue,
+      };
+    });
   }, [studentGpas]);
 
   if (chartData.length === 0) {
@@ -98,7 +103,7 @@ export function GpaChart({ studentGpas }: GpaChartProps) {
                         style={{ height: `${currentGpaHeight}%` }}
                       ></div>
                       <div className="text-xs text-gray-600 mt-1">
-                        {data.currentGpa.toFixed(2)}
+                        {data.currentGpa != null ? data.currentGpa.toFixed(2) : '0.00'}
                       </div>
                     </div>
                     
@@ -109,7 +114,7 @@ export function GpaChart({ studentGpas }: GpaChartProps) {
                         style={{ height: `${cumulativeGpaHeight}%` }}
                       ></div>
                       <div className="text-xs text-gray-600 mt-1">
-                        {data.cumulativeGpa.toFixed(2)}
+                        {data.cumulativeGpa != null ? data.cumulativeGpa.toFixed(2) : '0.00'}
                       </div>
                     </div>
                   </div>
@@ -121,8 +126,8 @@ export function GpaChart({ studentGpas }: GpaChartProps) {
           {/* GPA Scale */}
           <div className="flex justify-between text-xs text-gray-500 mt-4">
             <span>0.0</span>
-            <span>{(maxGpa / 2).toFixed(1)}</span>
-            <span>{maxGpa.toFixed(1)}</span>
+            <span>{maxGpa != null ? (maxGpa / 2).toFixed(1) : '0.0'}</span>
+            <span>{maxGpa != null ? maxGpa.toFixed(1) : '0.0'}</span>
           </div>
         </div>
       </CardContent>

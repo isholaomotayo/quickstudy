@@ -487,24 +487,6 @@ export default function ImmersiveQuiz({
           <div
             style={{ display: "flex", justifyContent: "center", gap: "16px" }}
           >
-            <button
-              onClick={() =>
-                (window.location.href = `/lms/learning-test?course_test_id=${courseTest.id}`)
-              }
-              style={{
-                background: "rgba(255, 255, 255, 0.1)",
-                border: "1px solid #e0e0e0",
-                color: "#2d2d2d",
-                padding: "12px 24px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "16px",
-                fontWeight: "500",
-                fontFamily: defaultFontFamily,
-              }}
-            >
-              Use Legacy Version
-            </button>
             {iCanTakeTest && !isOffline && !deadlinePassed && (
               <>
                 {courseTest.format === "assignment" &&

@@ -73,16 +73,16 @@ export function ForumContainer({
     !scope.course_id
   ) {
     return (
-      <GlassCard className="p-12 text-center">
+      <GlassCard className="p-12 text-center bg-card border border-border">
         <div className="space-y-4">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
-            <BookOpen className="w-8 h-8 text-blue-600" />
+          <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+            <BookOpen className="w-8 h-8 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-foreground mb-2">
               Select a Course
             </h3>
-            <p className="text-gray-600 max-w-md mx-auto">
+            <p className="text-muted-foreground max-w-md mx-auto">
               Choose a course from the list above to view its{" "}
               {scope.type === "timed_discussion"
                 ? "timed discussions"
@@ -104,7 +104,7 @@ export function ForumContainer({
       {/* Sort Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Sort by:</span>
+          <span className="text-sm text-muted-foreground">Sort by:</span>
           <div className="flex gap-1">
             {[
               { value: "recent", label: "Recent", icon: Clock },
@@ -120,8 +120,8 @@ export function ForumContainer({
                   onClick={() => setSortBy(option.value as any)}
                   className={`flex items-center gap-1 text-xs ${
                     sortBy === option.value
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-600 hover:text-blue-600"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-primary"
                   }`}
                 >
                   <IconComponent className="w-3 h-3" />
@@ -136,7 +136,7 @@ export function ForumContainer({
           variant="ghost"
           size="sm"
           onClick={onRefresh}
-          className="flex items-center gap-1 text-gray-600 hover:text-blue-600"
+          className="flex items-center gap-1 text-muted-foreground hover:text-primary"
         >
           <RefreshCw className="w-3 h-3" />
           Refresh
@@ -146,7 +146,7 @@ export function ForumContainer({
       {/* Pinned Posts */}
       {pinnedPosts.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-800 flex items-center gap-2">
+          <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
             📌 Pinned Posts
           </h3>
           {pinnedPosts.map((post) => (
@@ -165,7 +165,7 @@ export function ForumContainer({
       {/* Regular Posts */}
       <div className="space-y-4">
         {pinnedPosts.length > 0 && (
-          <h3 className="text-lg font-medium text-gray-800">
+          <h3 className="text-lg font-medium text-foreground">
             Recent {scope.type === "timed_discussion" ? "Discussions" : "Posts"}
           </h3>
         )}
@@ -186,7 +186,7 @@ export function ForumContainer({
       {/* Load More Button */}
       {posts.length >= 10 && (
         <div className="flex justify-center">
-          <Button variant="outline" className="bg-white/70 hover:bg-white/90">
+          <Button variant="outline" className="bg-card hover:bg-muted/40">
             Load More Posts
           </Button>
         </div>
@@ -258,17 +258,17 @@ function EmptyState({
   const canCreateTimedDiscussion = userData?.role !== "STUDENT";
 
   return (
-    <GlassCard className="p-12 text-center">
+    <GlassCard className="p-12 text-center bg-card border border-border">
       <div className="space-y-4">
-        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
-          <MessageSquare className="w-8 h-8 text-blue-600" />
+        <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+          <MessageSquare className="w-8 h-8 text-primary" />
         </div>
 
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-foreground mb-2">
             No {scope.type === "timed_discussion" ? "discussions" : "posts"} yet
           </h3>
-          <p className="text-gray-600 max-w-md mx-auto">
+          <p className="text-muted-foreground max-w-md mx-auto">
             {scope.type === "institution" &&
               "Be the first to start a conversation in the university forum!"}
             {scope.type === "course" &&
@@ -282,7 +282,7 @@ function EmptyState({
         {(scope.type !== "timed_discussion" || canCreateTimedDiscussion) && (
           <Button
             onClick={onCreatePost}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            className="bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground hover:opacity-90"
           >
             <MessageSquare className="w-4 h-4 mr-2" />
             Create First{" "}
@@ -292,7 +292,7 @@ function EmptyState({
 
         {/* Show permission message for students in timed discussion context */}
         {scope.type === "timed_discussion" && !canCreateTimedDiscussion && (
-          <div className="text-sm text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+          <div className="text-sm text-muted-foreground bg-muted/30 px-4 py-2 rounded-lg border border-border/60">
             Only faculty and staff can create timed discussions
           </div>
         )}

@@ -2,23 +2,24 @@
 
 import { useState, useEffect } from "react";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
-    Clock,
-    Calendar, Award,
-    TrendingUp,
-    BookOpen,
-    Download,
-    AlertCircle
+  Clock,
+  Calendar, Award,
+  TrendingUp,
+  BookOpen,
+  Download,
+  AlertCircle, CheckCircle,
+  XCircle
 } from "lucide-react";
 
 interface TestDetail {
@@ -37,13 +38,18 @@ interface TestDetail {
     questionOrder: number;
     questionMarks?: number;
     questionText: string;
+    questionDetails?: string;
     selection: Record<
       string,
       {
         text: string;
         is_answer: boolean;
+        is_correct?: boolean;
       }
-    >;
+    > | {
+      text_answer?: string;
+      file_answer?: string;
+    };
   }>;
   user?: {
     first_name: string;
@@ -52,6 +58,10 @@ interface TestDetail {
   };
   created_at: string;
   updated_at: string;
+  feedback?: Array<{
+    questionId: number;
+    feedback: string;
+  }>;
 }
 
 interface TestDetailModalProps {
@@ -114,11 +124,15 @@ export function TestDetailModal({
 
   const getScoreBadge = (score: number, maxScore: number) => {
     const percentage = (score / maxScore) * 100;
-    if (percentage >= 80) return "bg-green-100 text-green-800";
-    if (percentage >= 70) return "bg-blue-100 text-blue-800";
-    if (percentage >= 60) return "bg-yellow-100 text-yellow-800";
-    if (percentage >= 50) return "bg-orange-100 text-orange-800";
-    return "bg-red-100 text-red-800";
+    if (percentage >= 80)
+      return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50";
+    if (percentage >= 70)
+      return "bg-primary/10 text-primary border border-primary/40";
+    if (percentage >= 60)
+      return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50";
+    if (percentage >= 50)
+      return "bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-400/50";
+    return "bg-destructive/10 text-destructive border border-destructive/40";
   };
 
   const formatDate = (dateString: string) => {
@@ -182,7 +196,7 @@ export function TestDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent size="lg" className="max-w-4xl max-h-[80vh] overflow-y-auto bg-card text-foreground">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <BookOpen className="h-5 w-5" />
@@ -197,11 +211,11 @@ export function TestDetailModal({
           {/* Information Note */}
           {testDetail.questions_answers &&
             testDetail.questions_answers.length > 0 && (
-              <Card className="bg-blue-50 border-blue-200">
+              <Card className="bg-muted/30 border border-border/60">
                 <CardContent className="pt-4">
                   <div className="flex items-start space-x-2">
-                    <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                    <div className="text-sm text-blue-800">
+                    <AlertCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-muted-foreground">
                       <p className="font-medium mb-1">
                         Test Review Information:
                       </p>
@@ -217,9 +231,9 @@ export function TestDetailModal({
             )}
 
           {/* Score Summary */}
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <Card className="bg-muted/30 border border-border/60">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-blue-900">
+              <CardTitle className="flex items-center space-x-2 text-foreground">
                 <Award className="h-5 w-5" />
                 <span>Test Results</span>
               </CardTitle>
@@ -235,7 +249,7 @@ export function TestDetailModal({
                   >
                     {testDetail.score}/{testDetail.max_score}
                   </div>
-                  <div className="text-sm text-gray-600">Total Score</div>
+                  <div className="text-sm text-muted-foreground">Total Score</div>
                   <Badge
                     className={`mt-2 ${getScoreBadge(
                       testDetail.score,
@@ -246,30 +260,30 @@ export function TestDetailModal({
                   </Badge>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600">
+                  <div className="text-3xl font-bold text-foreground">
                     {correctAnswers}/{totalQuestions}
                   </div>
-                  <div className="text-sm text-gray-600">Correct Answers</div>
+                  <div className="text-sm text-muted-foreground">Correct Answers</div>
                   <Progress
                     value={(correctAnswers / totalQuestions) * 100}
                     className="mt-2"
                   />
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600">
+                  <div className="text-3xl font-bold text-foreground">
                     {testDetail.duration_mins} min
                   </div>
-                  <div className="text-sm text-gray-600">Time Taken</div>
-                  <div className="flex items-center justify-center mt-2">
-                    <Clock className="h-4 w-4 text-gray-500 mr-1" />
-                    <span className="text-xs text-gray-500">Duration</span>
+                  <div className="text-sm text-muted-foreground">Time Taken</div>
+                  <div className="flex items-center justify-center mt-2 text-muted-foreground">
+                    <Clock className="h-4 w-4 mr-1" />
+                    <span className="text-xs">Duration</span>
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-orange-600">
+                  <div className="text-3xl font-bold text-foreground">
                     {testDetail.attempt_number}/{testDetail.max_attempts}
                   </div>
-                  <div className="text-sm text-gray-600">Attempt</div>
+                  <div className="text-sm text-muted-foreground">Attempt</div>
                   <Progress
                     value={
                       (testDetail.attempt_number / testDetail.max_attempts) *
@@ -283,7 +297,7 @@ export function TestDetailModal({
           </Card>
 
           {/* Test Information */}
-          <Card>
+          <Card className="border border-border bg-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5" />
@@ -291,28 +305,28 @@ export function TestDetailModal({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                 <div>
-                  <span className="font-medium text-gray-700">Submitted:</span>
-                  <span className="ml-2 text-gray-600">
+                  <span className="font-medium text-foreground">Submitted:</span>
+                  <span className="ml-2">
                     {formatDate(testDetail.created_at)}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Deadline:</span>
-                  <span className="ml-2 text-gray-600">
+                  <span className="font-medium text-foreground">Deadline:</span>
+                  <span className="ml-2">
                     {formatDate(testDetail.deadline)}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Format:</span>
-                  <span className="ml-2 text-gray-600">
+                  <span className="font-medium text-foreground">Format:</span>
+                  <span className="ml-2">
                     {testDetail.format}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-gray-700">Duration:</span>
-                  <span className="ml-2 text-gray-600">
+                  <span className="font-medium text-foreground">Duration:</span>
+                  <span className="ml-2">
                     {testDetail.duration_mins} minutes
                   </span>
                 </div>
@@ -323,7 +337,7 @@ export function TestDetailModal({
           {/* Question Review */}
           {testDetail.questions_answers &&
           testDetail.questions_answers.length > 0 ? (
-            <Card>
+            <Card className="border border-border bg-card">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <TrendingUp className="h-5 w-5" />
@@ -332,57 +346,168 @@ export function TestDetailModal({
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {testDetail.questions_answers.map((question, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-medium text-gray-900">
-                          Question {question.questionOrder}:{" "}
-                          {question.questionText}
-                        </h4>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-500">
-                            {question.questionMarks || 1} mark
-                            {question.questionMarks !== 1 ? "s" : ""}
-                          </span>
+                  {testDetail.questions_answers.map((question, index) => {
+                    const selection = question.selection;
+                    const isObjectiveQuestion = selection && typeof selection === 'object' && !('text_answer' in selection);
+                    const isSubjectiveQuestion = selection && typeof selection === 'object' && ('text_answer' in selection || 'file_answer' in selection);
+                    
+                    // Find feedback for this question
+                    const questionFeedback = testDetail.feedback?.find(f => f.questionId === question.questionId);
+                    
+                    // Check if question was answered correctly (for objective questions)
+                    let isQuestionCorrect = false;
+                    if (isObjectiveQuestion) {
+                      isQuestionCorrect = Object.values(selection as Record<string, any>).every(
+                        (option) => (option.is_answer === true && option.is_correct === true) || 
+                                   (option.is_answer === false && option.is_correct === false)
+                      );
+                    }
+                    
+                    return (
+                      <div key={index} className="border border-border/60 rounded-lg p-4 bg-card">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-foreground mb-1">
+                              Question {question.questionOrder}:{" "}
+                              {question.questionText}
+                            </h4>
+                            {question.questionDetails && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {question.questionDetails}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-2 ml-4">
+                            {isObjectiveQuestion && (
+                              <Badge
+                                className={isQuestionCorrect ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50" : "bg-destructive/10 text-destructive border border-destructive/40"}
+                              >
+                                {isQuestionCorrect ? (
+                                  <><CheckCircle className="h-3 w-3 mr-1 inline" />Correct</>
+                                ) : (
+                                  <><XCircle className="h-3 w-3 mr-1 inline" />Incorrect</>
+                                )}
+                              </Badge>
+                            )}
+                            <span className="text-sm text-muted-foreground">
+                              {question.questionMarks || 1} mark{question.questionMarks !== 1 ? "s" : ""}
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Student's Answer Summary */}
-                      <div className="mb-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium text-gray-700">
-                            Question Status:
-                          </span>
-                          <span className="text-gray-600">
-                            Question completed
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        {Object.entries(question.selection).map(
-                          ([key, option]) => (
-                            <div
-                              key={key}
-                              className="flex items-center space-x-2 p-2 rounded bg-gray-50"
-                            >
-                              <span className="font-medium text-gray-700">
-                                {key}:
-                              </span>
-                              <span className="text-gray-900">
-                                {option.text || `Option ${key}`}
-                              </span>
+                        {/* Objective Question - Show options with user's selections */}
+                        {isObjectiveQuestion && (
+                          <div className="space-y-2">
+                            <div className="text-sm font-medium text-foreground mb-2">
+                              Your Answer{Object.values(selection as Record<string, any>).filter((o: any) => o.is_answer).length > 1 ? 's' : ''}:
                             </div>
-                          )
+                            {Object.entries(selection as Record<string, any>).map(
+                              ([key, option]) => {
+                                const isSelected = option.is_answer === true;
+                                const isCorrect = option.is_correct === true;
+                                
+                                return (
+                                  <div
+                                    key={key}
+                                    className={`flex items-start space-x-3 p-3 rounded-lg border-2 transition-colors ${
+                                      isSelected
+                                        ? isCorrect
+                                          ? "bg-emerald-500/10 border-emerald-400/50"
+                                          : "bg-destructive/10 border-destructive/40"
+                                        : "bg-muted/30 border-border/60"
+                                    }`}
+                                  >
+                                    <div className="flex-shrink-0 mt-0.5">
+                                      {isSelected ? (
+                                        isCorrect ? (
+                                          <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
+                                        ) : (
+                                          <XCircle className="h-5 w-5 text-destructive" />
+                                        )
+                                      ) : (
+                                        <div className="h-5 w-5 rounded-full border-2 border-border" />
+                                      )}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-start justify-between">
+                                        <div>
+                                          <span className="font-medium text-foreground mr-2">
+                                            {key}.
+                                          </span>
+                                          <span className={isSelected ? "font-medium" : "text-muted-foreground"}>
+                                            {option.text || `Option ${key}`}
+                                          </span>
+                                        </div>
+                                        {isSelected && (
+                                          <Badge variant="outline" className="ml-2">
+                                            Your Selection
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                            )}
+                          </div>
+                        )}
+
+                        {/* Subjective Question - Show text/file answer */}
+                        {isSubjectiveQuestion && (
+                          <div className="space-y-3">
+                            <div className="text-sm font-medium text-foreground">
+                              Your Answer:
+                            </div>
+                            {(selection as any).text_answer && (
+                              <div className="p-3 bg-muted/30 border border-border/60 rounded-lg">
+                                <p className="text-foreground whitespace-pre-wrap">
+                                  {(selection as any).text_answer}
+                                </p>
+                              </div>
+                            )}
+                            {(selection as any).file_answer && (
+                              <div className="p-3 bg-muted/30 border border-border/60 rounded-lg">
+                                <div className="flex items-center space-x-2">
+                                  <Download className="h-4 w-4 text-primary" />
+                                  <span className="text-sm font-medium text-foreground">
+                                    Submitted Files:
+                                  </span>
+                                </div>
+                                <div className="mt-2 text-sm text-muted-foreground">
+                                  {typeof (selection as any).file_answer === 'string' 
+                                    ? (selection as any).file_answer
+                                    : JSON.stringify((selection as any).file_answer, null, 2)
+                                  }
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Feedback Section */}
+                        {questionFeedback && (
+                          <div className="mt-4 p-3 bg-amber-500/10 border border-amber-400/50 rounded-lg">
+                            <div className="flex items-start space-x-2">
+                              <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <div className="text-sm font-medium text-foreground mb-1">
+                                  Instructor Feedback:
+                                </div>
+                                <p className="text-sm text-amber-700 dark:text-amber-300">
+                                  {questionFeedback.feedback}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            <Card className="border border-border bg-card">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <TrendingUp className="h-5 w-5" />
@@ -391,13 +516,13 @@ export function TestDetailModal({
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
-                  <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <BookOpen className="h-8 w-8 text-gray-400" />
+                  <div className="mx-auto w-16 h-16 bg-muted/40 rounded-full flex items-center justify-center mb-4">
+                    <BookOpen className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-foreground mb-2">
                     No Questions Available
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     This test doesn't have any questions or answers recorded.
                     This might be because the test was not completed or the
                     answers were not saved.

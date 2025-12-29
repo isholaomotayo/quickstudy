@@ -340,10 +340,10 @@ export function AssignmentCreatorModal({
                     }
                     placeholder="Enter assignment name"
                     required
-                    className={errors.name ? "border-red-500" : ""}
+                    className={errors.name ? "border-destructive" : ""}
                   />
                   {errors.name && (
-                    <p className="text-sm text-red-500">{errors.name}</p>
+                    <p className="text-sm text-destructive">{errors.name}</p>
                   )}
                 </div>
 
@@ -363,10 +363,10 @@ export function AssignmentCreatorModal({
                     }
                     placeholder="Optional"
                     min="1"
-                    className={errors.duration_mins ? "border-red-500" : ""}
+                    className={errors.duration_mins ? "border-destructive" : ""}
                   />
                   {errors.duration_mins && (
-                    <p className="text-sm text-red-500">
+                    <p className="text-sm text-destructive">
                       {errors.duration_mins}
                     </p>
                   )}
@@ -381,10 +381,10 @@ export function AssignmentCreatorModal({
                     onChange={(e) =>
                       setAssignment({ ...assignment, deadline: e.target.value })
                     }
-                    className={errors.deadline ? "border-red-500" : ""}
+                    className={errors.deadline ? "border-destructive" : ""}
                   />
                   {errors.deadline && (
-                    <p className="text-sm text-red-500">{errors.deadline}</p>
+                    <p className="text-sm text-destructive">{errors.deadline}</p>
                   )}
                 </div>
 
@@ -402,10 +402,10 @@ export function AssignmentCreatorModal({
                     }
                     min="1"
                     required
-                    className={errors.max_attempts ? "border-red-500" : ""}
+                    className={errors.max_attempts ? "border-destructive" : ""}
                   />
                   {errors.max_attempts && (
-                    <p className="text-sm text-red-500">
+                    <p className="text-sm text-destructive">
                       {errors.max_attempts}
                     </p>
                   )}
@@ -448,12 +448,12 @@ export function AssignmentCreatorModal({
             </CardHeader>
             <CardContent>
               {errors.questions && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-600">{errors.questions}</p>
+                <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+                  <p className="text-sm text-destructive">{errors.questions}</p>
                 </div>
               )}
               {assignment.questions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   <p>
                     No questions added yet. Click "Add Question" to get started.
                   </p>
@@ -477,7 +477,7 @@ export function AssignmentCreatorModal({
                             onClick={() => removeQuestion(index)}
                             variant="ghost"
                             size="sm"
-                            className="text-red-500 hover:text-red-700"
+                            className="text-destructive hover:text-destructive/80"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -546,8 +546,8 @@ export function AssignmentCreatorModal({
               )}
 
               {assignment.questions.length > 0 && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-blue-800">
+                <div className="mt-4 p-4 bg-muted/30 border border-border/60 rounded-lg">
+                  <p className="text-sm text-foreground">
                     Total Marks:{" "}
                     <span className="font-semibold">
                       {calculateTotalMarks()}
@@ -572,7 +572,7 @@ export function AssignmentCreatorModal({
                       published: e.target.checked,
                     })
                   }
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-primary focus:ring-primary border-border rounded"
                 />
                 <Label htmlFor="published" className="text-sm font-medium">
                   Publish assignment immediately
@@ -589,7 +589,7 @@ export function AssignmentCreatorModal({
                   type="button"
                   variant="outline"
                   onClick={clearDraft}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-destructive hover:text-destructive/80"
                 >
                   Clear Draft
                 </Button>

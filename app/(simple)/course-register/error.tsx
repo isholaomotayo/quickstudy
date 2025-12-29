@@ -17,16 +17,16 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center p-6">
-      <Card className="max-w-md w-full">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <Card className="max-w-md w-full border border-border bg-card">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-            <AlertCircle className="h-6 w-6 text-red-600" />
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+            <AlertCircle className="h-6 w-6 text-destructive" />
           </div>
-          <CardTitle className="text-red-800">Something went wrong</CardTitle>
+          <CardTitle className="text-destructive">Something went wrong</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             We encountered an error while loading the course registration page. 
             This might be a temporary issue.
           </p>
@@ -44,7 +44,7 @@ export default function Error({
             </Button>
           </div>
           {error.digest && (
-            <p className="text-xs text-gray-500 mt-4">
+            <p className="text-xs text-muted-foreground mt-4">
               Error ID: {error.digest}
             </p>
           )}

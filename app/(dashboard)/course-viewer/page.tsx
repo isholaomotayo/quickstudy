@@ -94,13 +94,13 @@ export default function CourseViewerPage() {
 
   if (!courseModuleId || !courseId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 max-w-md w-full mx-4">
           <div className="text-center">
-            <h3 className="text-sm font-medium text-red-800">
+            <h3 className="text-sm font-medium text-destructive">
               Missing Parameters
             </h3>
-            <p className="text-sm text-red-700 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Course ID and Module ID are required.
             </p>
           </div>
@@ -115,13 +115,13 @@ export default function CourseViewerPage() {
 
   if (isError || !courseData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 max-w-md w-full mx-4">
           <div className="text-center">
-            <h3 className="text-sm font-medium text-red-800">
+            <h3 className="text-sm font-medium text-destructive">
               Error Loading Course
             </h3>
-            <p className="text-sm text-red-700 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Failed to fetch course data. Please try again.
             </p>
           </div>
@@ -137,13 +137,13 @@ export default function CourseViewerPage() {
 
   if (!courseModuleData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md w-full mx-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6 max-w-md w-full mx-4">
           <div className="text-center">
-            <h3 className="text-sm font-medium text-red-800">
+            <h3 className="text-sm font-medium text-destructive">
               Module Not Found
             </h3>
-            <p className="text-sm text-red-700 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               The requested module could not be found.
             </p>
           </div>

@@ -21,7 +21,20 @@ export async function GET(request: NextRequest) {
 
     const user = authResult.user!;
     const { searchParams } = new URL(request.url);
-    const course_test_id = searchParams.get("course_test_id");
+
+    // Support both direct query param and filter format
+    let course_test_id = searchParams.get("course_test_id");
+
+    // If not found, check for filter parameter (format: filter=course_test_id:444)
+    if (!course_test_id) {
+      const filter = searchParams.get("filter");
+      if (filter) {
+        const match = filter.match(/course_test_id:(\d+)/);
+        if (match) {
+          course_test_id = match[1];
+        }
+      }
+    }
 
     if (!course_test_id) {
       return NextResponse.json(

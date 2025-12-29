@@ -197,11 +197,11 @@ export function ResultsClient() {
   };
 
   const getDegreeClassColor = (cgpa: number) => {
-    if (cgpa >= 4.5) return "bg-green-100 text-green-800";
-    if (cgpa >= 3.5) return "bg-blue-100 text-blue-800";
-    if (cgpa >= 2.5) return "bg-yellow-100 text-yellow-800";
-    if (cgpa >= 1.5) return "bg-orange-100 text-orange-800";
-    return "bg-gray-100 text-gray-800";
+    if (cgpa >= 4.5) return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50";
+    if (cgpa >= 3.5) return "bg-primary/10 text-primary border border-primary/40";
+    if (cgpa >= 2.5) return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50";
+    if (cgpa >= 1.5) return "bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-400/50";
+    return "bg-muted/40 text-muted-foreground border border-border";
   };
 
   const overallCGPA = calculateOverallCGPA();
@@ -209,11 +209,11 @@ export function ResultsClient() {
 
   if (loading) {
     return (
-      <Card>
+      <Card className="border border-border bg-card">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-600">Loading your results...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted/40 border-t-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading your results...</p>
           </div>
         </CardContent>
       </Card>
@@ -222,16 +222,16 @@ export function ResultsClient() {
 
   if (!userData) {
     return (
-      <Card>
+      <Card className="border border-border bg-card">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertCircle className="h-8 w-8 text-red-600" />
+            <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
+              <AlertCircle className="h-8 w-8 text-destructive" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-foreground">
               Authentication Required
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Please log in to view your academic results.
             </p>
             <Button
@@ -248,11 +248,11 @@ export function ResultsClient() {
 
   if (error) {
     return (
-      <Card>
+      <Card className="border border-border bg-card">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
-            <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
-            <p className="text-red-600">{error}</p>
+            <AlertCircle className="mx-auto h-12 w-12 text-destructive" />
+            <p className="text-destructive">{error}</p>
             <Button onClick={fetchResults} variant="outline">
               Try Again
             </Button>
@@ -309,16 +309,16 @@ export function ResultsClient() {
         learningResults.length === 0 &&
         !loading &&
         !error && (
-          <Card>
+          <Card className="border border-border bg-card">
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
-                <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                  <BookOpen className="h-8 w-8 text-gray-400" />
+                <div className="mx-auto w-16 h-16 bg-muted/40 rounded-full flex items-center justify-center">
+                  <BookOpen className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-foreground">
                   No Results Available
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   You don't have any published results yet. Results will appear
                   here once they are published by your instructors.
                 </p>

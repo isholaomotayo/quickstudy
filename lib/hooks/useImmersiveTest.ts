@@ -1,11 +1,11 @@
-import useSWR from 'swr';
+import useSWR from "swr";
 
 // Fetcher function for SWR with credentials (using relative URLs)
 const fetcher = async (url: string) => {
   const response = await fetch(url, {
-    credentials: 'include',
+    credentials: "include",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 
@@ -14,10 +14,15 @@ const fetcher = async (url: string) => {
     if (response.status === 404) {
       return null;
     }
-    throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to fetch ${url}: ${response.status} ${response.statusText}`
+    );
   }
 
-  return response.json();
+  const json = await response.json();
+
+  // Unwrap the data property if it exists (for Next.js API routes)
+  return json.data || json;
 };
 
 // Hook for fetching course test data
@@ -42,7 +47,9 @@ export function useCourseTest(courseTestId: string | null) {
 // Hook for fetching course questions
 export function useCourseQuestions(courseTestId: string | null) {
   const { data, error, isLoading, mutate } = useSWR(
-    courseTestId ? `/api/coursequestion?filter=course_test_id:${courseTestId}` : null,
+    courseTestId
+      ? `/api/coursequestion?filter=course_test_id:${courseTestId}`
+      : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -59,9 +66,14 @@ export function useCourseQuestions(courseTestId: string | null) {
 }
 
 // Hook for fetching past attempts
-export function usePastAttempts(courseTestId: string | null, userId: number | null) {
+export function usePastAttempts(
+  courseTestId: string | null,
+  userId: number | null
+) {
   const { data, error, isLoading, mutate } = useSWR(
-    courseTestId && userId && !isNaN(userId) ? `/api/studenttest?course_test_id=${courseTestId}&user_id=${userId}` : null,
+    courseTestId && userId && !isNaN(userId)
+      ? `/api/studenttest?course_test_id=${courseTestId}&user_id=${userId}`
+      : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -81,10 +93,10 @@ export function usePastAttempts(courseTestId: string | null, userId: number | nu
 export function useStartTest() {
   const startTest = async (courseTestId: number) => {
     const response = await fetch(`/api/studenttest/start`, {
-      method: 'POST',
-      credentials: 'include',
+      method: "POST",
+      credentials: "include",
       headers: {
-        'Content-Type': 'application/json;charset=utf-8',
+        "Content-Type": "application/json;charset=utf-8",
       },
       body: JSON.stringify({
         course_test_id: courseTestId,
@@ -95,7 +107,9 @@ export function useStartTest() {
       throw new Error(`Failed to start test: ${response.statusText}`);
     }
 
-    return response.json();
+    const json = await response.json();
+    // Unwrap data property if it exists
+    return json.data || json;
   };
 
   return { startTest };
@@ -105,10 +119,10 @@ export function useStartTest() {
 export function useFinishTest() {
   const finishTest = async (studentTestId: number, questionsAnswers: any[]) => {
     const response = await fetch(`/api/studenttest/finish`, {
-      method: 'POST',
-      credentials: 'include',
+      method: "POST",
+      credentials: "include",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         student_test_id: studentTestId,
@@ -120,7 +134,9 @@ export function useFinishTest() {
       throw new Error(`Failed to finish test: ${response.statusText}`);
     }
 
-    return response.json();
+    const json = await response.json();
+    // Unwrap data property if it exists
+    return json.data || json;
   };
 
   return { finishTest };

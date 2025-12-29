@@ -200,15 +200,31 @@ export function AdminToolbar({
       const { questions, ...testData } = quizData;
 
       // Create the quiz/test (without questions field)
-      const test = await api.post("/api/coursetest", {
+      const testResponse = await api.post("/api/coursetest", {
         ...testData,
         course_id: courseModule.course_id,
         course_module_id: courseModule.id,
         course_lesson_id: currentLesson?.id,
       });
 
+      // Debug logging
+      console.log("Full testResponse:", testResponse);
+      console.log("testResponse.data:", testResponse.data);
+      
+      // Extract the test data from the API response
+      // The API returns { success: true, data: testObject, user: ... }
+      // So we need testResponse.data.data to get the actual test object
+      const test = testResponse.data.data || testResponse.data;
+      console.log("Extracted test object:", test);
+      console.log("Test ID:", test?.id);
+
+      if (!test || !test.id) {
+        throw new Error("Failed to create test: No test ID returned");
+      }
+
       // Create questions for the quiz
       if (questions && questions.length > 0) {
+        console.log(`Creating ${questions.length} questions for test ID: ${test.id}`);
         for (const question of questions) {
           // Transform options array to object format
           let optionsObject: any = null;
@@ -257,16 +273,16 @@ export function AdminToolbar({
   return (
     <>
       {/* Admin Toolbar */}
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-4">
+      <div className="bg-muted/30 border-l-4 border-primary/40 p-3 mb-4 rounded-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Settings className="h-4 w-4 text-yellow-600" />
-            <span className="text-sm font-medium text-yellow-800">
+            <Settings className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-foreground">
               Admin Mode
             </span>
             <Badge
               variant="outline"
-              className="text-xs text-yellow-700 border-yellow-300"
+              className="text-xs text-primary border-primary/40"
             >
               {courseModule.published ? "Published" : "Draft"}
             </Badge>
@@ -277,7 +293,7 @@ export function AdminToolbar({
               size="sm"
               variant="outline"
               onClick={() => setAdminMode(!adminMode)}
-              className="border-yellow-300 text-yellow-700 hover:bg-yellow-100"
+              className="border-primary/40 text-primary hover:bg-primary/10"
             >
               {adminMode ? (
                 <>
@@ -296,7 +312,7 @@ export function AdminToolbar({
               <DropdownMenuTrigger asChild>
                 <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-primary hover:brightness-110 text-primary-foreground"
                 >
                   <Plus className="h-3 w-3 mr-1" />
                   Add Content
@@ -334,19 +350,19 @@ export function AdminToolbar({
 
         {/* Extended Admin Tools */}
         {adminMode && (
-          <div className="mt-3 pt-3 border-t border-yellow-200">
+          <div className="mt-3 pt-3 border-t border-border/60">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               <div className="text-xs">
-                <span className="font-medium text-yellow-800">Module:</span>
-                <div className="text-yellow-700">{courseModule.name}</div>
+                <span className="font-medium text-foreground">Module:</span>
+                <div className="text-muted-foreground">{courseModule.name}</div>
               </div>
               <div className="text-xs">
-                <span className="font-medium text-yellow-800">Lessons:</span>
-                <div className="text-yellow-700">{courseLessons.length}</div>
+                <span className="font-medium text-foreground">Lessons:</span>
+                <div className="text-muted-foreground">{courseLessons.length}</div>
               </div>
               <div className="text-xs">
-                <span className="font-medium text-yellow-800">Tests:</span>
-                <div className="text-yellow-700">
+                <span className="font-medium text-foreground">Tests:</span>
+                <div className="text-muted-foreground">
                   {courseLessons.reduce(
                     (total, lesson) =>
                       total + (lesson.course_tests?.length || 0),
@@ -355,8 +371,8 @@ export function AdminToolbar({
                 </div>
               </div>
               <div className="text-xs">
-                <span className="font-medium text-yellow-800">Status:</span>
-                <div className="text-yellow-700">
+                <span className="font-medium text-foreground">Status:</span>
+                <div className="text-muted-foreground">
                   {courseModule.published ? "Live" : "Draft"}
                 </div>
               </div>
@@ -364,9 +380,9 @@ export function AdminToolbar({
 
             {/* Current Lesson Actions */}
             {currentLesson && (
-              <div className="mt-3 pt-3 border-t border-yellow-200">
+              <div className="mt-3 pt-3 border-t border-border/60">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-yellow-800">
+                  <span className="text-xs font-medium text-foreground">
                     Current Lesson: {currentLesson.name}
                   </span>
                   <div className="flex items-center gap-1">
@@ -374,7 +390,7 @@ export function AdminToolbar({
                       size="sm"
                       variant="outline"
                       onClick={() => handleEditLesson(currentLesson)}
-                      className="h-6 text-xs border-yellow-300 text-yellow-700 hover:bg-yellow-100"
+                      className="h-6 text-xs border-primary/40 text-primary hover:bg-primary/10"
                     >
                       <Edit className="h-3 w-3 mr-1" />
                       Edit
@@ -383,7 +399,7 @@ export function AdminToolbar({
                       size="sm"
                       variant="outline"
                       onClick={() => confirmDeleteLesson(currentLesson.id)}
-                      className="h-6 text-xs border-red-300 text-red-700 hover:bg-red-100"
+                      className="h-6 text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
                     >
                       <Trash className="h-3 w-3 mr-1" />
                       Delete

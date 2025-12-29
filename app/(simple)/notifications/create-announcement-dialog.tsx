@@ -116,7 +116,7 @@ export function CreateAnnouncementDialog({ onAnnouncementCreated }: CreateAnnoun
       <DialogContent className="w-[900px] max-w-[90vw] max-h-[80vh] overflow-y-auto" style={{ width: '900px', maxWidth: '90vw' }}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Send className="w-5 h-5 text-blue-600" />
+            <Send className="w-5 h-5 text-primary" />
             Create New Announcement
           </DialogTitle>
           <DialogDescription>
@@ -127,7 +127,7 @@ export function CreateAnnouncementDialog({ onAnnouncementCreated }: CreateAnnoun
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="title" className="text-sm font-medium">
-              Title <span className="text-red-500">*</span>
+              Title <span className="text-destructive">*</span>
             </label>
             <Input
               id="title"
@@ -145,9 +145,9 @@ export function CreateAnnouncementDialog({ onAnnouncementCreated }: CreateAnnoun
           
           <div className="space-y-2">
             <label htmlFor="body" className="text-sm font-medium">
-              Message <span className="text-red-500">*</span>
+              Message <span className="text-destructive">*</span>
             </label>
-            <div className="border rounded-md overflow-hidden">
+            <div className="border border-border rounded-md overflow-hidden">
               <Editor
                 apiKey={TINYMCE_KEY}
                 onInit={(evt, editor) => editorRef.current = editor}
@@ -163,7 +163,7 @@ export function CreateAnnouncementDialog({ onAnnouncementCreated }: CreateAnnoun
           </div>
 
           {!title || !body ? (
-            <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 p-2 rounded-md">
+            <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-500/15 p-2 rounded-md">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>Please fill in all required fields</span>
             </div>

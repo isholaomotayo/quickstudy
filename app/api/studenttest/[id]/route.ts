@@ -68,6 +68,7 @@ export async function GET(request: NextRequest, context: RouteParams) {
       submitted_at: submission.submitted_at ?? "",
       attempt_number: submission.attempt_number ?? 1,
       max_attempts: submission.max_attempts ?? 1,
+      questions_answers: submission.questions_answers ?? [],
       score: submission.score ?? 0,
       max_score: submission.max_score ?? 0,
       feedback: submission.feedback ?? [],

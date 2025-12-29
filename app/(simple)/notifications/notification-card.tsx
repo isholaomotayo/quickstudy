@@ -59,11 +59,11 @@ const roleIcons = {
 };
 
 const roleColors = {
-  ADMIN: "bg-red-100 text-red-800",
-  SUPERADMIN: "bg-purple-100 text-purple-800", 
-  HOD: "bg-blue-100 text-blue-800",
-  STAFF: "bg-green-100 text-green-800",
-  LECTURER: "bg-orange-100 text-orange-800",
+  ADMIN: "bg-destructive/15 text-destructive",
+  SUPERADMIN: "bg-purple-500/15 text-purple-600 dark:text-purple-300", 
+  HOD: "bg-primary/10 text-primary",
+  STAFF: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300",
+  LECTURER: "bg-amber-400/15 text-amber-600 dark:text-amber-300",
 };
 
 export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit }: NotificationCardProps) {
@@ -124,7 +124,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
   const authorInitials = `${notification.user.first_name[0]}${notification.user.last_name[0]}`;
   
   const RoleIcon = roleIcons[notification.user.role as keyof typeof roleIcons] || User;
-  const roleColorClass = roleColors[notification.user.role as keyof typeof roleColors] || "bg-gray-100 text-gray-800";
+  const roleColorClass = roleColors[notification.user.role as keyof typeof roleColors] || "bg-muted/40 text-foreground";
 
   // Truncate body text for preview
   const previewLength = 150;
@@ -138,8 +138,8 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
     <GlassCard 
       className={`transition-all duration-300 hover:shadow-lg ${
         !notification.read 
-          ? "ring-2 ring-blue-200 bg-blue-50/30" 
-          : "hover:bg-gray-50/50"
+          ? "ring-2 ring-primary/25 bg-primary/5" 
+          : "hover:bg-muted/40"
       }`}
     >
       {/* Header */}
@@ -147,12 +147,12 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
         <div className="flex items-center gap-3 flex-1">
           {/* Unread indicator */}
           {!notification.read && (
-            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 animate-pulse" />
+            <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 animate-pulse" />
           )}
           
           {/* Author avatar */}
           <Avatar className="flex-shrink-0">
-            <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium">
+            <AvatarFallback className="bg-primary/15 text-primary text-sm font-medium">
               {authorInitials}
             </AvatarFallback>
           </Avatar>
@@ -160,7 +160,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
           {/* Author info and title */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {authorName}
               </p>
               <Badge className={`text-xs gap-1 ${roleColorClass}`}>
@@ -168,7 +168,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
                 {notification.user.role.toLowerCase()}
               </Badge>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+            <h3 className="text-lg font-semibold text-foreground line-clamp-2">
               {notification.title}
             </h3>
           </div>
@@ -202,7 +202,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
               size="sm"
               onClick={handleEdit}
               disabled={isToggling || isDeleting}
-              className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              className="gap-2 text-primary hover:text-primary hover:bg-primary/10"
               title="Edit announcement"
             >
               <Edit className="w-4 h-4" />
@@ -216,7 +216,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
               size="sm"
               onClick={handleDeleteClick}
               disabled={isToggling || isDeleting}
-              className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
               title="Delete announcement"
             >
               {isDeleting ? (
@@ -233,7 +233,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
       {/* Body */}
       <div className="mb-4">
         <div 
-          className="text-gray-700 leading-relaxed whitespace-pre-wrap"
+          className="text-muted-foreground leading-relaxed whitespace-pre-wrap"
           dangerouslySetInnerHTML={{ __html: displayBody }}
         />
         
@@ -242,7 +242,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
             variant="ghost"
             size="sm"
             onClick={() => setExpanded(!expanded)}
-            className="mt-2 gap-2 text-blue-600 hover:text-blue-700 p-0 h-auto font-medium"
+            className="mt-2 gap-2 text-primary hover:text-primary p-0 h-auto font-medium"
           >
             {expanded ? (
               <>
@@ -285,7 +285,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-500" />
+            <AlertTriangle className="w-5 h-5 text-destructive" />
             Delete Announcement
           </DialogTitle>
           <DialogDescription>
@@ -294,9 +294,9 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
         </DialogHeader>
         
         <div className="space-y-4">
-          <div className="p-3 bg-gray-50 rounded-md">
-            <h4 className="font-medium text-sm text-gray-900 mb-1">{notification.title}</h4>
-            <p className="text-sm text-gray-600 line-clamp-2">
+          <div className="p-3 bg-muted/40 rounded-md">
+            <h4 className="font-medium text-sm text-foreground mb-1">{notification.title}</h4>
+            <p className="text-sm text-muted-foreground line-clamp-2">
               {notification.body.replace(/<[^>]*>/g, '').slice(0, 100)}...
             </p>
           </div>

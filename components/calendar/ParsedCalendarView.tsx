@@ -62,14 +62,15 @@ export function ParsedCalendarView({
   };
 
   const getEventColor = (event: CalendarEvent) => {
-    if (event.holiday) return "bg-green-100 text-green-700 border-green-200";
+    if (event.holiday)
+      return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50";
     if (event.name.toLowerCase().includes("exam"))
-      return "bg-red-100 text-red-700 border-red-200";
+      return "bg-destructive/10 text-destructive border border-destructive/40";
     if (event.name.toLowerCase().includes("registration"))
-      return "bg-blue-100 text-blue-700 border-blue-200";
+      return "bg-primary/10 text-primary border border-primary/40";
     if (event.name.toLowerCase().includes("resumption"))
-      return "bg-purple-100 text-purple-700 border-purple-200";
-    return "bg-gray-100 text-gray-700 border-gray-200";
+      return "bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-400/50";
+    return "bg-muted/30 text-muted-foreground border border-border/60";
   };
 
   const formatDate = (dateString: string) => {
@@ -211,7 +212,7 @@ export function ParsedCalendarView({
       {/* Statistics and Quick Actions - Full Width */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Statistics Cards */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 border border-border bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="h-5 w-5" />
@@ -220,33 +221,33 @@ export function ParsedCalendarView({
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="text-2xl font-bold text-blue-600">
+              <div className="text-center p-4 bg-primary/10 rounded-lg border border-primary/30">
+                <div className="text-2xl font-bold text-primary">
                   {totalEvents}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div className="text-sm text-muted-foreground font-medium">
                   Total Events
                 </div>
               </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="text-2xl font-bold text-green-600">
+              <div className="text-center p-4 bg-emerald-500/10 rounded-lg border border-emerald-400/40">
+                <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-300">
                   {totalHolidays}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div className="text-sm text-muted-foreground font-medium">
                   Holidays
                 </div>
               </div>
-              <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
-                <div className="text-2xl font-bold text-red-600">
+              <div className="text-center p-4 bg-destructive/10 rounded-lg border border-destructive/40">
+                <div className="text-2xl font-bold text-destructive">
                   {totalExams}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Exams</div>
+                <div className="text-sm text-muted-foreground font-medium">Exams</div>
               </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <div className="text-2xl font-bold text-purple-600">
+              <div className="text-center p-4 bg-purple-500/15 rounded-lg border border-purple-400/40">
+                <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
                   {totalRegistration}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">
+                <div className="text-sm text-muted-foreground font-medium">
                   Registration
                 </div>
               </div>
@@ -255,7 +256,7 @@ export function ParsedCalendarView({
         </Card>
 
         {/* Quick Actions */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 border border-border bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Eye className="h-5 w-5" />
@@ -299,11 +300,11 @@ export function ParsedCalendarView({
           {calendarData.semesters.map((semester, semesterIndex) => (
             <Card
               key={`semester-${semester.name}-${semesterIndex}`}
-              className="h-fit"
+              className="h-fit border border-border bg-card"
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-blue-600" />
+                  <BookOpen className="h-5 w-5 text-primary" />
                   {semester.name}
                   <Badge variant="secondary">
                     {semester.events.length} Events
@@ -320,7 +321,7 @@ export function ParsedCalendarView({
                       return (
                         <div
                           key={`event-${event.name}-${event.start_date}-${eventIndex}`}
-                          className="border rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                          className="border border-border rounded-lg bg-card hover:bg-muted/30 transition-colors"
                         >
                           <button
                             type="button"
@@ -343,10 +344,10 @@ export function ParsedCalendarView({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2">
                                 <div>
-                                  <h4 className="font-medium text-gray-900 text-sm">
+                                  <h4 className="font-medium text-foreground text-sm">
                                     {event.name}
                                   </h4>
-                                  <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                                     <span className="flex items-center gap-1">
                                       <Clock className="h-3 w-3" />
                                       {formatDate(event.start_date)}
@@ -378,22 +379,22 @@ export function ParsedCalendarView({
                           </button>
 
                           {isExpanded && (
-                            <div className="px-3 pb-3 border-t bg-gray-50">
+                            <div className="px-3 pb-3 border-t border-border/60 bg-muted/30">
                               <div className="pt-3 space-y-2">
                                 <div className="grid grid-cols-2 gap-4 text-xs">
                                   <div>
-                                    <span className="font-medium text-gray-700">
+                                    <span className="font-medium text-foreground">
                                       Start:
                                     </span>
-                                    <p className="text-gray-600">
+                                    <p className="text-muted-foreground">
                                       {formatDate(event.start_date)}
                                     </p>
                                   </div>
                                   <div>
-                                    <span className="font-medium text-gray-700">
+                                    <span className="font-medium text-foreground">
                                       End:
                                     </span>
-                                    <p className="text-gray-600">
+                                    <p className="text-muted-foreground">
                                       {formatDate(event.end_date)}
                                     </p>
                                   </div>
@@ -405,7 +406,7 @@ export function ParsedCalendarView({
                                   {event.holiday && (
                                     <Badge
                                       variant="outline"
-                                      className="bg-green-100 text-green-700 border-green-200 text-xs"
+                                      className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/50 text-xs"
                                     >
                                       Holiday/Break
                                     </Badge>
@@ -418,8 +419,8 @@ export function ParsedCalendarView({
                       );
                     })
                   ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      <AlertCircle className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                    <div className="text-center py-4 text-muted-foreground">
+                      <AlertCircle className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="text-sm">No events in this semester</p>
                     </div>
                   )}
@@ -429,13 +430,13 @@ export function ParsedCalendarView({
           ))}
         </div>
       ) : (
-        <Card>
+        <Card className="border border-border bg-card">
           <CardContent className="text-center py-8">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">
               No Events Found
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               The calendar was parsed but no specific events could be extracted.
               You can still view the original PDF document.
             </p>

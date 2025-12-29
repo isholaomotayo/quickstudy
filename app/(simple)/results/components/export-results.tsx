@@ -60,9 +60,9 @@ export function ExportResults({ onExport, isExporting }: ExportResultsProps) {
   };
 
   return (
-    <Card className="bg-gradient-to-r from-slate-50 to-gray-50 border-slate-200">
+    <Card className="bg-card border border-border">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2 text-slate-800">
+        <CardTitle className="flex items-center space-x-2 text-foreground">
           <FileText className="h-5 w-5" />
           <span>Export & Share</span>
         </CardTitle>
@@ -100,22 +100,22 @@ export function ExportResults({ onExport, isExporting }: ExportResultsProps) {
 
         {/* Status Messages */}
         {exportStatus === "success" && (
-          <div className="flex items-center space-x-2 mt-3 text-green-600">
+          <div className="flex items-center space-x-2 mt-3 text-emerald-600 dark:text-emerald-300">
             <CheckCircle className="h-4 w-4" />
             <span className="text-sm">Export completed successfully!</span>
           </div>
         )}
 
         {exportStatus === "error" && (
-          <div className="flex items-center space-x-2 mt-3 text-red-600">
+          <div className="flex items-center space-x-2 mt-3 text-destructive">
             <AlertCircle className="h-4 w-4" />
             <span className="text-sm">Export failed. Please try again.</span>
           </div>
         )}
 
         {isExporting && (
-          <div className="flex items-center space-x-2 mt-3 text-blue-600">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+          <div className="flex items-center space-x-2 mt-3 text-primary">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-muted/40 border-t-primary"></div>
             <span className="text-sm">Generating export...</span>
           </div>
         )}
@@ -123,4 +123,3 @@ export function ExportResults({ onExport, isExporting }: ExportResultsProps) {
     </Card>
   );
 }
-

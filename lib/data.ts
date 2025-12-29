@@ -904,7 +904,8 @@ export async function getCoursesData(
   programme?: string,
   level?: string,
   status?: string,
-  limit: number = 50
+  limit: number = 50,
+  page: number = 1
 ) {
   try {
     const whereClause: Record<string, any> = {};
@@ -971,8 +972,17 @@ export async function getCoursesData(
       level,
       status,
       limit,
+      page,
     });
     console.log("Generated whereClause:", JSON.stringify(whereClause, null, 2));
+
+    // Get total count for pagination
+    const total = await prisma.course.count({
+      where: whereClause,
+    });
+
+    // Calculate skip for pagination
+    const skip = (page - 1) * limit;
 
     const courses = await prisma.course.findMany({
       where: whereClause,
@@ -1011,6 +1021,7 @@ export async function getCoursesData(
           },
         },
       },
+      skip: skip,
       take: limit,
       orderBy: {
         created_at: "desc",
@@ -1030,7 +1041,13 @@ export async function getCoursesData(
       _count: course._count,
     }));
 
-    return result;
+    return {
+      courses: result,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    };
   } catch (error) {
     console.error("Error fetching courses data:", error);
     throw new Error(

@@ -78,18 +78,18 @@ export function ModernTable<T extends Record<string, any>>({
 
   return (
     <div
-      className={`bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl overflow-hidden ${className}`}
+      className={`bg-card/80 backdrop-blur-sm rounded-2xl border border-border shadow-lg overflow-hidden ${className}`}
     >
       {searchable && (
-        <div className="p-6 border-b border-white/10">
+        <div className="p-6 border-b border-border/60 bg-card/80">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-white/20 bg-white/50 px-3 py-2 pl-10 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus:border-blue-300 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-md border border-border bg-card px-3 py-2 pl-10 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
         </div>
@@ -98,12 +98,12 @@ export function ModernTable<T extends Record<string, any>>({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gradient-to-r from-blue-50/50 to-emerald-50/50 border-b border-white/10">
+            <tr className="bg-gradient-to-r from-muted/40 via-card to-primary/5 border-b border-border/70">
               {columns.map((column, index) => (
                 <th
                   key={index}
-                  className={`px-6 py-4 text-left text-sm font-semibold text-gray-700 ${
-                    column.sortable ? "cursor-pointer hover:bg-white/20 transition-colors" : ""
+                  className={`px-6 py-4 text-left text-sm font-semibold text-foreground ${
+                    column.sortable ? "cursor-pointer hover:bg-muted/30 transition-colors" : ""
                   } ${column.className || ""}`}
                   onClick={() => column.sortable && handleSort(String(column.key))}
                 >
@@ -114,15 +114,15 @@ export function ModernTable<T extends Record<string, any>>({
                         <ChevronUp
                           className={`h-3 w-3 ${
                             sortConfig?.key === column.key && sortConfig.direction === "asc"
-                              ? "text-blue-600"
-                              : "text-gray-300"
+                              ? "text-primary"
+                              : "text-muted-foreground/60"
                           }`}
                         />
                         <ChevronDown
                           className={`h-3 w-3 -mt-1 ${
                             sortConfig?.key === column.key && sortConfig.direction === "desc"
-                              ? "text-blue-600"
-                              : "text-gray-300"
+                              ? "text-primary"
+                              : "text-muted-foreground/60"
                           }`}
                         />
                       </div>
@@ -136,13 +136,13 @@ export function ModernTable<T extends Record<string, any>>({
             {sortedData.map((item, index) => (
               <tr
                 key={index}
-                className={`border-b border-white/5 hover:bg-white/30 transition-all duration-200 ${
+                className={`border-b border-border/40 hover:bg-muted/30 transition-all duration-200 ${
                   onRowClick ? "cursor-pointer" : ""
-                } ${index % 2 === 0 ? "bg-white/10" : "bg-transparent"}`}
+                } ${index % 2 === 0 ? "bg-muted/20" : "bg-transparent"}`}
                 onClick={() => onRowClick?.(item)}
               >
                 {columns.map((column, colIndex) => (
-                  <td key={colIndex} className={`px-6 py-4 text-sm text-gray-700 ${column.className || ""}`}>
+                  <td key={colIndex} className={`px-6 py-4 text-sm text-foreground ${column.className || ""}`}>
                     {column.render ? column.render(item) : String(getValue(item, column.key) || "")}
                   </td>
                 ))}
@@ -152,8 +152,8 @@ export function ModernTable<T extends Record<string, any>>({
         </table>
 
         {sortedData.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            <div className="text-lg font-medium">No results found</div>
+          <div className="text-center py-12 text-muted-foreground">
+            <div className="text-lg font-medium text-foreground">No results found</div>
             <div className="text-sm mt-1">
               {searchable && searchTerm ? `No items match "${searchTerm}"` : "No data available"}
             </div>
@@ -162,8 +162,8 @@ export function ModernTable<T extends Record<string, any>>({
       </div>
 
       {sortedData.length > 0 && (
-        <div className="px-6 py-4 bg-gradient-to-r from-gray-50/50 to-white/50 border-t border-white/10">
-          <div className="text-sm text-gray-600">
+        <div className="px-6 py-4 bg-card/80 border-t border-border/60">
+          <div className="text-sm text-muted-foreground">
             Showing {sortedData.length} of {data.length} results
             {searchable && searchTerm && ` for "${searchTerm}"`}
           </div>

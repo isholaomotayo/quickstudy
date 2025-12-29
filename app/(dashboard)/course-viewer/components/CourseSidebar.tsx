@@ -117,57 +117,57 @@ export default function CourseSidebar({
   };
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 p-4 overflow-y-auto">
+    <div className="w-80 bg-card border-r border-border p-4 overflow-y-auto">
       {/* Progress Section */}
-      <Card className="mb-3">
+      <Card className="mb-3 bg-card border border-border">
         <CardContent className="space-y-2">
           {/* Overall Course Progress */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Overall Progress</span>
-              <span className="font-semibold text-gray-900">
+              <span className="text-muted-foreground">Overall Progress</span>
+              <span className="font-semibold text-foreground">
                 {courseProgress.completion_percentage}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-muted rounded-full h-2">
               <div
                 className={`h-2 rounded-full transition-all duration-300 ${
                   courseProgress.completion_percentage === 100
-                    ? "bg-green-500"
+                    ? "bg-emerald-500"
                     : courseProgress.completion_percentage >= 50
-                    ? "bg-yellow-500"
-                    : "bg-blue-500"
+                    ? "bg-amber-400"
+                    : "bg-primary"
                 }`}
                 style={{ width: `${courseProgress.completion_percentage}%` }}
               />
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground">
               {courseProgress.completed_lessons} of{" "}
               {courseProgress.total_lessons} lessons completed
             </div>
           </div>
 
           {/* Module Progress Section */}
-          <div className="pt-2 border-t border-gray-100">
+          <div className="pt-2 border-t border-border/60">
             <div className="flex items-center justify-between text-sm mb-1">
-              <span className="text-gray-600">Module Progress</span>
-              <span className="font-semibold text-gray-900">
+              <span className="text-muted-foreground">Module Progress</span>
+              <span className="font-semibold text-foreground">
                 {progressPercentage}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
+            <div className="w-full bg-muted rounded-full h-2 mb-1">
               <div
                 className={`h-2 rounded-full transition-all duration-300 ${
                   progressPercentage === 100
-                    ? "bg-green-500"
+                    ? "bg-emerald-500"
                     : progressPercentage >= 50
-                    ? "bg-yellow-500"
-                    : "bg-blue-500"
+                    ? "bg-amber-400"
+                    : "bg-primary"
                 }`}
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
-            <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>
                 {progress.completed.size} of {courseLessons.length} module
                 lessons completed
@@ -201,9 +201,9 @@ export default function CourseSidebar({
       </div>
 
       {/* Lessons List */}
-      <Card>
+      <Card className="bg-card border border-border">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-700">
+          <CardTitle className="text-sm font-medium text-foreground">
             Lessons
           </CardTitle>
         </CardHeader>
@@ -223,20 +223,20 @@ export default function CourseSidebar({
                     className={cn(
                       "group flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-all duration-200",
                       isActive
-                        ? "bg-blue-50 border border-blue-200"
-                        : "hover:bg-gray-50 border border-transparent",
-                      isCompleted && !isActive && "bg-green-50"
+                        ? "bg-primary/10 border border-primary/30"
+                        : "hover:bg-muted/30 border border-transparent",
+                      isCompleted && !isActive && "bg-emerald-500/10"
                     )}
                     onClick={() => onLessonSelect(lesson)}
                   >
                     {/* Status Icon */}
                     <div className="flex-shrink-0">
                       {isCompleted ? (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <CheckCircle className="h-4 w-4 text-emerald-500" />
                       ) : isActive ? (
-                        <Play className="h-4 w-4 text-blue-600" />
+                        <Play className="h-4 w-4 text-primary" />
                       ) : (
-                        <Circle className="h-4 w-4 text-gray-400" />
+                        <Circle className="h-4 w-4 text-muted-foreground" />
                       )}
                     </div>
 
@@ -247,15 +247,15 @@ export default function CourseSidebar({
                         <span
                           className={cn(
                             "text-sm font-medium truncate",
-                            isActive ? "text-blue-900" : "text-gray-900",
-                            isCompleted && !isActive && "text-green-800"
+                            isActive ? "text-foreground" : "text-foreground",
+                            isCompleted && !isActive && "text-emerald-600 dark:text-emerald-300"
                           )}
                         >
                           {lesson.name}
                         </span>
                       </div>
                       <div className="flex items-center justify-between mt-1">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                           Lesson {index + 1}
                         </span>
                         {hasTests && (
@@ -296,10 +296,10 @@ export default function CourseSidebar({
                       {lesson?.course_tests?.map((test, testIndex) => (
                         <div
                           key={test.id || testIndex}
-                          className="flex items-center space-x-2 p-2 rounded-md bg-gray-50 hover:bg-gray-100 transition-colors"
+                          className="flex items-center space-x-2 p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors"
                         >
-                          <FileText className="h-3 w-3 text-gray-500" />
-                          <span className="text-xs text-gray-700 truncate">
+                          <FileText className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-xs text-foreground truncate">
                             {test.name || `Test ${testIndex + 1}`}
                           </span>
                           <Button

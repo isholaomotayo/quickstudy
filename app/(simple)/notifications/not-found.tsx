@@ -8,7 +8,7 @@ export default function NotificationsNotFound() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-sky-500 to-emerald-400 bg-clip-text text-transparent">
           Page Not Found
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -19,12 +19,12 @@ export default function NotificationsNotFound() {
       {/* Not Found Card */}
       <GlassCard className="text-center py-16">
         <div className="max-w-md mx-auto space-y-6">
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-            <Bell className="w-10 h-10 text-gray-400" />
+          <div className="w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center mx-auto">
+            <Bell className="w-10 h-10 text-muted-foreground" />
           </div>
           
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-foreground">
               404 - Page Not Found
             </h2>
             <p className="text-muted-foreground">
@@ -61,10 +61,10 @@ export default function NotificationsNotFound() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Link 
               href="/notifications" 
-              className="p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-colors"
+              className="p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-blue-600" />
+                <Bell className="w-5 h-5 text-primary" />
                 <div>
                   <p className="font-medium">Notifications</p>
                   <p className="text-sm text-muted-foreground">View all your notifications</p>
@@ -74,10 +74,10 @@ export default function NotificationsNotFound() {
             
             <Link 
               href="/" 
-              className="p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-colors"
+              className="p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Home className="w-5 h-5 text-blue-600" />
+                <Home className="w-5 h-5 text-primary" />
                 <div>
                   <p className="font-medium">Dashboard</p>
                   <p className="text-sm text-muted-foreground">Return to your dashboard</p>

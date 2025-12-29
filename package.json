@@ -16,7 +16,9 @@
     "test:fetch": "jest tests/helpers/FetchWrapper.test.js",
     "test:working": "jest --testPathPattern=\"isolated|simple|FetchWrapper\"",
     "test:integration": "jest tests/integration/",
-    "test:manual": "node tests/manual-test.js"
+    "test:manual": "node tests/manual-test.js",
+    "reset-db": "node backend/scripts/reset-db.js",
+    "reset-db:preview": "node backend/scripts/reset-db.js --dry-run"
   },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.17",
@@ -169,7 +171,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.2",
-    "@types/bcryptjs": "^3.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/react": "^18",
     "@types/react-dom": "^18",

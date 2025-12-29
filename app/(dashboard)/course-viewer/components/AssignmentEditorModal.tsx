@@ -352,7 +352,7 @@ export function AssignmentEditorModal({
                       published: e.target.checked,
                     })
                   }
-                  className="rounded"
+                  className="rounded border-border text-primary focus:ring-primary"
                 />
                 <Label htmlFor="published">Published</Label>
               </div>
@@ -377,7 +377,7 @@ export function AssignmentEditorModal({
             </CardHeader>
             <CardContent>
               {formData.questions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   <p>
                     No questions added yet. Click "Add Question" to get started.
                   </p>
@@ -401,7 +401,7 @@ export function AssignmentEditorModal({
                             onClick={() => removeQuestion(index)}
                             variant="ghost"
                             size="sm"
-                            className="text-red-500 hover:text-red-700"
+                            className="text-destructive hover:text-destructive/80"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -488,8 +488,8 @@ export function AssignmentEditorModal({
               )}
 
               {formData.questions.length > 0 && (
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-sm text-blue-800">
+                <div className="mt-4 p-3 bg-muted/30 rounded-lg border border-border/60">
+                  <p className="text-sm text-foreground">
                     <strong>Total Marks:</strong> {calculateTotalMarks()}
                   </p>
                 </div>

@@ -250,7 +250,8 @@ export function useCoursesData(
   programme?: string,
   level?: string,
   status?: string,
-  limit: number = 50
+  limit: number = 50,
+  page: number = 1
 ) {
   const params = new URLSearchParams();
   if (search) params.append("search", search);
@@ -260,6 +261,7 @@ export function useCoursesData(
   if (level) params.append("level", level);
   if (status) params.append("status", status);
   params.append("limit", limit.toString());
+  params.append("page", page.toString());
 
   const { data, error, isLoading, mutate } = useSWR(
     `/api/dashboard/courses?${params.toString()}`,

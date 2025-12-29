@@ -2,71 +2,67 @@
 
 import { useState, useEffect } from "react";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  BookOpen,
-  Search,
-  Filter,
-  MoreHorizontal,
-  Download,
-  RefreshCw,
-  Eye,
-  Edit,
-  Trash2,
-  Plus,
-  Users,
-  Clock,
-  CheckCircle,
-  XCircle,
+    BookOpen,
+    Search, MoreHorizontal,
+    Download,
+    RefreshCw,
+    Eye,
+    Edit,
+    Trash2,
+    Plus,
+    Users, CheckCircle,
+    XCircle
 } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
 import {
-  useCourseStats,
-  useCoursesData,
-  useProgrammesData,
-  useLevelsData,
-  useDepartmentsData,
-  useFacultiesData,
+    useCourseStats,
+    useCoursesData,
+    useProgrammesData,
+    useLevelsData,
+    useDepartmentsData,
+    useFacultiesData,
 } from "@/hooks/useDashboardData";
 import { createCourseAction } from "@/app/(simple)/ops/actions/departments";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -197,9 +193,9 @@ export default function CourseManagement() {
   const selectedLevelId =
     levelFilter !== "all" ? parseInt(levelFilter) : undefined;
 
-  // Get courses data with server-side filtering
+  // Get courses data with server-side filtering and pagination
   const {
-    data: allCourses,
+    data: coursesResponse,
     error: coursesError,
     isLoading: coursesLoading,
     mutate: mutateCourses,
@@ -210,7 +206,8 @@ export default function CourseManagement() {
     selectedProgrammeId?.toString(), // programme ID
     selectedLevelId?.toString(), // level ID
     statusFilter === "all" ? undefined : statusFilter, // status
-    100 // Fetch more data for client-side pagination
+    itemsPerPage, // limit per page
+    currentPage // current page
   );
 
   // Debug logging
@@ -240,15 +237,10 @@ export default function CourseManagement() {
     selectedLevelId,
   ]);
 
-  // Server-side filtering is now handled by the API
-  // No need for client-side filtering
-  const filteredCourses = allCourses || [];
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const courses = filteredCourses.slice(startIndex, endIndex);
+  // Extract data from response
+  const courses = coursesResponse?.courses || [];
+  const totalPages = coursesResponse?.pages || 0;
+  const totalCourses = coursesResponse?.total || 0;
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -504,12 +496,13 @@ export default function CourseManagement() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>
-                Course Management ({filteredCourses.length} total)
+                Course Management ({totalCourses} total)
               </CardTitle>
               <CardDescription>
                 View and manage all courses in the system • Showing{" "}
-                {startIndex + 1}-{Math.min(endIndex, filteredCourses.length)} of{" "}
-                {filteredCourses.length}
+                {totalCourses > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}-
+                {Math.min(currentPage * itemsPerPage, totalCourses)} of{" "}
+                {totalCourses}
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -518,7 +511,10 @@ export default function CourseManagement() {
               </span>
               <Select
                 value={itemsPerPage.toString()}
-                onValueChange={(value) => setItemsPerPage(Number(value))}
+                onValueChange={(value) => {
+                  setItemsPerPage(Number(value));
+                  setCurrentPage(1); // Reset to first page when changing items per page
+                }}
               >
                 <SelectTrigger className="w-20">
                   <SelectValue />
@@ -528,6 +524,7 @@ export default function CourseManagement() {
                   <SelectItem value="10">10</SelectItem>
                   <SelectItem value="20">20</SelectItem>
                   <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
             </div>

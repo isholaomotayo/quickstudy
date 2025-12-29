@@ -241,7 +241,7 @@ export default function AIAssistantV2({
         .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
         .replace(
           /`([^`]+)`/g,
-          '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">$1</code>'
+          '<code class="bg-muted px-1 py-0.5 rounded text-sm font-mono">$1</code>'
         );
     };
 
@@ -254,7 +254,7 @@ export default function AIAssistantV2({
           html += listType === "ol" ? "</ol>" : "</ul>";
           inList = false;
         }
-        html += '<hr class="my-4 border-t border-gray-200">';
+        html += '<hr class="my-4 border-t border-border">';
         return;
       }
 
@@ -363,14 +363,14 @@ export default function AIAssistantV2({
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">
-                <Sparkles className="h-5 w-5 text-white" />
+              <div className="p-2 bg-gradient-to-r from-primary to-emerald-500 rounded-lg">
+                <Sparkles className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
                 <DialogTitle className="text-lg font-semibold">
                   Tutoris Learning Assistant
                 </DialogTitle>
-                <DialogDescription className="text-sm text-gray-600">
+                <DialogDescription className="text-sm text-muted-foreground">
                   Ask questions, get explanations, and receive personalized help
                   with <strong> {courseData.name} </strong> using the best AI
                   technology
@@ -397,34 +397,34 @@ export default function AIAssistantV2({
 
         <div className="flex-1 flex flex-col min-h-0">
           {/* Context Information */}
-          <div className="flex-shrink-0 p-3 bg-gray-50 rounded-lg mb-3">
+          <div className="flex-shrink-0 p-3 bg-muted/30 rounded-lg mb-3 border border-border/60">
             <div className="flex items-start space-x-3">
-              <BookOpen className="h-4 w-4 text-gray-500 mt-0.5" />
+              <BookOpen className="h-4 w-4 text-muted-foreground mt-0.5" />
               <div className="flex-1">
-                <p className="text-xs font-medium text-gray-900">
+                <p className="text-xs font-medium text-foreground">
                   Learning Context
                 </p>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-muted-foreground">
                   I can help you with: <strong>{courseData.name}</strong>
                   {currentLesson && ` • Current lesson: ${currentLesson.name}`}
                 </p>
                 {selectedText && (
-                  <div className="mt-1 p-1.5 bg-blue-50 rounded border border-blue-200">
-                    <p className="text-xs font-medium text-blue-900 mb-0.5">
+                  <div className="mt-1 p-1.5 bg-muted/30 rounded border border-border/60">
+                    <p className="text-xs font-medium text-foreground mb-0.5">
                       Selected Text:
                     </p>
-                    <p className="text-xs text-blue-800 line-clamp-1">
+                    <p className="text-xs text-muted-foreground line-clamp-1">
                       {selectedText}
                     </p>
                   </div>
                 )}
                 {/* Debug info for guardrails */}
                 {process.env.NODE_ENV === "development" && (
-                  <div className="mt-1 p-1.5 bg-yellow-50 rounded border border-yellow-200">
-                    <p className="text-xs font-medium text-yellow-900 mb-0.5">
+                  <div className="mt-1 p-1.5 bg-muted/30 rounded border border-border/60">
+                    <p className="text-xs font-medium text-foreground mb-0.5">
                       Debug: Guardrails Status
                     </p>
-                    <p className="text-xs text-yellow-800">
+                    <p className="text-xs text-muted-foreground">
                       Enabled: {enableGuardrails ? "Yes" : "No"} • Config:{" "}
                       {guardrailsConfig ? "Loaded" : "Missing"}
                     </p>
@@ -436,7 +436,7 @@ export default function AIAssistantV2({
 
           {/* Quick Prompts */}
           <div className="flex-shrink-0 mb-3">
-            <p className="text-xs font-medium text-gray-600 mb-1">
+            <p className="text-xs font-medium text-muted-foreground mb-1">
               Quick Questions:
             </p>
             <div className="flex flex-wrap gap-1">
@@ -470,8 +470,8 @@ export default function AIAssistantV2({
 
               return filteredMessages.length === 0 ? (
                 <div className="text-center py-8">
-                  <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">
+                  <MessageSquare className="h-12 w-12 text-muted-foreground/60 mx-auto mb-4" />
+                  <p className="text-muted-foreground">
                     I'm here to help! Ask me questions about the lesson content,
                     request explanations, or get help with difficult concepts.
                   </p>
@@ -487,21 +487,21 @@ export default function AIAssistantV2({
                     <Card
                       className={`max-w-[80%] ${
                         message.role === "user"
-                          ? "bg-blue-600 text-white"
-                          : "bg-white"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card"
                       }`}
                     >
                       <CardContent className="p-3">
                         <div className="flex items-start space-x-2">
                           {message.role === "assistant" && (
-                            <Sparkles className="h-4 w-4 text-purple-600 mt-0.5 flex-shrink-0" />
+                            <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                           )}
                           <div className="flex-1">
                             <div
                               className={`text-sm ${
                                 message.role === "user"
                                   ? "text-white"
-                                  : "text-gray-900"
+                                  : "text-foreground"
                               } ${
                                 message.role === "assistant"
                                   ? "prose prose-sm max-w-none"
@@ -520,8 +520,8 @@ export default function AIAssistantV2({
                               <div
                                 className={`text-xs mt-2 ${
                                   message.role === "user"
-                                    ? "text-blue-100"
-                                    : "text-gray-500"
+                                    ? "text-primary-foreground"
+                                    : "text-muted-foreground"
                                 }`}
                               >
                                 {formatTimestamp(message.timestamp)}
@@ -535,16 +535,16 @@ export default function AIAssistantV2({
                                 filteredMessages.length - 1 &&
                               message.content && (
                                 <div className="flex items-center space-x-1 mt-2">
-                                  <div className="w-1 h-1 bg-purple-600 rounded-full animate-pulse"></div>
+                                  <div className="w-1 h-1 bg-primary rounded-full animate-pulse"></div>
                                   <div
-                                    className="w-1 h-1 bg-purple-600 rounded-full animate-pulse"
+                                    className="w-1 h-1 bg-primary rounded-full animate-pulse"
                                     style={{ animationDelay: "0.2s" }}
                                   ></div>
                                   <div
-                                    className="w-1 h-1 bg-purple-600 rounded-full animate-pulse"
+                                    className="w-1 h-1 bg-primary rounded-full animate-pulse"
                                     style={{ animationDelay: "0.4s" }}
                                   ></div>
-                                  <span className="text-xs text-purple-600 ml-2">
+                                  <span className="text-xs text-primary ml-2">
                                     typing...
                                   </span>
                                 </div>
@@ -560,22 +560,22 @@ export default function AIAssistantV2({
 
             {isLoading && (
               <div className="flex justify-start">
-                <Card className="bg-white border-purple-200 border-2">
+                <Card className="bg-card border border-border">
                   <CardContent className="p-3">
                     <div className="flex items-center space-x-2">
-                      <Sparkles className="h-4 w-4 text-purple-600 animate-spin" />
+                      <Sparkles className="h-4 w-4 text-primary animate-spin" />
                       <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
                         <div
-                          className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"
+                          className="w-2 h-2 bg-primary rounded-full animate-pulse"
                           style={{ animationDelay: "0.2s" }}
                         ></div>
                         <div
-                          className="w-2 h-2 bg-purple-600 rounded-full animate-pulse"
+                          className="w-2 h-2 bg-primary rounded-full animate-pulse"
                           style={{ animationDelay: "0.4s" }}
                         ></div>
                       </div>
-                      <p className="text-sm text-purple-600 font-medium">
+                      <p className="text-sm text-primary font-medium">
                         AI is responding...
                       </p>
                     </div>
@@ -590,11 +590,11 @@ export default function AIAssistantV2({
 
           {/* Error Message */}
           {error && (
-            <div className="flex-shrink-0 mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex-shrink-0 mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
               <div className="flex items-start space-x-2">
                 <div className="flex-shrink-0">
                   <svg
-                    className="h-4 w-4 text-red-500 mt-0.5"
+                    className="h-4 w-4 text-destructive mt-0.5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -606,20 +606,20 @@ export default function AIAssistantV2({
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-red-700 font-medium mb-1">
+                  <p className="text-sm text-destructive font-medium mb-1">
                     {chatError && (chatError as any).type === "guardrails"
                       ? "Question Guidelines"
                       : "Error"}
                   </p>
-                  <p className="text-sm text-red-600">{error}</p>
+                  <p className="text-sm text-destructive">{error}</p>
                   {chatError &&
                     (chatError as any).suggestions &&
                     (chatError as any).suggestions.length > 0 && (
                       <div className="mt-2">
-                        <p className="text-xs text-red-600 font-medium mb-1">
+                        <p className="text-xs text-destructive font-medium mb-1">
                           Suggestions:
                         </p>
-                        <ul className="text-xs text-red-600 list-disc list-inside space-y-0.5">
+                        <ul className="text-xs text-destructive list-disc list-inside space-y-0.5">
                           {(chatError as any).suggestions.map(
                             (suggestion: string, index: number) => (
                               <li key={index}>{suggestion}</li>
@@ -657,7 +657,7 @@ export default function AIAssistantV2({
                     type="button"
                     onClick={stop}
                     variant="destructive"
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-destructive hover:bg-destructive/90"
                   >
                     <StopCircle className="h-4 w-4" />
                   </Button>
@@ -665,7 +665,7 @@ export default function AIAssistantV2({
                   <Button
                     type="submit"
                     disabled={!inputValue.trim()}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    className="bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground"
                   >
                     <Send className="h-4 w-4" />
                   </Button>

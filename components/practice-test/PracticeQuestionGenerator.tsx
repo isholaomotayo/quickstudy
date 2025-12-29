@@ -143,13 +143,13 @@ export default function PracticeQuestionGenerator({
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-400/40";
       case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-400/40";
       case "hard":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-destructive/10 text-destructive border border-destructive/30";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-muted/30 text-foreground border border-border/60";
     }
   };
 
@@ -167,7 +167,7 @@ export default function PracticeQuestionGenerator({
   const defaultTrigger = (
     <Button
       onClick={() => setShowDialog(true)}
-      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+      className="bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground"
       size="sm"
     >
       <Brain className="h-4 w-4 mr-2" />
@@ -187,10 +187,10 @@ export default function PracticeQuestionGenerator({
         <DialogContent className="max-w-2xl" size="xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-purple-600" />
+              <Brain className="h-5 w-5 text-primary" />
               AI Practice Question Generator
             </DialogTitle>
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-sm text-muted-foreground mt-2">
               Generate personalized practice questions for:{" "}
               <strong>{lessonName}</strong>
             </p>
@@ -198,16 +198,16 @@ export default function PracticeQuestionGenerator({
 
           <div className="space-y-6">
             {/* Quick Start Options */}
-            <Card>
+            <Card className="bg-card border border-border">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Play className="h-4 w-4 text-green-600" />
+                  <Play className="h-4 w-4 text-primary" />
                   Quick Start
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {/* Auto-start toggle */}
-                <div className="flex items-center space-x-2 mb-4 p-3 bg-gray-50 rounded-lg border">
+                <div className="flex items-center space-x-2 mb-4 p-3 bg-muted/30 rounded-lg border border-border/60">
                   <Switch
                     id="auto-start"
                     checked={autoStart}
@@ -220,7 +220,7 @@ export default function PracticeQuestionGenerator({
                     >
                       Auto-start after selection
                     </Label>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-muted-foreground">
                       {autoStart
                         ? "Quick start will begin practice immediately with 5s countdown"
                         : "Quick start will show confirmation before beginning practice"}
@@ -238,13 +238,13 @@ export default function PracticeQuestionGenerator({
                         questionTypes: ["multiple_choice"],
                       })
                     }
-                    className="h-auto p-4 text-left flex-col items-start"
+                    className="h-auto p-4 text-left flex-col items-start border border-border bg-card"
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Target className="h-4 w-4 text-green-600" />
+                      <Target className="h-4 w-4 text-primary" />
                       <span className="font-medium">Quick Review</span>
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-muted-foreground">
                       3 easy questions • Multiple choice
                     </div>
                   </Button>
@@ -258,13 +258,13 @@ export default function PracticeQuestionGenerator({
                         questionTypes: ["multiple_choice", "true_false"],
                       })
                     }
-                    className="h-auto p-4 text-left flex-col items-start"
+                    className="h-auto p-4 text-left flex-col items-start border border-border bg-card"
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <TrendingUp className="h-4 w-4 text-blue-600" />
+                      <TrendingUp className="h-4 w-4 text-primary" />
                       <span className="font-medium">Standard Practice</span>
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-muted-foreground">
                       5 medium questions • Mixed types
                     </div>
                   </Button>
@@ -278,13 +278,13 @@ export default function PracticeQuestionGenerator({
                         questionTypes: ["multiple_choice", "true_false"],
                       })
                     }
-                    className="h-auto p-4 text-left flex-col items-start"
+                    className="h-auto p-4 text-left flex-col items-start border border-border bg-card"
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Brain className="h-4 w-4 text-red-600" />
+                      <Brain className="h-4 w-4 text-destructive" />
                       <span className="font-medium">Challenge Mode</span>
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-muted-foreground">
                       8 hard questions • All types
                     </div>
                   </Button>
@@ -293,10 +293,10 @@ export default function PracticeQuestionGenerator({
             </Card>
 
             {/* Custom Configuration */}
-            <Card>
+            <Card className="bg-card border border-border">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Settings className="h-4 w-4 text-gray-600" />
+                  <Settings className="h-4 w-4 text-muted-foreground" />
                   Custom Configuration
                 </CardTitle>
               </CardHeader>
@@ -310,7 +310,7 @@ export default function PracticeQuestionGenerator({
                       setConfig((prev) => ({ ...prev, difficulty: value }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="border border-border bg-card">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -385,7 +385,7 @@ export default function PracticeQuestionGenerator({
                     ].map((type) => (
                       <div
                         key={type.id}
-                        className="flex items-center space-x-3 p-2 rounded-lg border"
+                        className="flex items-center space-x-3 p-2 rounded-lg border border-border bg-card"
                       >
                         <Checkbox
                           id={type.id}
@@ -408,7 +408,7 @@ export default function PracticeQuestionGenerator({
                             >
                               {type.label}
                             </label>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-muted-foreground">
                               {type.description}
                             </p>
                           </div>
@@ -417,7 +417,7 @@ export default function PracticeQuestionGenerator({
                     ))}
                   </div>
                   {config.questionTypes.length === 0 && (
-                    <p className="text-sm text-red-600">
+                    <p className="text-sm text-destructive">
                       Please select at least one question type.
                     </p>
                   )}
@@ -426,14 +426,14 @@ export default function PracticeQuestionGenerator({
             </Card>
 
             {/* Preview */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-muted/30 border border-border/60 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <Lightbulb className="h-5 w-5 text-blue-600 mt-0.5" />
+                <Lightbulb className="h-5 w-5 text-primary mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-blue-900">
+                  <h4 className="font-medium text-foreground">
                     Practice Preview
                   </h4>
-                  <p className="text-sm text-blue-800 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     You'll get <strong>{config.questionCount}</strong>{" "}
                     <Badge className={getDifficultyColor(config.difficulty)}>
                       {config.difficulty}
@@ -442,7 +442,7 @@ export default function PracticeQuestionGenerator({
                     - it's pure practice!
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs text-blue-700">Types:</span>
+                    <span className="text-xs text-muted-foreground">Types:</span>
                     {config.questionTypes.map((type) => (
                       <Badge key={type} variant="outline" className="text-xs">
                         {type.replace("_", " ")}
@@ -461,7 +461,7 @@ export default function PracticeQuestionGenerator({
             <Button
               onClick={handleStartPractice}
               disabled={config.questionTypes.length === 0}
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              className="bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground"
             >
               <Brain className="h-4 w-4 mr-2" />
               Generate & Start Practice
@@ -477,12 +477,12 @@ export default function PracticeQuestionGenerator({
             <DialogTitle className="flex items-center gap-2 text-center">
               {autoStart ? (
                 <>
-                  <Timer className="h-5 w-5 text-blue-600" />
+                  <Timer className="h-5 w-5 text-primary" />
                   Starting in {countdown}...
                 </>
               ) : (
                 <>
-                  <Play className="h-5 w-5 text-green-600" />
+                  <Play className="h-5 w-5 text-primary" />
                   Ready to start practice?
                 </>
               )}
@@ -492,7 +492,7 @@ export default function PracticeQuestionGenerator({
           <div className="text-center py-6">
             {autoStart ? (
               <div className="space-y-4">
-                <div className="text-6xl font-bold text-blue-600 animate-pulse">
+                <div className="text-6xl font-bold text-primary animate-pulse">
                   {countdown}
                 </div>
                 <div className="space-y-2">
@@ -515,13 +515,13 @@ export default function PracticeQuestionGenerator({
                   <p className="font-medium text-lg">
                     Starting {config.difficulty} practice
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     {config.questionCount} questions •{" "}
                     {config.questionTypes
                       .map((t) => t.replace("_", " "))
                       .join(", ")}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     Ready to test your knowledge?
                   </p>
                 </div>
@@ -538,7 +538,7 @@ export default function PracticeQuestionGenerator({
                 </Button>
                 <Button
                   onClick={handleStartPractice}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-primary hover:brightness-110 text-primary-foreground"
                 >
                   <Play className="h-4 w-4 mr-2" />
                   Start Now

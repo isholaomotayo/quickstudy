@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ClockIcon, UserIcon } from "lucide-react";
+import { ClockIcon, UserIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ModernTable } from "@/components/ui/modern-table";
@@ -41,18 +41,41 @@ export default function CoursesPage() {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(50);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCourses, setTotalCourses] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const [isAdmin] = useState(true); // TODO: Replace with actual admin check from auth context
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1); // Reset to first page on search
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Fetch courses data from API
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const courses = await api.get(`/api/course`);
+        const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
+        const response = await api.get(`/api/course?pgsize=${itemsPerPage}&pg=${currentPage}${searchParam}`);
   
+        // Extract pagination info from headers if available
+        const pagination = (response as any).pagination || {};
+        setTotalPages(pagination.pageCount || 0);
+        setTotalCourses(pagination.rowCount || response.data?.length || 0);
+
         // Transform the data to match our interface
-        const transformedCourses: Course[] = courses.data.map((course: any) => ({
+        const courses = response.data || [];
+        const transformedCourses: Course[] = courses.map((course: any) => ({
           id: course.id,
           code: course.code,
           name: course.name || course.title,
@@ -95,30 +118,30 @@ export default function CoursesPage() {
     };
 
     fetchCourses();
-  }, []);
+  }, [currentPage, itemsPerPage, debouncedSearch]);
   const getStatusColor = (status: Course["status"]) => {
     switch (status) {
       case "Available":
-        return "bg-emerald-100 text-emerald-700 border-emerald-200";
+        return "bg-primary/10 text-primary border-primary/30";
       case "Full":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-destructive/10 text-destructive border-destructive/30";
       case "Waitlist":
-        return "bg-amber-100 text-amber-700 border-amber-200";
+        return "bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-400/30";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-muted/40 text-foreground border-border";
     }
   };
 
   const getPublishStatusColor = (publishStatus: Course["publishStatus"]) => {
     switch (publishStatus) {
       case "Published":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-primary/10 text-primary border-primary/30";
       case "Not Published":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-destructive/10 text-destructive border-destructive/30";
       case "Pending":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        return "bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-400/30";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-muted/40 text-foreground border-border";
     }
   };
 
@@ -129,7 +152,7 @@ export default function CoursesPage() {
       sortable: true,
       className: "font-mono font-medium",
       render: (course: Course) => (
-        <div className="font-mono font-semibold text-blue-700">
+        <div className="font-mono font-semibold text-primary">
           {course.code || "N/A"}
         </div>
       ),
@@ -140,10 +163,10 @@ export default function CoursesPage() {
       sortable: true,
       render: (course: Course) => (
         <div>
-          <div className="font-semibold text-gray-900">
+          <div className="font-semibold text-foreground">
             {course.name || course.title || "Untitled Course"}
           </div>
-          <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+          <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <UserIcon className="h-3 w-3" />
               {course.instructor || "TBA"}
@@ -154,7 +177,7 @@ export default function CoursesPage() {
             </span>
           </div>
           {course.description && (
-            <div className="text-xs text-gray-400 mt-1 truncate max-w-xs">
+            <div className="text-xs text-muted-foreground mt-1 truncate max-w-xs">
               {course.description}
             </div>
           )}
@@ -169,7 +192,7 @@ export default function CoursesPage() {
       render: (course: Course) => (
         <Badge
           variant="outline"
-          className="bg-blue-50 text-blue-700 border-blue-200"
+          className="bg-primary/10 text-primary border-primary/30"
         >
           {course.units || 0} Units
         </Badge>
@@ -204,13 +227,13 @@ export default function CoursesPage() {
                 ? `${completedLessons}/${totalLessons}`
                 : "Not Started"}
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+            <div className="w-full bg-muted rounded-full h-2 mt-1">
               <div
-                className="bg-gradient-to-r from-blue-500 to-emerald-500 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-primary to-emerald-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-muted-foreground mt-1">
               {completionPercentage}%
             </div>
           </div>
@@ -228,25 +251,25 @@ export default function CoursesPage() {
 
         let buttonText = "Start Course";
         let buttonClass =
-          "cursor-pointer bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white";
+          "cursor-pointer bg-gradient-to-r from-primary to-emerald-500 hover:brightness-110 text-primary-foreground";
         let isDisabled = course.publishStatus !== "Published";
 
         if (course.publishStatus !== "Published") {
           buttonText = "Not Available";
-          buttonClass = "bg-gray-400 text-white cursor-not-allowed";
+          buttonClass = "bg-muted text-muted-foreground cursor-not-allowed";
           isDisabled = true;
         } else if (hasResult) {
           buttonText = "View Result";
           buttonClass =
-            "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white";
+            "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:brightness-110 text-primary-foreground";
         } else if (isCompleted) {
           buttonText = "Completed";
           buttonClass =
-            "cursor-pointer bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white";
+            "cursor-pointer bg-gradient-to-r from-emerald-500 to-emerald-600 hover:brightness-110 text-primary-foreground";
         } else if (isEnrolled) {
           buttonText = "Continue";
           buttonClass =
-            "cursor-pointer bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white";
+            "cursor-pointer bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-primary-foreground";
         }
 
         return (
@@ -270,10 +293,10 @@ export default function CoursesPage() {
   return (
     <>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-foreground mb-2">
           Available Courses
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Browse and enroll in courses for the current semester
         </p>
       </div>
@@ -281,16 +304,16 @@ export default function CoursesPage() {
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600">Loading courses...</span>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted/50 border-t-primary"></div>
+          <span className="ml-3 text-muted-foreground">Loading courses...</span>
         </div>
       )}
 
       {/* Error State */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-6">
           <div className="flex">
-            <div className="text-red-600">
+            <div className="text-destructive">
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -300,10 +323,10 @@ export default function CoursesPage() {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
+              <h3 className="text-sm font-medium text-destructive">
                 Error loading courses
               </h3>
-              <p className="text-sm text-red-700 mt-1">{error}</p>
+              <p className="text-sm text-muted-foreground mt-1">{error}</p>
             </div>
           </div>
         </div>
@@ -312,25 +335,109 @@ export default function CoursesPage() {
       {/* Courses Table */}
       {!loading && !error && (
         <>
+          {/* Search Input */}
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Search courses by name or code..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            {debouncedSearch && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Showing results for "{debouncedSearch}"
+              </p>
+            )}
+          </div>
+
           <ModernTable
             data={coursesData}
             columns={columns}
-            searchable={true}
-            searchPlaceholder="Search courses, instructors, or codes..."
+            searchable={false}
             onRowClick={(item: Course) => setSelectedCourse(item)}
             className="animate-fade-in"
           />
 
+          {/* Pagination Controls */}
+          {totalPages > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-6 mt-6 bg-card/50 rounded-lg border border-border">
+              <div className="text-sm font-medium text-foreground">
+                Showing <span className="text-primary">{totalCourses > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> - 
+                <span className="text-primary">{Math.min(currentPage * itemsPerPage, totalCourses)}</span> of 
+                <span className="text-primary"> {totalCourses}</span> courses
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Items per page:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="border border-border rounded-md px-3 py-1 text-sm bg-background"
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                  >
+                    First
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Last
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {coursesData.length}
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 text-center">
+              <div className="text-2xl font-bold text-primary">
+                {totalCourses || coursesData.length}
               </div>
-              <div className="text-sm text-gray-600">Total Courses</div>
+              <div className="text-sm text-muted-foreground">Total Courses</div>
             </div>
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-              <div className="text-2xl font-bold text-emerald-600">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 text-center">
+              <div className="text-2xl font-bold text-primary">
                 {
                   coursesData.filter(
                     (c) =>
@@ -338,23 +445,23 @@ export default function CoursesPage() {
                   ).length
                 }
               </div>
-              <div className="text-sm text-gray-600">Available to Start</div>
+              <div className="text-sm text-muted-foreground">Available to Start</div>
             </div>
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 text-center">
+              <div className="text-2xl font-bold text-amber-500">
                 {
                   coursesData.filter(
                     (c) => c.student_enrolled && !c.student_completed
                   ).length
                 }
               </div>
-              <div className="text-sm text-gray-600">In Progress</div>
+              <div className="text-sm text-muted-foreground">In Progress</div>
             </div>
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl border border-border p-4 text-center">
+              <div className="text-2xl font-bold text-emerald-500">
                 {coursesData.filter((c) => c.student_completed).length}
               </div>
-              <div className="text-sm text-gray-600">Completed</div>
+              <div className="text-sm text-muted-foreground">Completed</div>
             </div>
           </div>
         </>

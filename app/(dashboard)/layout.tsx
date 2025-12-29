@@ -1,27 +1,11 @@
 "use client";
 
-import {
-  BarChart3,
-  BookOpen,
-  Bell,
-  Calendar,
-  CreditCard,
-  Eye,
-  FileText,
-  HelpCircle,
-  LogOut,
-  NotebookTabs,
-  TrendingUp,
-  Users,
-} from "lucide-react";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import AppHeader from "@/components/ui/app-header";
-import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/components/ui/user-profile";
 import { NotificationBell } from "@/components/ui/notification-bell";
-import { TopMenu, NavigationItem } from "@/components/ui/top-menu";
+import { TopMenu } from "@/components/ui/top-menu";
 import { useApp } from "@/contexts/AppContext";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
@@ -51,9 +35,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }, [isLoading, userData, refreshUserData]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">
+    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-emerald-400/5 dark:from-primary/10 dark:via-background dark:to-primary/10" />
+        <div className="absolute -left-24 -top-16 h-64 w-64 rounded-full bg-primary/10 blur-3xl dark:bg-primary/15" />
+        <div className="absolute -right-32 -bottom-24 h-80 w-80 rounded-full bg-emerald-400/12 blur-[120px] dark:bg-emerald-300/15" />
+      </div>
+
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-blue-100 sticky top-0 z-50">
+      <header className="sticky top-0 z-50 border-b border-border/60 bg-card/80 backdrop-blur-md py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <AppHeader showBackButton={false} />
@@ -70,7 +60,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <TopMenu />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
     </div>
