@@ -10,6 +10,7 @@ const checkAccess = require("../helpers/utils").checkAccess;
 // Get Data Models
 const Staff = require("../models/Staff");
 const Student = require("../models/Student");
+const Institution = require("../models/Institution");
 const mailTemplate = require("../email");
 const { sgMail } = require("../services/emailService");
 require("dotenv").config();
@@ -119,11 +120,24 @@ exports.deferProcessByStudent = async (req, reply) => {
     reason
   );
 
+  // Fetch institution support email
+  let supportEmail = "support.cdel@unn.edu.ng";
+  try {
+    const institutionId = validatedUser.institution_id || 1;
+    const institution = await Institution.where({ id: institutionId }).fetch({ require: false });
+    if (institution) {
+      supportEmail = institution.get("support_mail") || institution.get("email") || supportEmail;
+    }
+  } catch (err) {
+    console.log("Error fetching institution for deferment email:", err);
+    // Use fallback email if fetch fails
+  }
+
   // const director = 'boniface.nworgu@unn.edu.ng'
   const testingMails = [
     "boniface.nworgu@unn.edu.ng",
     "ebere.kalu@unn.edu.ng",
-    "support.cdel@unn.edu.ng",
+    supportEmail,
   ];
   let student,
     success,

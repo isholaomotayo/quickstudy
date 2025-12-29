@@ -1,13 +1,28 @@
 const boom = require("boom");
 const mailTemplate = require("../email");
 const { sgMail } = require("../services/emailService");
+const Institution = require("../models/Institution");
 require("dotenv").config();
 
 exports.supportController = async (req, reply) => {
-  const { email, first_name, last_name, subject, message } = req.body;
+  const { email, first_name, last_name, subject, message, institution_id } = req.body;
 
   const sender = email;
-  const reciever = `support.cdel@unn.edu.ng`;
+  
+  // Fetch institution data for support email
+  let supportEmail = process.env.SUPPORT_EMAIL || "support.cdel@unn.edu.ng";
+  try {
+    const institutionId = institution_id || 1; // Default to institution id 1
+    const institution = await Institution.where({ id: institutionId }).fetch({ require: false });
+    if (institution) {
+      supportEmail = institution.get("support_mail") || institution.get("email") || supportEmail;
+    }
+  } catch (err) {
+    console.log("Error fetching institution for support email:", err);
+    // Use fallback email if fetch fails
+  }
+  
+  const reciever = supportEmail;
 
   const emailTemplateParams = {
     subject: `New support request from ${sender}`,
@@ -18,7 +33,7 @@ exports.supportController = async (req, reply) => {
   };
 
   const msg = {
-    to: process.env.SUPPORT_EMAIL || reciever,
+    to: reciever,
     from: sender,
     subject: emailTemplateParams.subject,
     text: emailTemplateParams.title,

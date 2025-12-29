@@ -558,6 +558,14 @@ export async function registerUser(
 
     // Send welcome email with verification link
     try {
+      // Fetch institution data for email
+      const institutionId = result.newUser.institution_id || 1;
+      const institution = await prisma.institution.findUnique({
+        where: { id: institutionId },
+        select: { support_mail: true, email: true },
+      });
+      const supportEmail = institution?.support_mail || institution?.email || process.env.SUPPORT_EMAIL || "support.cdel@unn.edu.ng";
+
       const emailTemplateParams = {
         subject: `Welcome to ${process.env.NAME || "iLearn"}`,
         email: result.newUser.email,
@@ -568,7 +576,7 @@ export async function registerUser(
 
       const msg = {
         to: result.newUser.email,
-        from: process.env.SUPPORT_EMAIL || "support.cdel@unn.edu.ng",
+        from: supportEmail,
         subject: emailTemplateParams.subject,
         text: `Hi ${emailTemplateParams.name}, welcome to ${emailTemplateParams.organization}! Use the link: ${emailTemplateParams.activate} to activate your account`,
         html:

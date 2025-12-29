@@ -3,26 +3,27 @@
 import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import toast from "react-hot-toast";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { GlassCard } from "../../components/ui/glass-card";
-import { OptimizedDynamicBackground } from "../../components/ui/webgl-mesh-gradient";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import {
-    User,
-    Mail,
-    Lock,
-    Phone,
-    Eye,
-    EyeOff,
-    AlertTriangle,
-    GraduationCap, UserCheck
+  User,
+  Mail,
+  Lock,
+  Phone,
+  Eye,
+  EyeOff,
+  AlertTriangle,
+  CheckCircle2,
+  UserCheck,
 } from "lucide-react";
 import {
-    verifyRefCode,
-    getInstituionByParams,
+  verifyRefCode,
+  getInstituionByParams,
 } from "../../helpers/FetchWrapper";
 import { userNameValid } from "../../helpers/utils";
 import { registerUser } from "./action";
@@ -205,113 +206,90 @@ function ApplyComponent() {
   };
 
   return (
-    <OptimizedDynamicBackground>
-      <div className="flex items-center justify-center p-4 relative min-h-[calc(100vh-8rem)]">
-        {/* Centralized Content Container */}
-        <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Side - Branding & Information */}
-          <div className="text-center lg:text-left space-y-8">
-            {/* Institution Logo */}
-            <div className="flex justify-center lg:justify-start">
+    <div className="min-h-screen relative overflow-hidden bg-slate-50">
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,118,110,0.05)_1px,transparent_1px),linear-gradient(180deg,rgba(15,118,110,0.05)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      <div className="absolute -top-20 -left-24 h-72 w-72 rounded-full bg-teal-100/50 blur-3xl" />
+      <div className="absolute -bottom-24 -right-10 h-80 w-80 rounded-full bg-blue-100/50 blur-3xl" />
+
+      <div className="relative min-h-screen flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
+          <div className="space-y-8">
+            <div className="flex items-center justify-center lg:justify-start gap-4">
               {state.institution?.logo && (
                 <img
-                  className="h-20 w-auto animate-fade-in"
+                  className="h-14 w-auto"
                   src={state.institution.logo}
                   alt="Institution Logo"
                 />
               )}
-            </div>
-
-            {/* Welcome Text */}
-            <div
-              className="space-y-4 animate-fade-in"
-              style={{ animationDelay: "0.2s" }}
-            >
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
-                Join{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600">
+              <div>
+                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
+                  Application Portal
+                </p>
+                <h1 className="text-3xl font-semibold text-slate-900">
                   {state.institution?.name || "iLearn"}
-                </span>
-              </h1>
-              <p className="text-xl text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                Start your educational journey with us. Apply now to access
-                world-class programs and unlock your potential.
-              </p>
-            </div>
-
-            {/* Information Points */}
-            <div
-              className="space-y-4 animate-fade-in"
-              style={{ animationDelay: "0.4s" }}
-            >
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-white/50">
-                <h3 className="font-semibold text-gray-800 mb-2">
-                  📋 Required Documents
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Professional passport photograph, International Passport,
-                  Voter's ID Card, or Driver's License
-                </p>
-              </div>
-
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-white/50">
-                <h3 className="font-semibold text-gray-800 mb-2">
-                  ✉️ Email Verification
-                </h3>
-                <p className="text-sm text-gray-600">
-                  After registration, check your email for verification
-                  instructions
-                </p>
+                </h1>
               </div>
             </div>
 
-            {/* Decorative Elements */}
-            <div
-              className="hidden lg:flex items-center space-x-4 animate-fade-in"
-              style={{ animationDelay: "0.6s" }}
-            >
-              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 shadow-lg flex items-center justify-center backdrop-blur-sm">
-                <GraduationCap className="h-8 w-8 text-white" />
-              </div>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 shadow-lg flex items-center justify-center backdrop-blur-sm">
-                <span className="text-lg">📚</span>
-              </div>
-              <div className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 shadow-lg flex items-center justify-center backdrop-blur-sm">
-                <span className="text-xl">🎓</span>
-              </div>
-            </div>
-
-            {/* Mobile Institution Name */}
-            <div className="lg:hidden">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                Apply Now
+            <div className="space-y-4">
+              <h2 className="text-4xl lg:text-5xl font-semibold text-slate-900 leading-tight">
+                Start your application with confidence
               </h2>
-              <p className="text-gray-600">
-                Fill out the form to start your application
+              <p className="text-lg text-slate-600 max-w-xl">
+                Complete your profile, verify your email, and unlock the next
+                step in your academic journey.
               </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+              <Image
+                src="/images/a-group-of-three-african-american-students.jpg"
+                alt="Prospective students collaborating"
+                width={620}
+                height={420}
+                className="w-full rounded-xl object-cover"
+                priority
+              />
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+                <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-teal-600" />
+                  Required documents
+                </h3>
+                <p className="text-xs text-slate-500 mt-2">
+                  Passport photo, International Passport, Voter ID, or Driver's
+                  License.
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white/80 p-4 shadow-sm">
+                <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-teal-600" />
+                  Email verification
+                </h3>
+                <p className="text-xs text-slate-500 mt-2">
+                  We'll send a verification link after registration.
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Right Side - Application Form */}
           <div className="w-full max-w-2xl mx-auto lg:mx-0">
-            {/* Desktop Form Header */}
-            <div
-              className="hidden lg:block mb-8 text-center animate-fade-in"
-              style={{ animationDelay: "0.3s" }}
-            >
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Apply Now
+            <div className="mb-8 text-center">
+              <p className="text-xs uppercase tracking-[0.4em] text-slate-500">
+                Apply now
+              </p>
+              <h2 className="text-3xl font-semibold text-slate-900">
+                Create your account
               </h2>
-              <p className="text-gray-600">
+              <p className="text-slate-600">
                 Fill out all fields to complete your application
               </p>
             </div>
 
-            {/* Application Form */}
-            <GlassCard
-              className="backdrop-blur-xl bg-white/80 border-white/50 shadow-2xl animate-slide-up max-h-[80vh] overflow-y-auto"
-              style={{ animationDelay: "0.4s" }}
-            >
+            <GlassCard className="border-slate-200 bg-white/90 shadow-xl max-h-[80vh] overflow-y-auto">
               {state.error && (
                 <Alert
                   variant="destructive"
@@ -327,8 +305,8 @@ function ApplyComponent() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <User className="h-5 w-5 text-blue-500" />
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <User className="h-5 w-5 text-teal-600" />
                     Personal Information
                   </h3>
 
@@ -337,7 +315,7 @@ function ApplyComponent() {
                     <div className="space-y-2">
                       <Label
                         htmlFor="firstName"
-                        className="text-gray-700 font-medium"
+                        className="text-slate-700 font-medium"
                       >
                         First Name
                       </Label>
@@ -350,14 +328,14 @@ function ApplyComponent() {
                         onChange={handleChange}
                         placeholder="Enter your first name"
                         disabled={state.isLoading}
-                        className="bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20"
+                        className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20"
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label
                         htmlFor="lastName"
-                        className="text-gray-700 font-medium"
+                        className="text-slate-700 font-medium"
                       >
                         Last Name
                       </Label>
@@ -370,7 +348,7 @@ function ApplyComponent() {
                         onChange={handleChange}
                         placeholder="Enter your last name"
                         disabled={state.isLoading}
-                        className="bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20"
+                        className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20"
                       />
                     </div>
                   </div>
@@ -380,7 +358,7 @@ function ApplyComponent() {
                     <div className="space-y-2">
                       <Label
                         htmlFor="otherName"
-                        className="text-gray-700 font-medium"
+                        className="text-slate-700 font-medium"
                       >
                         Other Name
                       </Label>
@@ -393,14 +371,14 @@ function ApplyComponent() {
                         onChange={handleChange}
                         placeholder="Enter your other name"
                         disabled={state.isLoading}
-                        className="bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20"
+                        className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20"
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label
                         htmlFor="username"
-                        className="text-gray-700 font-medium"
+                        className="text-slate-700 font-medium"
                       >
                         Username
                       </Label>
@@ -413,7 +391,7 @@ function ApplyComponent() {
                         onChange={handleChange}
                         placeholder="lowercase letters and numbers only"
                         disabled={state.isLoading}
-                        className={`bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20 ${
+                        className={`bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20 ${
                           state.username && !userNameValid(state.username)
                             ? "border-red-400 focus:border-red-400"
                             : ""
@@ -432,9 +410,9 @@ function ApplyComponent() {
                     <div className="space-y-2">
                       <Label
                         htmlFor="password"
-                        className="text-gray-700 font-medium flex items-center gap-2"
+                        className="text-slate-700 font-medium flex items-center gap-2"
                       >
-                        <Lock className="h-4 w-4 text-blue-500" />
+                        <Lock className="h-4 w-4 text-teal-600" />
                         Password
                       </Label>
                       <div className="relative">
@@ -447,17 +425,17 @@ function ApplyComponent() {
                           onChange={handleChange}
                           placeholder="Enter your password"
                           disabled={state.isLoading}
-                          className="bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20 pr-10"
+                          className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20 pr-10"
                         />
                         <button
                           type="button"
                           onClick={() => togglePasswordVisibility("password")}
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-blue-500 transition-colors"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-teal-600 transition-colors"
                         >
                           {state.showPassword ? (
-                            <EyeOff className="h-4 w-4 text-gray-500" />
+                            <EyeOff className="h-4 w-4" />
                           ) : (
-                            <Eye className="h-4 w-4 text-gray-500" />
+                            <Eye className="h-4 w-4" />
                           )}
                         </button>
                       </div>
@@ -466,7 +444,7 @@ function ApplyComponent() {
                     <div className="space-y-2">
                       <Label
                         htmlFor="confirmPassword"
-                        className="text-gray-700 font-medium"
+                        className="text-slate-700 font-medium"
                       >
                         Confirm Password
                       </Label>
@@ -480,19 +458,19 @@ function ApplyComponent() {
                           onChange={handleChange}
                           placeholder="Confirm your password"
                           disabled={state.isLoading}
-                          className="bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20 pr-10"
+                          className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20 pr-10"
                         />
                         <button
                           type="button"
                           onClick={() =>
                             togglePasswordVisibility("confirmPassword")
                           }
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-blue-500 transition-colors"
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-teal-600 transition-colors"
                         >
                           {state.showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4 text-gray-500" />
+                            <EyeOff className="h-4 w-4" />
                           ) : (
-                            <Eye className="h-4 w-4 text-gray-500" />
+                            <Eye className="h-4 w-4" />
                           )}
                         </button>
                       </div>
@@ -501,9 +479,9 @@ function ApplyComponent() {
                 </div>
 
                 {/* Contact Information Section */}
-                <div className="space-y-4 pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <Mail className="h-5 w-5 text-green-500" />
+                <div className="space-y-4 pt-6 border-t border-slate-200">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <Mail className="h-5 w-5 text-teal-600" />
                     Contact Information
                   </h3>
 
@@ -511,9 +489,9 @@ function ApplyComponent() {
                     <div className="space-y-2">
                       <Label
                         htmlFor="email"
-                        className="text-gray-700 font-medium flex items-center gap-2"
+                        className="text-slate-700 font-medium flex items-center gap-2"
                       >
-                        <Mail className="h-4 w-4 text-blue-500" />
+                        <Mail className="h-4 w-4 text-teal-600" />
                         Email Address
                       </Label>
                       <Input
@@ -525,16 +503,16 @@ function ApplyComponent() {
                         onChange={handleChange}
                         placeholder="We will send login details to you"
                         disabled={state.isLoading}
-                        className="bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20"
+                        className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20"
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label
                         htmlFor="phone"
-                        className="text-gray-700 font-medium flex items-center gap-2"
+                        className="text-slate-700 font-medium flex items-center gap-2"
                       >
-                        <Phone className="h-4 w-4 text-blue-500" />
+                        <Phone className="h-4 w-4 text-teal-600" />
                         Phone Number
                       </Label>
                       <Input
@@ -546,21 +524,21 @@ function ApplyComponent() {
                         onChange={handleChange}
                         placeholder="Enter your phone number"
                         disabled={state.isLoading}
-                        className="bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20"
+                        className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20"
                       />
                     </div>
                   </div>
 
                   {/* Referral Code */}
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="referral_code"
-                      className="text-gray-700 font-medium flex items-center gap-2"
-                    >
-                      <UserCheck className="h-4 w-4 text-purple-500" />
-                      Referrer's Code (Optional)
-                    </Label>
-                    <Input
+                  <Label
+                    htmlFor="referral_code"
+                    className="text-slate-700 font-medium flex items-center gap-2"
+                  >
+                    <UserCheck className="h-4 w-4 text-teal-600" />
+                    Referrer's Code (Optional)
+                  </Label>
+                  <Input
                       id="referral_code"
                       name="referral_code"
                       type="text"
@@ -570,9 +548,9 @@ function ApplyComponent() {
                       disabled={
                         state.isLoading || !!searchParams?.get("referrerCode")
                       }
-                      className="bg-white/70 border-gray-200 text-gray-800 placeholder:text-gray-500 focus:border-blue-400 focus:ring-blue-400/20"
-                    />
-                  </div>
+                    className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20"
+                  />
+                </div>
                 </div>
 
                 {/* Affiliate Program Section */}
@@ -648,7 +626,7 @@ function ApplyComponent() {
                 <div className="pt-6">
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white font-semibold border-0 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
+                    className="w-full bg-teal-600 text-white font-semibold border-0 shadow-lg hover:bg-teal-700 transition-all"
                     size="lg"
                     disabled={state.isLoading}
                   >
@@ -664,12 +642,12 @@ function ApplyComponent() {
                 </div>
 
                 {/* Login Link */}
-                <div className="text-center pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600">
+                <div className="text-center pt-4 border-t border-slate-200">
+                  <p className="text-sm text-slate-600">
                     Already have an account?{" "}
                     <Link
                       href="/signin"
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="text-teal-700 hover:text-teal-900 font-medium"
                     >
                       Sign In Here
                     </Link>
@@ -677,11 +655,13 @@ function ApplyComponent() {
                 </div>
 
                 {/* Support Info */}
-                <div className="text-center pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600">
+                <div className="text-center pt-4 border-t border-slate-200">
+                  <p className="text-sm text-slate-600">
                     For any questions or concerns, send an email to{" "}
-                    <strong className="text-blue-600">
-                      support.cdel@unn.edu.ng
+                    <strong className="text-teal-700">
+                      {state.institution?.support_mail ||
+                        state.institution?.email ||
+                        "support.cdel@unn.edu.ng"}
                     </strong>
                   </p>
                 </div>
@@ -690,39 +670,7 @@ function ApplyComponent() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(40px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out forwards;
-        }
-
-        .animate-slide-up {
-          animation: slide-up 0.6s ease-out forwards;
-        }
-      `}</style>
-    </OptimizedDynamicBackground>
+    </div>
   );
 }
 
@@ -730,14 +678,12 @@ export default function Apply() {
   return (
     <Suspense
       fallback={
-        <OptimizedDynamicBackground>
-          <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading...</p>
-            </div>
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
+            <p className="text-slate-600">Loading...</p>
           </div>
-        </OptimizedDynamicBackground>
+        </div>
       }
     >
       <ApplyComponent />

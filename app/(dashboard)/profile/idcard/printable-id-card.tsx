@@ -23,6 +23,7 @@ interface StudentData {
   validThrough: string;
   photoUrl?: string;
   institutionLogo?: string;
+  institutionEmail?: string;
 }
 
 interface PrintableIdCardProps {
@@ -498,7 +499,7 @@ export function PrintableIdCard({ student }: PrintableIdCardProps) {
                   <div className="flex items-center gap-0.5">
                     <Mail className="w-1.5 h-1.5 text-gray-500" />
                     <span className="text-gray-600">
-                      support.cdel@unn.edu.ng
+                      {student.institutionEmail || "support.cdel@unn.edu.ng"}
                     </span>
                   </div>
                 </div>
