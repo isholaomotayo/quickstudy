@@ -66,16 +66,19 @@ export default function CoursesPage() {
       try {
         setLoading(true);
         const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
-        const response = await api.get(`/api/course?pgsize=${itemsPerPage}&pg=${currentPage}${searchParam}`);
+        const courses = await api.get(`/api/course?pgsize=${itemsPerPage}&pg=${currentPage}${searchParam}`);
   
-        // Extract pagination info from headers if available
-        const pagination = (response as any).pagination || {};
-        setTotalPages(pagination.pageCount || 0);
-        setTotalCourses(pagination.rowCount || response.data?.length || 0);
+        // API returns courses array directly (api.get already unwraps the response)
+        // Ensure we have an array
+        const coursesArray = Array.isArray(courses) ? courses : [];
+        
+        // Calculate pagination from data length (API doesn't return total count yet)
+        setTotalCourses(coursesArray.length);
+        // For now, assume we have more pages if we got a full page of results
+        setTotalPages(coursesArray.length === itemsPerPage ? currentPage + 1 : currentPage);
 
         // Transform the data to match our interface
-        const courses = response.data || [];
-        const transformedCourses: Course[] = courses.map((course: any) => ({
+        const transformedCourses: Course[] = coursesArray.map((course: any) => ({
           id: course.id,
           code: course.code,
           name: course.name || course.title,
@@ -354,13 +357,24 @@ export default function CoursesPage() {
             )}
           </div>
 
-          <ModernTable
-            data={coursesData}
-            columns={columns}
-            searchable={false}
-            onRowClick={(item: Course) => setSelectedCourse(item)}
-            className="animate-fade-in"
-          />
+          {coursesData.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground bg-card/80 backdrop-blur-sm rounded-2xl border border-border">
+              <div className="text-lg font-medium text-foreground mb-2">No courses available</div>
+              <div className="text-sm">
+                {debouncedSearch 
+                  ? `No courses match "${debouncedSearch}". Try a different search term.`
+                  : "There are no courses available at the moment. Please check back later."}
+              </div>
+            </div>
+          ) : (
+            <ModernTable
+              data={coursesData}
+              columns={columns}
+              searchable={false}
+              onRowClick={(item: Course) => setSelectedCourse(item)}
+              className="animate-fade-in"
+            />
+          )}
 
           {/* Pagination Controls */}
           {totalPages > 0 && (

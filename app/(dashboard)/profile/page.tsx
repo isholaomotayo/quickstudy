@@ -104,8 +104,7 @@ export default function UserProfile() {
       setLoading(true);
 
       // Use the new unified profile endpoint with api-wrapper
-      const response = await api.get("/api/profile");
-      const data = response.data; // API wrapper returns {data: profileObject}
+      const data = await api.get("/api/profile"); // API wrapper already returns the unwrapped data
 
       // Set institution data for ID card
       setInstitutionData(data.institution || null);
@@ -181,8 +180,8 @@ export default function UserProfile() {
       };
 
       // Use the new unified profile endpoint with api-wrapper
-      const response = await api.put("/api/profile", payload);
-      toast.success(response.data.message || "Profile updated successfully");
+      await api.put("/api/profile", payload);
+      toast.success("Profile updated successfully");
 
       setIsEditing(false);
       await fetchProfileData(); // Refresh data
