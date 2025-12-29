@@ -20,7 +20,14 @@ export async function GET(req: NextRequest) {
   const user = authResult.user;
 
   // Role check: STUDENT, STAFF, HOD, ADMIN, SUPERADMIN
-  const allowedRoles = ["STUDENT", "STAFF", "HOD", "ADMIN", "SUPERADMIN", "LECTURER"];
+  const allowedRoles = [
+    "STUDENT",
+    "STAFF",
+    "HOD",
+    "ADMIN",
+    "SUPERADMIN",
+    "LECTURER",
+  ];
   if (!allowedRoles.includes(user.role)) {
     return createAuthErrorResponse("Insufficient permissions", 403);
   }
@@ -51,7 +58,9 @@ export async function GET(req: NextRequest) {
         return createJsonResponse([]);
       }
 
-      const courseIds = studentCourses.map((sc) => sc.course_id);
+      const courseIds = studentCourses
+        .map((sc) => sc.course_id)
+        .filter((id): id is number => id !== null);
 
       // Get forum topics for enrolled courses
       topics = await prisma.course_forum_topic.findMany({
@@ -126,7 +135,14 @@ export async function POST(req: NextRequest) {
   const user = authResult.user;
 
   // Role check
-  const allowedRoles = ["STUDENT", "STAFF", "HOD", "ADMIN", "SUPERADMIN", "LECTURER"];
+  const allowedRoles = [
+    "STUDENT",
+    "STAFF",
+    "HOD",
+    "ADMIN",
+    "SUPERADMIN",
+    "LECTURER",
+  ];
   if (!allowedRoles.includes(user.role)) {
     return createAuthErrorResponse("Insufficient permissions", 403);
   }
@@ -159,7 +175,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return createJsonResponse(newForumTopic, 201);
+    const response = createJsonResponse(newForumTopic);
+    const data = await response.json();
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error("Error creating course forum topic:", error);
     return createAuthErrorResponse("Failed to create course forum topic", 500);

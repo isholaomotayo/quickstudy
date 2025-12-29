@@ -109,11 +109,6 @@ export default function ProgramsManagement() {
       return [];
     }
   };
-    } catch (error) {
-      console.error("Error loading program options:", error);
-      return [];
-    }
-  };
 
   const handleSwitchProgram = async (studentId: string) => {
     if (switching) return;

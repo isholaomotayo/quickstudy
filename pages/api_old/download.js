@@ -27,3 +27,8 @@ export default (req, res) => {
 
   //'https://res.cloudinary.com/emergingplatforms/image/upload/v1585995395/ilearn/houmn01vxa2xqif1i8nk.pdf'
 };
+
+// Prevent static generation
+export function getServerSideProps() {
+  return { props: {} };
+}

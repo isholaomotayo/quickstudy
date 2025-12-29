@@ -14,3 +14,8 @@ export default function handler(req, res) {
   console.log("Environment Variables:", envVars);
   res.json(envVars);
 }
+
+// Prevent static generation
+export function getServerSideProps() {
+  return { props: {} };
+}

@@ -270,7 +270,7 @@ export function CourseRegistrationClient() {
               id: reg.id,
               course_id: reg.course_id || reg.course?.id,
               course: reg.course,
-              level: reg.level || courseFromList?.level || null,
+              level: reg.level || null,
               approval_status: reg.approval_status || false,
               cleared: reg.cleared || false,
               created_at: reg.created_at || new Date().toISOString(),

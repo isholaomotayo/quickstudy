@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   createJsonResponse,
   createAuthErrorResponse,
@@ -44,7 +44,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return createJsonResponse(newForumThread, 201);
+    const response = createJsonResponse(newForumThread);
+    const data = await response.json();
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error("Error creating forum thread:", error);
     return createAuthErrorResponse("Failed to create forum thread", 500);

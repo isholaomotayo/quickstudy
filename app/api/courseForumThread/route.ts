@@ -49,7 +49,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return createJsonResponse(newForumThread, 201);
+    const response = createJsonResponse(newForumThread);
+    const data = await response.json();
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error("Error creating course forum thread:", error);
     return createAuthErrorResponse("Failed to create course forum thread", 500);

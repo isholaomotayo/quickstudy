@@ -20,3 +20,13 @@
 //         return;
 //     }
 // }
+
+// Placeholder default export for Next.js
+export default function UploadForm() {
+  return null;
+}
+
+// Prevent static generation
+export function getServerSideProps() {
+  return { props: {} };
+}

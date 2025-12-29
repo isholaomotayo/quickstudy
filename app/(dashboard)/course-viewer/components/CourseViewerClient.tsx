@@ -667,11 +667,7 @@ export default function CourseViewerClient({
           }
           currentModuleId={courseModuleData.id}
           currentLessonId={activeLesson?.id}
-          preloadedConversations={
-            activeLesson?.id
-              ? preloadedConversations.get(activeLesson.id)
-              : undefined
-          }
+          preloadedConversations={undefined}
           onClose={() => {
             setShowAssistant(false);
             setSelectedText(""); // Clear the selected text when closing

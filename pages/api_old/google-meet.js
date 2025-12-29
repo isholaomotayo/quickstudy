@@ -154,3 +154,8 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// Prevent static generation
+export function getServerSideProps() {
+  return { props: {} };
+}

@@ -29,3 +29,8 @@ export const config = {
     responseLimit: false,
   },
 };
+
+// Prevent static generation
+export function getServerSideProps() {
+  return { props: {} };
+}

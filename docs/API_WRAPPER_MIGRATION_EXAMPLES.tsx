@@ -304,7 +304,7 @@ interface Course {
 // Usage with types
 export async function getCoursesTyped(): Promise<Course[]> {
   const response = await api.get<ApiSuccessResponse<Course[]>>("/api/course");
-  return response.data.data;
+  return response.data;
 }
 
 // ============================================================================

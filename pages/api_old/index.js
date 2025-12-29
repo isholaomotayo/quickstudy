@@ -7,3 +7,8 @@ export default function handler(req, res) {
     url: req.url,
   });
 }
+
+// Prevent static generation
+export function getServerSideProps() {
+  return { props: {} };
+}
