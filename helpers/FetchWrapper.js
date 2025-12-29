@@ -1121,11 +1121,30 @@ export async function DeleteFetch(url, req = {}) {
   });
 }
 
+/**
+ * Get API base URL - use relative URL for same-origin requests, or env var for external API
+ */
+function getApiUrl() {
+  // In browser/client-side, always use relative URL for Next.js API routes
+  if (typeof window !== "undefined") {
+    return ""; // Relative URL - same origin
+  }
+  // Server-side: use environment variable or default
+  // Check NEXT_PUBLIC_API_URL first (available on client), then API_URL (server-only)
+  return process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "";
+}
+
 export async function getInstituionByParams(data, ctx) {
   let institution;
 
   try {
-    institution = await fetch(`${process.env.API_URL}/api/institution/params`, {
+    const apiBaseUrl = getApiUrl();
+    // Use relative URL if apiBaseUrl is empty (client-side), otherwise use full URL
+    const apiUrl = apiBaseUrl
+      ? `${apiBaseUrl}/api/institution/params`
+      : "/api/institution/params";
+
+    institution = await fetch(apiUrl, {
       method: "post",
       credentials: "include",
       headers: {
