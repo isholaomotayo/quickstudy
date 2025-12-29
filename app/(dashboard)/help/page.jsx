@@ -66,7 +66,7 @@ export default function HelpSupportPage() {
 
 	const supportPhone = "+2348167667864";
 	const supportEmail =
-		process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@hyperlearn.ng";
+		process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@quickstudy.ng";
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">

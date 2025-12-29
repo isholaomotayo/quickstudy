@@ -426,7 +426,7 @@ export default function StudentDashboard() {
                             <span className="text-[9px] font-bold">Call</span>
                         </a>
                         <a
-                            href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@hyperlearn.ng"}`}
+                            href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@quickstudy.ng"}`}
                             className="flex flex-col items-center p-2 bg-gray-50 rounded hover:bg-teal-50 transition-colors"
                         >
                             <Mail className="w-4 h-4 text-gray-600 mb-1" />

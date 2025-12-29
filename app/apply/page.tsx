@@ -227,7 +227,7 @@ function ApplyComponent() {
                   Application Portal
                 </p>
                 <h1 className="text-3xl font-semibold text-slate-900">
-                  {state.institution?.name || "iLearn"}
+                  {state.institution?.name || "quickStudy"}
                 </h1>
               </div>
             </div>
@@ -655,16 +655,16 @@ function ApplyComponent() {
                 </div>
 
                 {/* Support Info */}
-                <div className="text-center pt-4 border-t border-slate-200">
-                  <p className="text-sm text-slate-600">
-                    For any questions or concerns, send an email to{" "}
-                    <strong className="text-teal-700">
-                      {state.institution?.support_mail ||
-                        state.institution?.email ||
-                        "support.cdel@unn.edu.ng"}
-                    </strong>
-                  </p>
-                </div>
+                {state.institution?.support_mail || state.institution?.email ? (
+                  <div className="text-center pt-4 border-t border-slate-200">
+                    <p className="text-sm text-slate-600">
+                      For any questions or concerns, send an email to{" "}
+                      <strong className="text-teal-700">
+                        {state.institution?.support_mail || state.institution?.email}
+                      </strong>
+                    </p>
+                  </div>
+                ) : null}
               </form>
             </GlassCard>
           </div>

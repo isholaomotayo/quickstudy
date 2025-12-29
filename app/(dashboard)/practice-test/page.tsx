@@ -65,12 +65,12 @@ export async function generateMetadata({
 
   if (!lessonId) {
     return {
-      title: "Practice Test - iLearn",
+      title: "Practice Test - quickStudy",
     };
   }
 
   return {
-    title: "AI Practice Test - iLearn",
+    title: "AI Practice Test - quickStudy",
     description: "AI-generated practice questions to reinforce your learning",
   };
 }

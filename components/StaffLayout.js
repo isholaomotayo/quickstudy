@@ -15,7 +15,7 @@ const logoStyle = {
 };
 
 const StaffLayout = (props) => {
-  const appTitle = `iLearn`;
+  const appTitle = `quickStudy`;
   const router = useRouter();
   // Fetch this list of user's permitted urls from backend
   const fetchedPermissions = [

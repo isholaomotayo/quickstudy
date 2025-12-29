@@ -5,7 +5,7 @@ import { withRouter } from 'next/router';
 
 const defaultLayout = (props) => {
   
-  const appTitle = 'iLearn';
+  const appTitle = 'quickStudy';
 
   return (
     <div>

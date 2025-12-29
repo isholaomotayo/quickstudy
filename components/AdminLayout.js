@@ -17,7 +17,7 @@ const logoStyle = {
 };
 
 const AdminLayout = (props) => {
-  const appTitle = `iLearn`;
+  const appTitle = `quickStudy`;
   const router = useRouter();
   const [navOpen, setNavOpen] = useState(false);
 

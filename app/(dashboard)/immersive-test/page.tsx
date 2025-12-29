@@ -34,12 +34,12 @@ export async function generateMetadata({
 
   if (!courseTestId) {
     return {
-      title: "Immersive Test - iLearn",
+      title: "Immersive Test - quickStudy",
     };
   }
 
   return {
-    title: "Immersive Test - iLearn",
+    title: "Immersive Test - quickStudy",
     description: "Interactive test experience with enhanced UI",
   };
 }

@@ -138,7 +138,7 @@ export function ParsedCalendarView({
     const icalContent = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//iLearn//Calendar//EN",
+      "PRODID:-//quickStudy//Calendar//EN",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
       `X-WR-CALNAME:${institutionName} Academic Calendar ${
@@ -162,7 +162,7 @@ export function ParsedCalendarView({
           `UID:${institutionName.replace(/\s+/g, "")}_${semester.name.replace(
             /\s+/g,
             ""
-          )}_${index}_${Date.now()}@ilearn.com`,
+          )}_${index}_${Date.now()}@quickstudy.com`,
           `DTSTART:${formatDateForIcal(startDate)}`,
           `DTEND:${formatDateForIcal(endDate)}`,
           `SUMMARY:${event.name}`,

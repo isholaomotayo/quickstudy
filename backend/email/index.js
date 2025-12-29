@@ -4,7 +4,7 @@ module.exports = {
     <html lang="en">
     
     <head>
-        <title>iLearn | The Complete Learning Platform</title>
+        <title>quickStudy | The Complete Learning Platform</title>
        
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
@@ -205,7 +205,7 @@ module.exports = {
                                                     <tr>
                                                         <td align="right"
                                                             style="padding: 0 0 5px 0; font-size: 14px; font-family: Arial, sans-serif; color: #666666; text-decoration: none;">
-                                                            <span style="color: #666666; text-decoration: none;">iLearn -
+                                                            <span style="color: #666666; text-decoration: none;">quickStudy -
                                                                 The complete learning platform<br></span></td>
                                                     </tr>
                                                 </table>

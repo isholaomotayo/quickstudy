@@ -31,7 +31,7 @@ const mailTemplate = {
     <html lang="en">
     
     <head>
-        <title>iLearn | The Complete Learning Platform</title>
+        <title>quickStudy | The Complete Learning Platform</title>
        
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
@@ -232,7 +232,7 @@ const mailTemplate = {
                                                     <tr>
                                                         <td align="right"
                                                             style="padding: 0 0 5px 0; font-size: 14px; font-family: Arial, sans-serif; color: #666666; text-decoration: none;">
-                                                            <span style="color: #666666; text-decoration: none;">iLearn -
+                                                            <span style="color: #666666; text-decoration: none;">quickStudy -
                                                                 The complete learning platform<br></span></td>
                                                     </tr>
                                                 </table>
@@ -567,11 +567,11 @@ export async function registerUser(
       const supportEmail = institution?.support_mail || institution?.email || process.env.SUPPORT_EMAIL || "support.cdel@unn.edu.ng";
 
       const emailTemplateParams = {
-        subject: `Welcome to ${process.env.NAME || "iLearn"}`,
+        subject: `Welcome to ${process.env.NAME || "quickStudy"}`,
         email: result.newUser.email,
         activate: `${process.env.API_URL}/api/verify?code=${verificationCode}-${result.newUser.id}`,
         name: result.newUser.first_name,
-        organization: process.env.NAME || "iLearn",
+        organization: process.env.NAME || "quickStudy",
       };
 
       const msg = {

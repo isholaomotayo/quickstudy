@@ -482,7 +482,7 @@ export default function StudentDashboard() {
                 </a>
                 <a
                   href={`mailto:${
-                    process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@hyperlearn.ng"
+                    process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@quickstudy.ng"
                   }`}
                   className="flex flex-col items-center rounded-md border border-border px-2 py-2 hover:border-primary/40"
                 >

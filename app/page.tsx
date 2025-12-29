@@ -192,7 +192,7 @@ export default function LandingPage() {
                   <Button
                     asChild
                     size="lg"
-                    className="bg-white text-[color:var(--lms-teal)] text-base px-8 py-6 rounded-xl shadow-lg hover:bg-white/90 transition-all"
+                    className="bg-[color:var(--lms-teal)] text-white text-base px-7 h-12 rounded-xl shadow-lg hover:opacity-90 transition-all w-full sm:w-auto"
                   >
                     <Link href="/apply">
                       Apply Now <ChevronRight className="ml-2" size={18} />
@@ -202,7 +202,7 @@ export default function LandingPage() {
                     asChild
                     size="lg"
                     variant="outline"
-                    className="border border-white/70 text-white hover:bg-white/10 text-base px-8 py-6 rounded-xl transition-all"
+                    className="border border-white/70 text-white hover:bg-white/10 text-base px-7 h-12 rounded-xl transition-all w-full sm:w-auto bg-transparent"
                   >
                     <Link href="/signin">Sign In</Link>
                   </Button>

@@ -20,7 +20,7 @@ export default function ApplyLayout({
       } catch (error) {
         console.error("Error loading institution:", error);
         // Set default institution if loading fails
-        setInstitution({ name: "iLearn", logo: null });
+        setInstitution({ name: "quickStudy", logo: null });
       } finally {
         setIsLoading(false);
       }
@@ -33,7 +33,7 @@ export default function ApplyLayout({
   if (isLoading) {
     return (
       <ApplicantNavLayout
-        institutionName="iLearn"
+        institutionName="quickStudy"
         institutionLogo={undefined}
       >
         {children}
@@ -43,7 +43,7 @@ export default function ApplyLayout({
 
   return (
     <ApplicantNavLayout
-      institutionName={institution?.name || "iLearn"}
+      institutionName={institution?.name || "quickStudy"}
       institutionLogo={institution?.logo}
     >
       {children}

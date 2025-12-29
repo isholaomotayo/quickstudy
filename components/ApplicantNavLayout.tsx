@@ -16,7 +16,7 @@ interface ApplicantNavLayoutProps {
 
 export default function ApplicantNavLayout({
   children,
-  institutionName = "iLearn",
+  institutionName = "quickStudy",
   institutionLogo,
 }: ApplicantNavLayoutProps) {
   const router = useRouter();

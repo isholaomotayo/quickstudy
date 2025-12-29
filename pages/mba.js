@@ -3,7 +3,7 @@ const Mba = () => <div
     __html:
       '<iframe style= "border:0" width="100%" height="2000" \
             src="/site/mba/index.html" \
-            title="iLearn Marketing Site" > \
+            title="quickStudy Marketing Site" > \
             </iframe>',
   }}
 ></div>;

@@ -50,7 +50,7 @@ describe('test for all header related events', () => {
     it('should visit homepage', () => {
         cy.visit('http://localhost:8080/forum');
 
-        cy.contains('iLearn').click()
+        cy.contains('quickStudy').click()
         cy.url().should('visit', 'http://localhost:8080/')
     })
 })

@@ -36,7 +36,7 @@ export default AssignmentsPage;
 
 export async function generateMetadata() {
   return {
-    title: "Assignment Management - iLearn",
+    title: "Assignment Management - quickStudy",
     description: "Manage assignments and grade student submissions",
   };
 }

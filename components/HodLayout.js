@@ -16,7 +16,7 @@ const logoStyle = {
 };
 
 const HodLayout = (props) => {
-  const appTitle = `iLearn`;
+  const appTitle = `quickStudy`;
   const router = useRouter();
   const [navOpen, setNavOpen] = useState(false);
 

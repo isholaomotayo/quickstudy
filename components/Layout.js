@@ -22,7 +22,7 @@ const Layout = ({
   showSidebar = true,
   ...props
 }) => {
-  const appTitle = `iLearn`;
+  const appTitle = `quickStudy`;
   const [navOpen, setNavOpen] = useState(false);
   const [pagePath, setPagePath] = useState("");
   useEffect(() => {

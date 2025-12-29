@@ -410,7 +410,7 @@ function SigninComponent() {
                   Campus Portal
                 </p>
                 <h1 className="text-3xl font-semibold text-slate-900">
-                  {state.institution?.name || "iLearn"}
+                  {state.institution?.name || "quickStudy"}
                 </h1>
               </div>
             </div>
@@ -629,14 +629,14 @@ function SigninComponent() {
                 </div>
 
                 <div className="text-center pt-6 border-t border-slate-200">
-                  <p className="text-sm text-slate-600">
-                    For questions, email{" "}
-                    <strong className="text-teal-700">
-                      {state.institution?.support_mail ||
-                        state.institution?.email ||
-                        "support.cdel@unn.edu.ng"}
-                    </strong>
-                  </p>
+                  {state.institution?.support_mail || state.institution?.email ? (
+                    <p className="text-sm text-slate-600">
+                      For questions, email{" "}
+                      <strong className="text-teal-700">
+                        {state.institution?.support_mail || state.institution?.email}
+                      </strong>
+                    </p>
+                  ) : null}
                 </div>
               </form>
             </GlassCard>
