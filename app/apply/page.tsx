@@ -78,25 +78,42 @@ function ApplyComponent() {
     const loadInstitution = async () => {
       try {
         // Get current URL from window location
-        const currentUrl = typeof window !== "undefined" ? window.location.origin : "";
-        
+        const currentUrl =
+          typeof window !== "undefined" ? window.location.origin : "";
+
         // Try to fetch by URL first, fallback to ID if URL fails
-        let institution = null;
+        let institution: any = null;
         if (currentUrl) {
           try {
             institution = await getInstituionByParams({ url: currentUrl }, {});
           } catch (urlError) {
-            console.warn("Failed to fetch institution by URL, trying ID:", urlError);
+            console.warn(
+              "Failed to fetch institution by URL, trying ID:",
+              urlError
+            );
           }
         }
-        
+
+        // Check if institution is valid (has id property)
+        const hasValidId =
+          institution &&
+          typeof institution === "object" &&
+          "id" in institution &&
+          institution.id;
+
         // Fallback to ID if URL lookup failed or returned empty
-        if (!institution || (typeof institution === "object" && !institution.id)) {
+        if (!hasValidId) {
           institution = await getInstituionByParams({ id: "1" }, {});
         }
-        
+
         // Ensure we have a valid institution object
-        if (institution && typeof institution === "object" && institution.id) {
+        const isValidInstitution =
+          institution &&
+          typeof institution === "object" &&
+          "id" in institution &&
+          institution.id;
+
+        if (isValidInstitution) {
           setState((prev) => ({
             ...prev,
             institution,
@@ -565,14 +582,14 @@ function ApplyComponent() {
 
                   {/* Referral Code */}
                   <div className="space-y-2">
-                  <Label
-                    htmlFor="referral_code"
-                    className="text-slate-700 font-medium flex items-center gap-2"
-                  >
-                    <UserCheck className="h-4 w-4 text-teal-600" />
-                    Referrer's Code (Optional)
-                  </Label>
-                  <Input
+                    <Label
+                      htmlFor="referral_code"
+                      className="text-slate-700 font-medium flex items-center gap-2"
+                    >
+                      <UserCheck className="h-4 w-4 text-teal-600" />
+                      Referrer's Code (Optional)
+                    </Label>
+                    <Input
                       id="referral_code"
                       name="referral_code"
                       type="text"
@@ -582,9 +599,9 @@ function ApplyComponent() {
                       disabled={
                         state.isLoading || !!searchParams?.get("referrerCode")
                       }
-                    className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20"
-                  />
-                </div>
+                      className="bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500/20"
+                    />
+                  </div>
                 </div>
 
                 {/* Affiliate Program Section */}
@@ -694,7 +711,8 @@ function ApplyComponent() {
                     <p className="text-sm text-slate-600">
                       For any questions or concerns, send an email to{" "}
                       <strong className="text-teal-700">
-                        {state.institution?.support_mail || state.institution?.email}
+                        {state.institution?.support_mail ||
+                          state.institution?.email}
                       </strong>
                     </p>
                   </div>

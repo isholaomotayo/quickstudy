@@ -19,7 +19,7 @@ export default function ApplyLayout({
         const currentUrl = typeof window !== "undefined" ? window.location.origin : "";
         
         // Try to fetch by URL first, fallback to ID if URL fails
-        let institutionData = null;
+        let institutionData: any = null;
         if (currentUrl) {
           try {
             institutionData = await getInstituionByParams({ url: currentUrl }, {});
@@ -28,13 +28,24 @@ export default function ApplyLayout({
           }
         }
         
+        // Check if institutionData is valid (has id property)
+        const hasValidId = institutionData && 
+          typeof institutionData === "object" && 
+          "id" in institutionData && 
+          institutionData.id;
+        
         // Fallback to ID if URL lookup failed or returned empty
-        if (!institutionData || (typeof institutionData === "object" && !institutionData.id)) {
+        if (!hasValidId) {
           institutionData = await getInstituionByParams({ id: "1" }, {});
         }
         
         // Ensure we have a valid institution object
-        if (institutionData && typeof institutionData === "object" && institutionData.id) {
+        const isValidInstitution = institutionData && 
+          typeof institutionData === "object" && 
+          "id" in institutionData && 
+          institutionData.id;
+        
+        if (isValidInstitution) {
           setInstitution(institutionData);
         } else {
           console.error("Invalid institution data received:", institutionData);

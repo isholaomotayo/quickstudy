@@ -350,7 +350,7 @@ export default function ApplicationStart() {
       const currentUrl = typeof window !== "undefined" ? window.location.origin : "";
       
       // Try to fetch by URL first, fallback to ID if URL fails
-      let institution = null;
+      let institution: any = null;
       if (currentUrl) {
         try {
           institution = await getInstituionByParams({ url: currentUrl }, {});
@@ -359,13 +359,24 @@ export default function ApplicationStart() {
         }
       }
       
+      // Check if institution is valid (has id property)
+      const hasValidId = institution && 
+        typeof institution === "object" && 
+        "id" in institution && 
+        institution.id;
+      
       // Fallback to ID if URL lookup failed or returned empty
-      if (!institution || (typeof institution === "object" && !institution.id)) {
+      if (!hasValidId) {
         institution = await getInstituionByParams({ id: "1" }, {});
       }
       
       // Ensure we have a valid institution object
-      if (institution && typeof institution === "object" && institution.id) {
+      const isValidInstitution = institution && 
+        typeof institution === "object" && 
+        "id" in institution && 
+        institution.id;
+      
+      if (isValidInstitution && institution) {
         setUiState((prev) => ({
           ...prev,
           institution,
