@@ -34,13 +34,13 @@ export default function RootPage() {
   );
   const isHOD = useCallback(() => userData?.role === "HOD", [userData?.role]);
 
-  // Set a timeout to redirect to signin if authentication takes too long
+  // Set a timeout to redirect to landing if authentication takes too long
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!userData && !isLoading) {
-        console.log("Authentication timeout - redirecting to signin");
+        console.log("Authentication timeout - redirecting to landing");
         setAuthTimeout(true);
-        router.replace("/signin");
+        router.replace("/landing");
       }
     }, 5000); // 5 second timeout
 
@@ -84,15 +84,15 @@ export default function RootPage() {
           router.replace("/admin"); // HOD redirects to admin dashboard
         } else {
           // For other roles like DECLINED APPLICANT, DEFERRED, etc.
-          console.log("Unknown role, redirecting to /signin");
-          router.replace("/signin");
+          console.log("Unknown role, redirecting to /landing");
+          router.replace("/landing");
         }
       } else if (hasAttemptedRefresh) {
-        // Only redirect to signin after we've attempted to refresh and still have no user data
+        // Only redirect to landing after we've attempted to refresh and still have no user data
         console.log(
-          "No user data after refresh attempt, redirecting to signin"
+          "No user data after refresh attempt, redirecting to landing"
         );
-        router.replace("/signin");
+        router.replace("/landing");
       }
     }
   }, [
