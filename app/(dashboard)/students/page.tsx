@@ -26,10 +26,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import FutureStudentLanding from "@/components/FutureStudentLanding";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-wrapper";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useInstitutionForUser } from "@/hooks/useInstitution";
 
 interface DashboardData {
   student: {
@@ -73,22 +74,83 @@ interface DashboardData {
     name: string;
     start_date: string;
   } | null;
+  financialSummary?: {
+    tuition: { status: string; count: number; paid: number; pending: number };
+    registration: {
+      status: string;
+      count: number;
+      paid: number;
+      pending: number;
+    };
+    exams: { status: string; count: number; paid: number; pending: number };
+    receipts: { status: string; count: number };
+  };
 }
 
-interface InstitutionData {
-  id: number;
-  support_mail?: string | null;
-  email?: string | null;
-  phone?: string | null;
+// Rotating word component for stellar alternatives
+function RotatingWord() {
+  const words = [
+    "stellar",
+    "excellent",
+    "outstanding",
+    "amazing",
+    "brilliant",
+    "exceptional",
+    "remarkable",
+    "impressive",
+    "phenomenal",
+    "extraordinary",
+  ];
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Start rotation after initial render
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % words.length);
+    }, 4000); // Change every 4 seconds
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [words.length]);
+
+  const currentWord = words[currentIndex];
+
+  return (
+    <span
+      className="text-primary italic relative inline-block overflow-hidden"
+      style={{
+        verticalAlign: "baseline",
+        height: "1.2em",
+        lineHeight: "1.2em",
+        display: "inline-block",
+        position: "relative",
+        minWidth: "max-content",
+        top: "8px",
+      }}
+    >
+      <span
+        key={currentIndex}
+        className="inline-block whitespace-nowrap"
+        style={{
+          animation: "slideDown 700ms ease-in-out",
+        }}
+      >
+        {currentWord}.
+      </span>
+    </span>
+  );
 }
 
 export default function StudentDashboard() {
   const router = useRouter();
+  const { institution: institutionData } = useInstitutionForUser();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
   );
-  const [institutionData, setInstitutionData] =
-    useState<InstitutionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,25 +166,7 @@ export default function StudentDashboard() {
 
         setDashboardData(data);
 
-        // Fetch institution data if we have institution_id
-        if (data.userData?.institution_id) {
-          try {
-            const institutionResponse = await api.post(
-              "/api/institution/params",
-              {
-                id: data.userData.institution_id,
-              }
-            );
-            const institutionApiResponse =
-              institutionResponse.data || institutionResponse;
-            const institution =
-              institutionApiResponse.data || institutionApiResponse;
-            setInstitutionData(institution);
-          } catch (instErr) {
-            console.error("Error fetching institution data:", instErr);
-            // Don't fail the whole dashboard if institution fetch fails
-          }
-        }
+        // Institution data is now loaded via useInstitutionForUser hook
       } catch (err) {
         console.error("Dashboard data fetch error:", err);
         setError("Failed to load dashboard data");
@@ -235,8 +279,7 @@ export default function StudentDashboard() {
                 </span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight max-w-lg">
-                Your Academic journey is looking{" "}
-                <span className="text-primary italic">stellar.</span>
+                Your Academic journey is looking <RotatingWord />
               </h2>
               <div className="flex flex-wrap gap-3 pt-2">
                 <div className="bg-white/5 dark:bg-white/5 border border-white/10 rounded-xl p-3 min-w-[120px]">
@@ -411,31 +454,65 @@ export default function StudentDashboard() {
             </Link>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-2">
-            {[
-              { label: "Tuition", status: "Paid", color: "bg-primary" },
-              {
-                label: "Registration",
-                status: "Pending",
-                color: "bg-amber-500",
-              },
-              { label: "Exams", status: "Due", color: "bg-destructive" },
-              { label: "Receipts", status: "Available", color: "bg-blue-500" },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="p-2.5 bg-white/5 dark:bg-white/5 rounded-lg border border-white/5 flex flex-col justify-between"
-              >
-                <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter">
-                  {item.label}
-                </span>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <div className={`w-1.5 h-1.5 rounded-full ${item.color}`} />
-                  <span className="text-[11px] font-semibold">
-                    {item.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+            {(() => {
+              const financialSummary = dashboardData?.financialSummary;
+
+              // Helper function to get color based on status
+              const getStatusColor = (status: string): string => {
+                const normalizedStatus = status.toLowerCase();
+                switch (normalizedStatus) {
+                  case "paid":
+                    return "bg-primary";
+                  case "pending":
+                    return "bg-amber-500";
+                  case "due":
+                    return "bg-destructive";
+                  case "available":
+                    return "bg-blue-500";
+                  default:
+                    return "bg-muted";
+                }
+              };
+
+              const financialItems = [
+                {
+                  label: "Tuition",
+                  status: financialSummary?.tuition?.status || "Due",
+                },
+                {
+                  label: "Registration",
+                  status: financialSummary?.registration?.status || "Due",
+                },
+                {
+                  label: "Exams",
+                  status: financialSummary?.exams?.status || "Due",
+                },
+                {
+                  label: "Receipts",
+                  status: financialSummary?.receipts?.status || "None",
+                },
+              ];
+
+              return financialItems.map((item) => {
+                const color = getStatusColor(item.status);
+                return (
+                  <div
+                    key={item.label}
+                    className="p-2.5 bg-white/5 dark:bg-white/5 rounded-lg border border-white/5 flex flex-col justify-between"
+                  >
+                    <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter">
+                      {item.label}
+                    </span>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <div className={`w-1.5 h-1.5 rounded-full ${color}`} />
+                      <span className="text-[11px] font-semibold">
+                        {item.status}
+                      </span>
+                    </div>
+                  </div>
+                );
+              });
+            })()}
           </CardContent>
         </Card>
 

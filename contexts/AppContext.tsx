@@ -11,6 +11,14 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { removeCookies } from "cookies-next";
+import {
+  getInstitutionFromCache,
+  setInstitutionInCache,
+  getCurrentUrlOrigin,
+  clearInstitutionCache,
+  isLocalhost,
+} from "@/lib/institution-cache";
+import { getInstituionByParams } from "@/helpers/FetchWrapper";
 
 interface UserData {
   id: number;
@@ -37,6 +45,8 @@ interface UserData {
   };
 }
 
+// InstitutionData is imported from institution-cache
+
 interface AppState {
   // User data
   userData: UserData | null;
@@ -55,6 +65,12 @@ interface AppState {
   // Sidebar state
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+
+  // Institution data
+  institutionData: InstitutionData | null;
+  institutionLoading: boolean;
+  loadInstitution: (institutionId?: number | string | null, url?: string | null) => Promise<void>;
+  refreshInstitution: () => Promise<void>;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -65,9 +81,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [count, setCount] = useState(0);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [institutionData, setInstitutionData] = useState<InstitutionData | null>(null);
+  const [institutionLoading, setInstitutionLoading] = useState(false);
   const hasInitiallyLoaded = useRef(false);
   const retryCount = useRef(0);
   const maxRetries = 3;
+  const institutionFetchingRef = useRef(false);
   const router = useRouter();
 
   const loadUserData = useCallback(() => {
@@ -216,14 +235,183 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         (window as any).__APP_USER_DATA = null;
       }
 
+      // Clear institution data
+      setInstitutionData(null);
+      if (userData?.institution_id) {
+        clearInstitutionCache(userData.institution_id, null);
+      }
+      const currentUrl = typeof window !== "undefined" ? getCurrentUrlOrigin() : null;
+      if (currentUrl) {
+        clearInstitutionCache(null, currentUrl);
+      }
+
       // Reset retry count
       retryCount.current = 0;
     }
-  }, []);
+  }, [userData]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
+
+  const loadInstitution = useCallback(
+    async (institutionId?: number | string | null, url?: string | null) => {
+      if (institutionFetchingRef.current) return;
+
+      // Determine which institution to fetch
+      let targetInstitutionId = institutionId || userData?.institution_id || null;
+      let targetUrl = url || (typeof window !== "undefined" ? getCurrentUrlOrigin() : null);
+
+      // For localhost, always use institution ID 1
+      if (!targetInstitutionId && (!targetUrl || isLocalhost(targetUrl))) {
+        targetInstitutionId = 1;
+        targetUrl = null;
+      }
+
+      // Check cache first
+      const cached = getInstitutionFromCache(targetInstitutionId, targetUrl);
+      if (cached) {
+        setInstitutionData(cached);
+        setInstitutionLoading(false);
+        return;
+      }
+
+      // Fetch from database
+      institutionFetchingRef.current = true;
+      setInstitutionLoading(true);
+
+      try {
+        let fetchedInstitution: any = null;
+
+        // Try URL-based lookup first (for public pages, but skip localhost)
+        if (targetUrl && !isLocalhost(targetUrl)) {
+          try {
+            fetchedInstitution = await getInstituionByParams({ url: targetUrl }, {});
+            if (
+              fetchedInstitution &&
+              typeof fetchedInstitution === "object" &&
+              fetchedInstitution.id
+            ) {
+              setInstitutionInCache(fetchedInstitution, fetchedInstitution.id, targetUrl);
+              setInstitutionData(fetchedInstitution);
+              setInstitutionLoading(false);
+              institutionFetchingRef.current = false;
+              return;
+            }
+          } catch (urlError) {
+            // Silently fail URL lookup, will fallback to ID
+          }
+        }
+
+        // Fallback to ID-based lookup
+        if (!fetchedInstitution && targetInstitutionId) {
+          try {
+            fetchedInstitution = await getInstituionByParams(
+              { id: String(targetInstitutionId) },
+              {}
+            );
+            if (
+              fetchedInstitution &&
+              typeof fetchedInstitution === "object" &&
+              fetchedInstitution.id
+            ) {
+              setInstitutionInCache(fetchedInstitution, targetInstitutionId, targetUrl);
+              setInstitutionData(fetchedInstitution);
+              setInstitutionLoading(false);
+              institutionFetchingRef.current = false;
+              return;
+            }
+          } catch (idError) {
+            // Log error but continue to fallback
+            if (process.env.NODE_ENV === "development") {
+              console.error("Failed to fetch institution by ID:", idError);
+            }
+          }
+        }
+
+        // Final fallback to default institution (ID: 1)
+        // This handles cases where URL lookup fails or for localhost
+        if (!fetchedInstitution) {
+          try {
+            fetchedInstitution = await getInstituionByParams({ id: "1" }, {});
+            if (
+              fetchedInstitution &&
+              typeof fetchedInstitution === "object" &&
+              fetchedInstitution.id
+            ) {
+              // Cache with the institution ID, not the URL
+              setInstitutionInCache(fetchedInstitution, 1, null);
+              setInstitutionData(fetchedInstitution);
+            }
+          } catch (defaultError) {
+            if (process.env.NODE_ENV === "development") {
+              console.error("Failed to fetch default institution:", defaultError);
+            }
+          }
+        }
+      } catch (error) {
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error loading institution:", error);
+        }
+      } finally {
+        setInstitutionLoading(false);
+        institutionFetchingRef.current = false;
+      }
+    },
+    [userData]
+  );
+
+  const refreshInstitution = useCallback(async () => {
+    // Clear current institution data state
+    setInstitutionData(null);
+    
+    // Clear cache to force refetch
+    if (userData?.institution_id) {
+      clearInstitutionCache(userData.institution_id, null);
+    }
+    // Also clear any cached data for the old institution (if it exists and differs)
+    if (institutionData?.id && institutionData.id !== userData?.institution_id) {
+      clearInstitutionCache(institutionData.id, null);
+    }
+    
+    const currentUrl = typeof window !== "undefined" ? getCurrentUrlOrigin() : null;
+    if (currentUrl) {
+      clearInstitutionCache(null, currentUrl);
+    }
+
+    // Reload institution
+    await loadInstitution();
+  }, [loadInstitution, userData, institutionData]);
+
+  // Load institution when user data is available
+  // Also refresh if institution_id changes (user switched institutions)
+  useEffect(() => {
+    if (userData?.institution_id) {
+      // Check if context has wrong institution data
+      const hasWrongInstitution = 
+        institutionData && 
+        institutionData.id !== userData.institution_id;
+      
+      // If no institution data or wrong institution, load it
+      if (!institutionData || hasWrongInstitution) {
+        if (hasWrongInstitution) {
+          // Clear wrong institution cache
+          clearInstitutionCache(institutionData.id, null);
+        }
+        loadInstitution();
+      }
+    } else if (userData === null && institutionData) {
+      // User logged out, clear institution data
+      setInstitutionData(null);
+      // Clear all institution caches
+      if (typeof window !== "undefined") {
+        const currentUrl = getCurrentUrlOrigin();
+        if (currentUrl) {
+          clearInstitutionCache(null, currentUrl);
+        }
+      }
+    }
+  }, [userData, institutionData, institutionLoading, loadInstitution]);
 
   useEffect(() => {
     // Add a delay before loading user data to ensure loading state is visible
@@ -274,6 +462,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         toggleTheme,
         sidebarOpen,
         setSidebarOpen,
+        institutionData,
+        institutionLoading,
+        loadInstitution,
+        refreshInstitution,
       }}
     >
       {children}

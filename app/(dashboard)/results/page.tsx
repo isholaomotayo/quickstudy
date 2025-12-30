@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { ResultsClient } from "@/app/(simple)/results/results-client";
-import ResultsSkeleton from "@/app/(simple)/results/loading";
+import { ResultsClient } from "@/app/(dashboard)/results/results-client";
+import ResultsSkeleton from "@/app/(dashboard)/results/loading";
 import { CgpaClient } from "./cgpa-client";
 import CgpaLoading from "./cgpa-loading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

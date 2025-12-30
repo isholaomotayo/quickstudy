@@ -13,14 +13,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-    Plus,
-    Receipt,
-    Calendar, CheckCircle,
-    Clock,
-    Trash2,
-    ShoppingCart
-} from "lucide-react";
+import { Receipt, Calendar, Trash2, ShoppingCart } from "lucide-react";
+import PaymentHistoryList from "./payment-history-list";
 
 interface PaymentItem {
   id: string;
@@ -40,12 +34,28 @@ interface CartItem extends PaymentItem {
   ref_id: string;
 }
 
+interface PaymentHistory {
+  id: string;
+  amount: number;
+  processor: string;
+  reference: string;
+  status: boolean | number;
+  created_at: string;
+  cart: Record<string, any> | string;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+}
+
 interface PaymentClientWrapperProps {
   fixedDues: PaymentItem[];
   flexibleDues: Record<string, PaymentItem[]>;
   userData: any;
   paymentDetails: any;
   payment_plan_options: Record<string, { title: string }>;
+  paymentsHistory?: PaymentHistory[];
+  isHigherAccess?: boolean;
+  showHistory?: boolean;
 }
 
 // Cart persistence utilities
@@ -107,6 +117,9 @@ export default function PaymentClientWrapper({
   userData,
   paymentDetails,
   payment_plan_options,
+  paymentsHistory = [],
+  isHigherAccess = false,
+  showHistory = false,
 }: PaymentClientWrapperProps) {
   const [mounted, setMounted] = useState(false);
   const [cartState, setCartState] = useState<Record<string, CartItem>>({});
@@ -357,249 +370,241 @@ export default function PaymentClientWrapper({
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* Payment Cart */}
-      <div className="lg:col-span-4 space-y-6">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="space-y-5">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+          <Card className="bg-card border border-border shadow-lg">
+            <CardHeader className="space-y-1">
+              <CardTitle className="flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-primary" />
+                Fixed Fees
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                One-time items that can be paid independently.
+              </p>
+            </CardHeader>
+            <CardContent>
+              {!fixedDues || fixedDues.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Receipt className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">No fixed fees available</p>
+                </div>
+              ) : (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {fixedDues.map((due, i) => {
+                    const rowID = `i-${i}`;
+                    const addedToCart = rowInState(due.id, rowID);
+                    return (
+                      <Button
+                        key={rowID}
+                        onClick={() => addToCart(due, rowID)}
+                        disabled={addedToCart}
+                        variant={addedToCart ? "secondary" : "outline"}
+                        size="sm"
+                        className="h-auto w-full items-start justify-between gap-2 whitespace-normal rounded-md border-border/70 px-3 py-2 text-left"
+                      >
+                        <div className="space-y-1">
+                          <div className="text-sm font-semibold">
+                            {due.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            ₦{due.unit_price.toLocaleString()}
+                          </div>
+                        </div>
+                        <span className="text-xs font-semibold text-primary">
+                          {addedToCart ? "Added" : "Add"}
+                        </span>
+                      </Button>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border border-border shadow-lg">
+            <CardHeader className="space-y-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  Flexible Fees
+                </CardTitle>
+                <Select value={activePayPlan} onValueChange={handlePlanChange}>
+                  <SelectTrigger className="w-full sm:w-56">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(payment_plan_options).map(
+                      ([plan, planDetails]) => (
+                        <SelectItem key={plan} value={plan}>
+                          {planDetails.title}
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Pay in sequence based on your selected plan.
+              </p>
+            </CardHeader>
+            <CardContent>
+              {!flexibleDues[activePayPlan] ||
+              flexibleDues[activePayPlan].length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calendar className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">
+                    No flexible fees available for{" "}
+                    {payment_plan_options[activePayPlan]?.title}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(() => {
+                    let lastRowItem: PaymentItem | null = null;
+                    return flexibleDues[activePayPlan]?.map((due, i) => {
+                      const rowID = `j-${i}`;
+                      const addedToCart = rowInState(due.id, rowID);
+                      const buttonEnabled = getButtonEnabled(
+                        due,
+                        rowID,
+                        lastRowItem
+                      );
+                      lastRowItem = due;
+
+                      return (
+                        <Button
+                          key={rowID}
+                          onClick={() => addToCart(due, rowID, activePayPlan)}
+                          disabled={addedToCart || !buttonEnabled}
+                          variant={addedToCart ? "secondary" : "outline"}
+                          size="sm"
+                          className="h-auto w-full items-start justify-between gap-2 whitespace-normal rounded-md border-border/70 px-3 py-2 text-left disabled:opacity-60"
+                        >
+                          <div className="space-y-1">
+                            <div className="text-sm font-semibold">
+                              {due.name}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              ₦{due.unit_price.toLocaleString()}
+                            </div>
+                          </div>
+                          <span className="text-xs font-semibold text-primary">
+                            {addedToCart
+                              ? "Added"
+                              : !buttonEnabled
+                              ? "Pay Prev"
+                              : "Add"}
+                          </span>
+                        </Button>
+                      );
+                    });
+                  })()}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {showHistory && (
+          <PaymentHistoryList
+            paymentsHistory={paymentsHistory}
+            isHigherAccess={isHigherAccess}
+            userData={userData}
+            title="Payment History"
+          />
+        )}
+      </div>
+
+      <div className="space-y-6">
         <Card className="bg-card border border-border shadow-xl sticky top-24 py-0">
-          <CardHeader className="bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground rounded-t-lg">
-            <CardTitle className="flex items-center gap-2">
-              <ShoppingCart className="w-5 h-15" />
+          <CardHeader className="bg-primary text-primary-foreground rounded-t-lg py-3">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <ShoppingCart className="w-5 h-5" />
               Payment Cart
               {Object.keys(cartState).length > 0 && (
-                <span className="text-sm bg-primary-foreground/20 px-2 py-1 rounded-full">
+                <span className="text-[11px] bg-primary-foreground/20 px-2 py-1 rounded-full uppercase tracking-wide">
                   {Object.keys(cartState).length} item
                   {Object.keys(cartState).length !== 1 ? "s" : ""}
                 </span>
               )}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="space-y-4">
               {Object.keys(cartState).length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ShoppingCart className="w-12 h-12 mx-auto mb-2 opacity-30" />
+                <div className="text-center py-6 text-muted-foreground">
+                  <ShoppingCart className="w-10 h-10 mx-auto mb-2 opacity-30" />
                   <p className="text-sm">Your cart is empty</p>
                   <p className="text-xs">Add items from the payment list</p>
                 </div>
               ) : (
                 <>
-                  <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm font-semibold">
+                    <span>Total</span>
+                    <span className="text-emerald-600 dark:text-emerald-300">
+                      ₦{cartSum.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      onClick={payWithPaystack}
+                      disabled={!Object.keys(cartState).length}
+                      className="bg-primary text-primary-foreground hover:opacity-90 shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                      size="sm"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      <span className="ml-2">Pay</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={clearCart}
+                      className="h-9 text-xs"
+                      size="sm"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span className="ml-2">Clear</span>
+                    </Button>
+                  </div>
+                  <Separator />
+                  <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
                     {Object.entries(cartState).map(([feeID, lineItem], i) => (
                       <div
                         key={`cart_item_${i}`}
-                        className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/60"
+                        className="flex items-start justify-between gap-3 rounded-lg border border-border/70 bg-muted/20 px-3 py-2"
                       >
-                        <div className="flex-1">
-                          <h4 className="font-medium text-sm">
+                        <div className="flex-1 space-y-1">
+                          <div className="text-sm font-semibold text-foreground">
                             {lineItem.name.split(":")[0]}
-                          </h4>
-                          <p className="text-xs text-muted-foreground">
-                            Qty: {lineItem.quantity} • Plan: {lineItem.fee_plan}
-                          </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                            <span className="rounded-full bg-muted px-2 py-0.5">
+                              Qty {lineItem.quantity}
+                            </span>
+                            <span className="rounded-full bg-muted px-2 py-0.5">
+                              Plan {lineItem.fee_plan}
+                            </span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold">
+                          <span className="text-sm font-semibold">
                             ₦{lineItem.subtotal.toLocaleString()}
                           </span>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => removeFromCart(feeID)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
-                            <Trash2 className="w-3 h-3" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                       </div>
                     ))}
                   </div>
-                  <Separator />
-                  <div className="flex justify-between items-center font-bold text-lg">
-                    <span>Total:</span>
-                    <span className="text-emerald-600 dark:text-emerald-300">
-                      ₦{cartSum.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="space-y-2">
-                    <Button
-                      onClick={payWithPaystack}
-                      disabled={!Object.keys(cartState).length}
-                      className="w-full bg-gradient-to-r from-primary to-emerald-500 text-primary-foreground hover:opacity-90 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                      size="lg"
-                    >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Make Payment
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={clearCart}
-                      className="w-full"
-                      size="sm"
-                    >
-                      Clear Cart
-                    </Button>
-                  </div>
                 </>
               )}
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Payment Items */}
-      <div className="lg:col-span-8 space-y-6">
-        {/* Fixed Fees */}
-        <Card className="bg-card border border-border shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-primary" />
-              Fixed Fees
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!fixedDues || fixedDues.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Receipt className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                <p className="text-sm">No fixed fees available</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {fixedDues.map((due, i) => {
-                  const rowID = `i-${i}`;
-                  const addedToCart = rowInState(due.id, rowID);
-                  return (
-                    <div
-                      key={rowID}
-                      className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/60"
-                    >
-                      <div>
-                        <h4 className="font-medium">{due.name}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          ₦{due.unit_price.toLocaleString()}
-                        </p>
-                      </div>
-                      <Button
-                        onClick={() => addToCart(due, rowID)}
-                        disabled={addedToCart}
-                        variant={addedToCart ? "secondary" : "default"}
-                        size="sm"
-                        className={
-                          addedToCart ? "" : "bg-primary hover:opacity-90"
-                        }
-                      >
-                        {addedToCart ? (
-                          <>
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Added
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add to Cart
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Flexible Fees */}
-        <Card className="bg-card border border-border shadow-lg">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-primary" />
-                Flexible Fees
-              </CardTitle>
-              <Select value={activePayPlan} onValueChange={handlePlanChange}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(payment_plan_options).map(
-                    ([plan, planDetails]) => (
-                      <SelectItem key={plan} value={plan}>
-                        {planDetails.title}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {!flexibleDues[activePayPlan] ||
-            flexibleDues[activePayPlan].length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Calendar className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                <p className="text-sm">
-                  No flexible fees available for{" "}
-                  {payment_plan_options[activePayPlan]?.title}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {(() => {
-                  let lastRowItem: PaymentItem | null = null;
-                  return flexibleDues[activePayPlan]?.map((due, i) => {
-                    const rowID = `j-${i}`;
-                    const addedToCart = rowInState(due.id, rowID);
-                    const buttonEnabled = getButtonEnabled(
-                      due,
-                      rowID,
-                      lastRowItem
-                    );
-                    lastRowItem = due;
-
-                    return (
-                      <div
-                        key={rowID}
-                        className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/60"
-                      >
-                        <div>
-                          <h4 className="font-medium">{due.name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            ₦{due.unit_price.toLocaleString()}
-                          </p>
-                        </div>
-                        <Button
-                          onClick={() => addToCart(due, rowID, activePayPlan)}
-                          disabled={addedToCart || !buttonEnabled}
-                          variant={addedToCart ? "secondary" : "default"}
-                          size="sm"
-                          className={
-                            addedToCart
-                              ? ""
-                              : "bg-primary hover:opacity-90 disabled:opacity-50"
-                          }
-                        >
-                          {addedToCart ? (
-                            <>
-                              <CheckCircle className="w-4 h-4 mr-2" />
-                              Added
-                            </>
-                          ) : !buttonEnabled ? (
-                            <>
-                              <Clock className="w-4 h-4 mr-2" />
-                              Pay Previous First
-                            </>
-                          ) : (
-                            <>
-                              <Plus className="w-4 h-4 mr-2" />
-                              Add to Cart
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    );
-                  });
-                })()}
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>

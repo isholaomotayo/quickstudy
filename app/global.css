@@ -133,3 +133,14 @@
 .dark .glass-card {
   background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.01), transparent);
 }
+
+@keyframes slideDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

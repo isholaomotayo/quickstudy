@@ -41,10 +41,10 @@ import {
   postStudent,
   postAffiliate,
   getAllProgrammes,
-  getInstituionByParams,
 } from "../../../helpers/FetchWrapper";
 import statesData from "../../../helpers/states.js";
 import { useApp } from "../../../contexts/AppContext";
+import { useInstitutionByUrl } from "../../../hooks/useInstitution";
 
 interface ApplicationFormData {
   // Personal Information
@@ -168,6 +168,8 @@ const STORAGE_KEY = "application_form_data";
 export default function ApplicationStart() {
   const router = useRouter();
   const { userData, isLoading: userLoading } = useApp();
+  const { institution, isLoading: isLoadingInstitution } =
+    useInstitutionByUrl();
 
   const [formData, setFormData] = useState<ApplicationFormData>({
     firstName: "",
@@ -218,7 +220,6 @@ export default function ApplicationStart() {
     isLoading: false,
     isSaving: false,
     error: "",
-    institution: null as any,
     hasUnsavedChanges: false,
     uploadingPassportPhoto: false,
     uploadingIdentityDocument: false,
@@ -316,9 +317,24 @@ export default function ApplicationStart() {
     };
 
     loadApplicationData();
-    loadInstitution();
     loadPrograms();
   }, []);
+
+  // Update institution_id when institution loads from hook
+  useEffect(() => {
+    if (institution?.id) {
+      setFormData((prev) => ({
+        ...prev,
+        institution_id: String(institution.id),
+      }));
+    } else if (!isLoadingInstitution && !institution) {
+      // If loading is complete and no institution found, ensure we use ID 1
+      setFormData((prev) => ({
+        ...prev,
+        institution_id: "1",
+      }));
+    }
+  }, [institution, isLoadingInstitution]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -344,74 +360,8 @@ export default function ApplicationStart() {
     }
   }, [hasLoadedFromStorage]);
 
-  const loadInstitution = async () => {
-    try {
-      // Get current URL from window location
-      const currentUrl = typeof window !== "undefined" ? window.location.origin : "";
-      
-      // Try to fetch by URL first, fallback to ID if URL fails
-      let institution: any = null;
-      if (currentUrl) {
-        try {
-          institution = await getInstituionByParams({ url: currentUrl }, {});
-        } catch (urlError) {
-          console.warn("Failed to fetch institution by URL, trying ID:", urlError);
-        }
-      }
-      
-      // Check if institution is valid (has id property)
-      const hasValidId = institution && 
-        typeof institution === "object" && 
-        "id" in institution && 
-        institution.id;
-      
-      // Fallback to ID if URL lookup failed or returned empty
-      if (!hasValidId) {
-        institution = await getInstituionByParams({ id: "1" }, {});
-      }
-      
-      // Ensure we have a valid institution object
-      const isValidInstitution = institution && 
-        typeof institution === "object" && 
-        "id" in institution && 
-        institution.id;
-      
-      if (isValidInstitution && institution) {
-        setUiState((prev) => ({
-          ...prev,
-          institution,
-        }));
-        setFormData((prev) => ({
-          ...prev,
-          institution_id: String(institution.id || "1"),
-        }));
-      } else {
-        console.error("Invalid institution data received:", institution);
-        // Set default values to prevent crashes
-        const defaultInstitution = { id: 1, name: "quickStudy" };
-        setUiState((prev) => ({
-          ...prev,
-          institution: defaultInstitution,
-        }));
-        setFormData((prev) => ({
-          ...prev,
-          institution_id: "1",
-        }));
-      }
-    } catch (error) {
-      console.error("Error loading institution:", error);
-      // Set default values to prevent crashes
-      const defaultInstitution = { id: 1, name: "quickStudy" };
-      setUiState((prev) => ({
-        ...prev,
-        institution: defaultInstitution,
-      }));
-      setFormData((prev) => ({
-        ...prev,
-        institution_id: "1",
-      }));
-    }
-  };
+  // Institution is now loaded via useInstitutionByUrl hook
+  // No need for separate loadInstitution function
 
   const loadPrograms = async () => {
     try {

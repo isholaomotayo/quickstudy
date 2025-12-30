@@ -1,71 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ApplicantNavLayout from "../../components/ApplicantNavLayout";
-import { getInstituionByParams } from "../../helpers/FetchWrapper";
+import { useInstitutionByUrl } from "../../hooks/useInstitution";
 
 export default function ApplyLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [institution, setInstitution] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadInstitution = async () => {
-      try {
-        // Get current URL from window location
-        const currentUrl = typeof window !== "undefined" ? window.location.origin : "";
-        
-        // Try to fetch by URL first, fallback to ID if URL fails
-        let institutionData: any = null;
-        if (currentUrl) {
-          try {
-            institutionData = await getInstituionByParams({ url: currentUrl }, {});
-          } catch (urlError) {
-            console.warn("Failed to fetch institution by URL, trying ID:", urlError);
-          }
-        }
-        
-        // Check if institutionData is valid (has id property)
-        const hasValidId = institutionData && 
-          typeof institutionData === "object" && 
-          "id" in institutionData && 
-          institutionData.id;
-        
-        // Fallback to ID if URL lookup failed or returned empty
-        if (!hasValidId) {
-          institutionData = await getInstituionByParams({ id: "1" }, {});
-        }
-        
-        // Ensure we have a valid institution object
-        const isValidInstitution = institutionData && 
-          typeof institutionData === "object" && 
-          "id" in institutionData && 
-          institutionData.id;
-        
-        if (isValidInstitution) {
-          setInstitution(institutionData);
-        } else {
-          console.error("Invalid institution data received:", institutionData);
-          // Set default institution to prevent crashes
-          setInstitution({ id: 1, name: "quickStudy", logo: null });
-        }
-      } catch (error) {
-        console.error("Error loading institution:", error);
-        // Set default institution if loading fails
-        setInstitution({ id: 1, name: "quickStudy", logo: null });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadInstitution();
-  }, []);
+  // Use the same unified hook that signin uses
+  const { institution, isLoading: isLoadingInstitution } = useInstitutionByUrl();
 
   // Show loading state briefly while institution data loads
-  if (isLoading) {
+  if (isLoadingInstitution) {
     return (
       <ApplicantNavLayout
         institutionName={undefined}

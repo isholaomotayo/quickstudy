@@ -307,6 +307,181 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Fetch payment history for financial summary
+    let financialSummary = {
+      tuition: { status: "Due", count: 0, paid: 0, pending: 0 },
+      registration: { status: "Due", count: 0, paid: 0, pending: 0 },
+      exams: { status: "Due", count: 0, paid: 0, pending: 0 },
+      receipts: { status: "Available", count: 0 },
+    };
+
+    // Payment status constants
+    const PAYMENT_STATUS = {
+      PENDING: 0,
+      PAID: 1,
+      FAILED: 2,
+    } as const;
+
+    // Type definitions for better type safety
+    type PaymentCategory = {
+      status: string;
+      count: number;
+      paid: number;
+      pending: number;
+    };
+
+    type CartItem = {
+      name?: string;
+      unit_price?: number | string;
+      quantity?: number;
+    };
+
+    // Helper function to safely parse payment cart
+    function parsePaymentCart(cart: unknown): CartItem[] {
+      if (!cart) return [];
+
+      try {
+        const parsed =
+          typeof cart === "string" ? JSON.parse(cart) : cart;
+        
+        // Validate that parsed result is an object
+        if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+          return [];
+        }
+
+        // Extract cart items from object
+        return Object.values(parsed) as CartItem[];
+      } catch (error) {
+        console.error("Error parsing payment cart", {
+          error: error instanceof Error ? error.message : "Unknown error",
+          cartType: typeof cart,
+        });
+        return [];
+      }
+    }
+
+    // Helper function to categorize item by name
+    function categorizeItemName(
+      name: string
+    ): "tuition" | "registration" | "exams" | null {
+      const normalized = name.toLowerCase().trim();
+      
+      if (
+        normalized.includes("tuition") ||
+        normalized.includes("school fee") ||
+        normalized.includes("school fees")
+      ) {
+        return "tuition";
+      }
+      
+      if (
+        normalized.includes("registration") ||
+        normalized.includes("registration fee")
+      ) {
+        return "registration";
+      }
+      
+      if (
+        normalized.includes("exam") ||
+        normalized.includes("examination") ||
+        normalized.includes("exam fee")
+      ) {
+        return "exams";
+      }
+      
+      return null;
+    }
+
+    // Helper function to update category statistics
+    function updateCategoryStats(
+      category: PaymentCategory,
+      status: number
+    ): void {
+      category.count++;
+      if (status === PAYMENT_STATUS.PAID) {
+        category.paid++;
+      } else if (status === PAYMENT_STATUS.PENDING) {
+        category.pending++;
+      }
+    }
+
+    // Helper function to determine category status
+    function determineCategoryStatus(category: PaymentCategory): string {
+      if (category.paid > 0) return "Paid";
+      if (category.pending > 0) return "Pending";
+      return "Due";
+    }
+
+    try {
+      const payments = await prisma.payment2.findMany({
+        where: {
+          student_id: student.id,
+        },
+        select: {
+          id: true,
+          amount: true,
+          status: true,
+          cart: true,
+          reference: true,
+          created_at: true,
+          paid_at: true,
+        },
+        orderBy: {
+          created_at: "desc",
+        },
+        take: 100, // Limit to prevent memory issues with large payment histories
+      });
+
+      // Process payments and categorize
+      payments.forEach((payment) => {
+        const status = payment.status ?? PAYMENT_STATUS.PENDING;
+        const amount = Number(payment.amount) || 0;
+
+        // Count receipts (successful payments)
+        if (status === PAYMENT_STATUS.PAID) {
+          financialSummary.receipts.count++;
+        }
+
+        // Parse and categorize cart items
+        const cartItems = parsePaymentCart(payment.cart);
+
+        if (cartItems.length > 0) {
+          cartItems.forEach((item) => {
+            const itemName = item.name || "";
+            const category = categorizeItemName(itemName);
+
+            if (category) {
+              updateCategoryStats(financialSummary[category], status);
+            }
+          });
+        } else if (amount > 0) {
+          // Fallback for older payments without cart data
+          // Default to tuition category
+          updateCategoryStats(financialSummary.tuition, status);
+        }
+      });
+
+      // Determine final status for each category
+      financialSummary.tuition.status = determineCategoryStatus(
+        financialSummary.tuition
+      );
+      financialSummary.registration.status = determineCategoryStatus(
+        financialSummary.registration
+      );
+      financialSummary.exams.status = determineCategoryStatus(
+        financialSummary.exams
+      );
+      financialSummary.receipts.status =
+        financialSummary.receipts.count > 0 ? "Available" : "None";
+    } catch (error) {
+      console.error("Error fetching payment history for financial summary", {
+        studentId: student.id.toString(),
+        error: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      // Keep default values if there's an error
+    }
+
     // Return dashboard data without duplicating student in userData
     const dashboardData = {
       student: studentData,
@@ -325,6 +500,7 @@ export async function GET(req: NextRequest) {
       },
       isFutureStudent,
       admittedSession,
+      financialSummary,
     };
 
     // Cache the response

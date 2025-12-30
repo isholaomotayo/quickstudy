@@ -21,10 +21,8 @@ import {
   CheckCircle2,
   UserCheck,
 } from "lucide-react";
-import {
-  verifyRefCode,
-  getInstituionByParams,
-} from "../../helpers/FetchWrapper";
+import { verifyRefCode } from "../../helpers/FetchWrapper";
+import { useInstitutionByUrl } from "../../hooks/useInstitution";
 import { userNameValid } from "../../helpers/utils";
 import { registerUser } from "./action";
 
@@ -45,14 +43,13 @@ interface ApplyState {
   showPassword: boolean;
   showConfirmPassword: boolean;
   isLoading: boolean;
-  isLoadingInstitution: boolean;
   error?: string;
-  institution?: any;
 }
 
 function ApplyComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { institution, isLoading: isLoadingInstitution } = useInstitutionByUrl();
 
   const [state, setState] = React.useState<ApplyState>({
     username: "",
@@ -67,81 +64,29 @@ function ApplyComponent() {
     is_affiliate: false,
     bank: "",
     account_no: "",
-    institution_id: "1",
+    institution_id: "1", // Default to 1, will be updated when institution loads
     showPassword: false,
     showConfirmPassword: false,
     isLoading: false,
-    isLoadingInstitution: true,
     error: undefined,
-    institution: null,
   });
 
+  // Update institution_id when institution loads
+  // For localhost or when URL lookup fails, institution will have ID 1
   React.useEffect(() => {
-    const loadInstitution = async () => {
-      try {
-        setState((prev) => ({ ...prev, isLoadingInstitution: true }));
-
-        // Get current URL from window location
-        const currentUrl =
-          typeof window !== "undefined" ? window.location.origin : "";
-
-        // Try to fetch by URL first, fallback to ID if URL fails
-        let institution: any = null;
-        if (currentUrl) {
-          try {
-            institution = await getInstituionByParams({ url: currentUrl }, {});
-          } catch (urlError) {
-            console.warn(
-              "Failed to fetch institution by URL, trying ID:",
-              urlError
-            );
-          }
-        }
-
-        // Check if institution is valid (has id property)
-        const hasValidId =
-          institution &&
-          typeof institution === "object" &&
-          "id" in institution &&
-          institution.id;
-
-        // Fallback to ID if URL lookup failed or returned empty
-        if (!hasValidId) {
-          institution = await getInstituionByParams({ id: "1" }, {});
-        }
-
-        // Ensure we have a valid institution object
-        const isValidInstitution =
-          institution &&
-          typeof institution === "object" &&
-          "id" in institution &&
-          institution.id;
-
-        if (isValidInstitution) {
-          setState((prev) => ({
-            ...prev,
-            institution,
-            institution_id: String(institution.id || "1"),
-            isLoadingInstitution: false,
-          }));
-        } else {
-          console.error("Invalid institution data received:", institution);
-          setState((prev) => ({
-            ...prev,
-            isLoadingInstitution: false,
-          }));
-        }
-      } catch (error) {
-        console.error("Error loading institution:", error);
-        setState((prev) => ({
-          ...prev,
-          isLoadingInstitution: false,
-        }));
-      }
-    };
-
-    loadInstitution();
-  }, []);
+    if (institution?.id) {
+      setState((prev) => ({
+        ...prev,
+        institution_id: String(institution.id),
+      }));
+    } else if (!isLoadingInstitution && !institution) {
+      // If loading is complete and no institution found, ensure we use ID 1
+      setState((prev) => ({
+        ...prev,
+        institution_id: "1",
+      }));
+    }
+  }, [institution, isLoadingInstitution]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -689,13 +634,12 @@ function ApplyComponent() {
                 </div>
 
                 {/* Support Info */}
-                {state.institution?.support_mail || state.institution?.email ? (
+                {institution?.support_mail || institution?.email ? (
                   <div className="text-center pt-4 border-t border-slate-200">
                     <p className="text-sm text-slate-600">
                       For any questions or concerns, send an email to{" "}
                       <strong className="text-teal-700">
-                        {state.institution?.support_mail ||
-                          state.institution?.email}
+                        {institution?.support_mail || institution?.email}
                       </strong>
                     </p>
                   </div>

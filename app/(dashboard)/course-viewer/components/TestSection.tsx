@@ -5,21 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-    FileText,
-    Clock,
-    ExternalLink,
-    Play,
-    CheckCircle,
-    AlertCircle,
-    Plus,
-    Edit,
-    Trash2,
-    Eye,
-    EyeOff,
+  FileText,
+  Clock,
+  ExternalLink,
+  Play,
+  CheckCircle,
+  AlertCircle,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { AssignmentCreatorModal } from "./AssignmentCreatorModal";
 import { AssignmentEditorModal } from "./AssignmentEditorModal";
-import { QuizCreator } from "@/app/(simple)/course/components/QuizCreator";
+import { QuizCreator } from "@/app/(dashboard)/course/components/QuizCreator";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { toast } from "sonner";
 import { api } from "@/lib/api-wrapper";
@@ -83,39 +83,44 @@ export default function TestSection({
       const quizData = await api.get(
         `/api/coursetest/${quiz.id}?questions=true`
       );
-      
+
       // Transform questions from API format to QuizCreator format
       // API returns 'course_questions' not 'questions'
-      const transformedQuestions = quizData.course_questions?.map((q: any) => {
-        // Convert options object to array format
-        let optionsArray: string[] = ["", "", "", ""];
-        let correctAnswer = q.answer || ""; // API returns answer directly
-        
-        if (q.options && typeof q.options === "object" && Object.keys(q.options).length > 0) {
-          // Options exist as object with letter keys
-          const letters = ["A", "B", "C", "D", "E"];
-          letters.forEach((letter, index) => {
-            if (q.options[letter] && q.options[letter].text) {
-              optionsArray[index] = q.options[letter].text;
-              if (q.options[letter].is_answer) {
-                correctAnswer = letter;
+      const transformedQuestions =
+        quizData.course_questions?.map((q: any) => {
+          // Convert options object to array format
+          let optionsArray: string[] = ["", "", "", ""];
+          let correctAnswer = q.answer || ""; // API returns answer directly
+
+          if (
+            q.options &&
+            typeof q.options === "object" &&
+            Object.keys(q.options).length > 0
+          ) {
+            // Options exist as object with letter keys
+            const letters = ["A", "B", "C", "D", "E"];
+            letters.forEach((letter, index) => {
+              if (q.options[letter] && q.options[letter].text) {
+                optionsArray[index] = q.options[letter].text;
+                if (q.options[letter].is_answer) {
+                  correctAnswer = letter;
+                }
               }
-            }
-          });
-        }
-        
-        return {
-          id: q.id,
-          question: q.question || "",
-          details: q.details || "",
-          marks: q.marks || 1,
-          order: q.order || 1,
-          question_type: quizData.format || "quiz",
-          options: optionsArray,
-          correct_answer: correctAnswer,
-        };
-      }) || [];
-      
+            });
+          }
+
+          return {
+            id: q.id,
+            question: q.question || "",
+            details: q.details || "",
+            marks: q.marks || 1,
+            order: q.order || 1,
+            question_type: quizData.format || "quiz",
+            options: optionsArray,
+            correct_answer: correctAnswer,
+          };
+        }) || [];
+
       // Convert deadline from ISO format to datetime-local format (YYYY-MM-DDTHH:mm)
       let formattedDeadline = "";
       if (quizData.deadline) {
@@ -123,17 +128,17 @@ export default function TestSection({
           const date = new Date(quizData.deadline);
           // Format as YYYY-MM-DDTHH:mm for datetime-local input
           const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          const hours = String(date.getHours()).padStart(2, "0");
+          const minutes = String(date.getMinutes()).padStart(2, "0");
           formattedDeadline = `${year}-${month}-${day}T${hours}:${minutes}`;
         } catch (e) {
-          console.error('Error formatting deadline:', e);
+          console.error("Error formatting deadline:", e);
           formattedDeadline = "";
         }
       }
-      
+
       // Transform quiz data to match QuizCreator format
       const transformedQuizData = {
         id: quizData.id,
@@ -150,7 +155,7 @@ export default function TestSection({
         published: quizData.published || false,
         questions: transformedQuestions,
       };
-      
+
       setSelectedQuiz(transformedQuizData);
       setShowQuizEditor(true);
     } catch (error) {
@@ -178,16 +183,24 @@ export default function TestSection({
       }
     } catch (error: any) {
       console.error("Error deleting quiz:", error);
-      
+
       // Handle specific error cases from api-wrapper error
-      if (error.message?.includes("student") && error.message?.includes("taken")) {
+      if (
+        error.message?.includes("student") &&
+        error.message?.includes("taken")
+      ) {
         toast.error(error.message);
-      } else if (error.message?.includes("not found") || error.message?.includes("No Rows Deleted")) {
+      } else if (
+        error.message?.includes("not found") ||
+        error.message?.includes("No Rows Deleted")
+      ) {
         toast.error("Quiz not found. It may have been already deleted.");
       } else {
-        toast.error(error.message || "Failed to delete quiz. Please try again.");
+        toast.error(
+          error.message || "Failed to delete quiz. Please try again."
+        );
       }
-      
+
       setShowDeleteConfirm(false);
       setQuizToDelete(null);
     }
@@ -207,9 +220,12 @@ export default function TestSection({
         const existingData = await api.get(
           `/api/coursetest/${quizData.id}?questions=true`
         );
-        
+
         // Delete existing questions
-        if (existingData.course_questions && existingData.course_questions.length > 0) {
+        if (
+          existingData.course_questions &&
+          existingData.course_questions.length > 0
+        ) {
           for (const question of existingData.course_questions) {
             await api.delete(`/api/coursequestion/${question.id}`);
           }
@@ -225,13 +241,13 @@ export default function TestSection({
           let optionsObject: any = null;
           if (question.options && Array.isArray(question.options)) {
             const tempOptions: any = {};
-            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const letters = ["A", "B", "C", "D", "E"];
             question.options.forEach((optionText: string, index: number) => {
               if (optionText && optionText.trim()) {
                 const letter = letters[index];
                 tempOptions[letter] = {
                   text: optionText,
-                  is_answer: question.correct_answer === letter
+                  is_answer: question.correct_answer === letter,
                 };
               }
             });

@@ -2,24 +2,26 @@
 
 import { useState } from "react";
 import {
-    Settings,
-    Plus,
-    Edit,
-    Trash,
-    Eye,
-    EyeOff, FileText,
-    HelpCircle,
-    CheckSquare
+  Settings,
+  Plus,
+  Edit,
+  Trash,
+  Eye,
+  EyeOff,
+  FileText,
+  HelpCircle,
+  CheckSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem, DropdownMenuTrigger
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { LessonCreator } from "@/app/(simple)/course/components/LessonCreator";
-import { QuizCreator } from "@/app/(simple)/course/components/QuizCreator";
+import { LessonCreator } from "@/app/(dashboard)/course/components/LessonCreator";
+import { QuizCreator } from "@/app/(dashboard)/course/components/QuizCreator";
 import { AssignmentCreatorModal } from "./AssignmentCreatorModal";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { toast } from "sonner";
@@ -210,7 +212,7 @@ export function AdminToolbar({
       // Debug logging
       console.log("Full testResponse:", testResponse);
       console.log("testResponse.data:", testResponse.data);
-      
+
       // Extract the test data from the API response
       // The API returns { success: true, data: testObject, user: ... }
       // So we need testResponse.data.data to get the actual test object
@@ -224,19 +226,21 @@ export function AdminToolbar({
 
       // Create questions for the quiz
       if (questions && questions.length > 0) {
-        console.log(`Creating ${questions.length} questions for test ID: ${test.id}`);
+        console.log(
+          `Creating ${questions.length} questions for test ID: ${test.id}`
+        );
         for (const question of questions) {
           // Transform options array to object format
           let optionsObject: any = null;
           if (question.options && Array.isArray(question.options)) {
             const tempOptions: any = {};
-            const letters = ['A', 'B', 'C', 'D', 'E'];
+            const letters = ["A", "B", "C", "D", "E"];
             question.options.forEach((optionText: string, index: number) => {
               if (optionText && optionText.trim()) {
                 const letter = letters[index];
                 tempOptions[letter] = {
                   text: optionText,
-                  is_answer: question.correct_answer === letter
+                  is_answer: question.correct_answer === letter,
                 };
               }
             });
@@ -358,7 +362,9 @@ export function AdminToolbar({
               </div>
               <div className="text-xs">
                 <span className="font-medium text-foreground">Lessons:</span>
-                <div className="text-muted-foreground">{courseLessons.length}</div>
+                <div className="text-muted-foreground">
+                  {courseLessons.length}
+                </div>
               </div>
               <div className="text-xs">
                 <span className="font-medium text-foreground">Tests:</span>
