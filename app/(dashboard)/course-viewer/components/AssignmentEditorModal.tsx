@@ -179,9 +179,6 @@ export function AssignmentEditorModal({
 
     setLoading(true);
     try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
       // Convert deadline to proper ISO format if it exists
       const requestData = {
         ...finalAssignment,

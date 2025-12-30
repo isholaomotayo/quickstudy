@@ -45,6 +45,7 @@ interface ApplyState {
   showPassword: boolean;
   showConfirmPassword: boolean;
   isLoading: boolean;
+  isLoadingInstitution: boolean;
   error?: string;
   institution?: any;
 }
@@ -70,6 +71,7 @@ function ApplyComponent() {
     showPassword: false,
     showConfirmPassword: false,
     isLoading: false,
+    isLoadingInstitution: true,
     error: undefined,
     institution: null,
   });
@@ -77,6 +79,8 @@ function ApplyComponent() {
   React.useEffect(() => {
     const loadInstitution = async () => {
       try {
+        setState((prev) => ({ ...prev, isLoadingInstitution: true }));
+
         // Get current URL from window location
         const currentUrl =
           typeof window !== "undefined" ? window.location.origin : "";
@@ -118,23 +122,20 @@ function ApplyComponent() {
             ...prev,
             institution,
             institution_id: String(institution.id || "1"),
+            isLoadingInstitution: false,
           }));
         } else {
           console.error("Invalid institution data received:", institution);
-          // Set default values to prevent crashes
           setState((prev) => ({
             ...prev,
-            institution: { id: 1, name: "quickStudy" },
-            institution_id: "1",
+            isLoadingInstitution: false,
           }));
         }
       } catch (error) {
         console.error("Error loading institution:", error);
-        // Set default values to prevent crashes
         setState((prev) => ({
           ...prev,
-          institution: { id: 1, name: "quickStudy" },
-          institution_id: "1",
+          isLoadingInstitution: false,
         }));
       }
     };
@@ -265,24 +266,6 @@ function ApplyComponent() {
       <div className="relative min-h-screen flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
           <div className="space-y-8">
-            <div className="flex items-center justify-center lg:justify-start gap-4">
-              {state.institution?.logo && (
-                <img
-                  className="h-14 w-auto"
-                  src={state.institution?.logo}
-                  alt="Institution Logo"
-                />
-              )}
-              <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
-                  Application Portal
-                </p>
-                <h1 className="text-3xl font-semibold text-slate-900">
-                  {state.institution?.name || "quickStudy"}
-                </h1>
-              </div>
-            </div>
-
             <div className="space-y-4">
               <h2 className="text-4xl lg:text-5xl font-semibold text-slate-900 leading-tight">
                 Start your application with confidence

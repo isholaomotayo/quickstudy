@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { getServerApiUrl } from '@/lib/server-api-url';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +14,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('Batch GPA calculation request body:', JSON.stringify(body, null, 2));
 
-    // Build backend URL
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-    const gpaUrl = `${backendUrl}/api/studentgpa/batch`;
+    // Construct absolute URL for server-side fetch
+    const gpaUrl = getServerApiUrl(request, `/api/studentgpa/batch`);
 
     // Forward the request to backend
     const response = await fetch(gpaUrl, {

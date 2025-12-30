@@ -16,7 +16,7 @@ interface ApplicantNavLayoutProps {
 
 export default function ApplicantNavLayout({
   children,
-  institutionName = "quickStudy",
+  institutionName,
   institutionLogo,
 }: ApplicantNavLayoutProps) {
   const router = useRouter();
@@ -112,27 +112,29 @@ export default function ApplicantNavLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo and Institution Name */}
-            <div className="flex items-center space-x-3">
-              {institutionLogo ? (
-                <img
-                  src={institutionLogo}
-                  alt={`${institutionName} Logo`}
-                  className="h-8 w-auto"
-                />
-              ) : (
-                <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">
-                    {institutionName.charAt(0)}
+            {institutionName && (
+              <div className="flex items-center space-x-3">
+                {institutionLogo ? (
+                  <img
+                    src={institutionLogo}
+                    alt={`${institutionName} Logo`}
+                    className="h-8 w-auto"
+                  />
+                ) : (
+                  <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">
+                      {institutionName.charAt(0)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="text-lg font-semibold text-gray-900">
+                    {institutionName}
                   </span>
+                  <span className="text-xs text-gray-500">Application Portal</span>
                 </div>
-              )}
-              <div className="flex flex-col">
-                <span className="text-lg font-semibold text-gray-900">
-                  {institutionName}
-                </span>
-                <span className="text-xs text-gray-500">Application Portal</span>
               </div>
-            </div>
+            )}
 
             {/* User Info and Logout */}
             <div className="flex items-center space-x-4">
@@ -170,7 +172,9 @@ export default function ApplicantNavLayout({
       <footer className="bg-white/50 backdrop-blur-sm border-t border-gray-200/50 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="text-center text-sm text-gray-500">
-            <p>&copy; {new Date().getFullYear()} {institutionName}. All rights reserved.</p>
+            {institutionName && (
+              <p>&copy; {new Date().getFullYear()} {institutionName}. All rights reserved.</p>
+            )}
           </div>
         </div>
       </footer>

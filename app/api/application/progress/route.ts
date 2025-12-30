@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { getServerApiUrl } from "@/lib/server-api-url";
 
 // Simple in-memory storage for demo (use database in production)
 const applicationStorage = new Map();
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
 
       // First, get the existing student record to get the student ID
       const existingStudentResponse = await fetch(
-        `${process.env.API_URL}/api/student/userid/${userId}`,
+        getServerApiUrl(request, `/api/student/userid/${userId}`),
         {
           method: "GET",
           headers: {
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
       if (studentId) {
         // Update existing student record using PUT
         backendResponse = await fetch(
-          `${process.env.API_URL}/api/student/${studentId}`,
+          getServerApiUrl(request, `/api/student/${studentId}`),
           {
             method: "PUT",
             headers: {
@@ -160,7 +161,7 @@ export async function POST(request: NextRequest) {
         );
       } else {
         // Create new student record using POST
-        backendResponse = await fetch(`${process.env.API_URL}/api/student`, {
+        backendResponse = await fetch(getServerApiUrl(request, `/api/student`), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -183,7 +184,7 @@ export async function POST(request: NextRequest) {
 
         try {
           const avatarResponse = await fetch(
-            `${process.env.API_URL}/api/user/${userId}`,
+            getServerApiUrl(request, `/api/user/${userId}`),
             {
               method: "PUT",
               headers: {

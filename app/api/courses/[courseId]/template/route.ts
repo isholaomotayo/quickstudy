@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { getServerApiUrl } from '@/lib/server-api-url';
 
 export async function GET(
   request: NextRequest,
@@ -16,15 +17,15 @@ export async function GET(
     const cookieStore = await cookies();
     const cookieString = cookieStore.toString();
 
-    // Build backend URL with query parameters
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-    let templateUrl = `${backendUrl}/api/studentresult/template/${courseId}`;
+    // Construct absolute URL with query parameters
+    let templateUrl = `/api/studentresult/template/${courseId}`;
     if (semesterId) {
       templateUrl += `?semester_id=${semesterId}`;
     }
+    const absoluteUrl = getServerApiUrl(request, templateUrl);
 
     // Call the backend API
-    const response = await fetch(templateUrl, {
+    const response = await fetch(absoluteUrl, {
       method: 'GET',
       credentials: 'include',
       headers: {

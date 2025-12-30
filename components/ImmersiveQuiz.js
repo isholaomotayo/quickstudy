@@ -17,7 +17,7 @@ import {
 import { translateCode } from "../helpers/language/translate";
 // import CountdownClock from "./CountdownClock";
 
-const API_URL = process.env.API_URL;
+// Using relative URLs for API calls
 const defaultFontFamily =
   'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
 
@@ -224,7 +224,7 @@ export default function ImmersiveQuiz({
       course_test_id: courseTest?.id,
     };
 
-    const response = await fetch(`${API_URL}/api/studenttest/start`, {
+    const response = await fetch(`/api/studenttest/start`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
@@ -280,7 +280,7 @@ export default function ImmersiveQuiz({
       }
     });
 
-    const response = await fetch(`${API_URL}/api/studenttest/finish`, {
+    const response = await fetch(`/api/studenttest/finish`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

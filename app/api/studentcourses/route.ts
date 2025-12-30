@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { getServerApiUrl } from '@/lib/server-api-url';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,8 +16,7 @@ export async function GET(request: NextRequest) {
     const cookieString = cookieStore.toString();
 
     // Call the backend API
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-    const response = await fetch(`${backendUrl}/api/studentcourse?${queryString}`, {
+    const response = await fetch(getServerApiUrl(request, `/api/studentcourse?${queryString}`), {
       method: 'GET',
       credentials: 'include',
       headers: {

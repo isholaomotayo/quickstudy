@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { getServerApiUrl } from "@/lib/server-api-url";
 
 // Define types for the API responses
 interface UserData {
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     // Get student data from backend
     const studentResponse = await fetch(
-      `${process.env.API_URL}/api/student/userid/${userId}`,
+      getServerApiUrl(request, `/api/student/userid/${userId}`),
       {
         method: "GET",
         headers: {
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
 
     // Get user data for avatar
     const userResponse = await fetch(
-      `${process.env.API_URL}/api/user/${userId}`,
+      getServerApiUrl(request, `/api/user/${userId}`),
       {
         method: "GET",
         headers: {

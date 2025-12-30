@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { getServerApiUrl } from '@/lib/server-api-url';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +14,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('Request body received:', JSON.stringify(body, null, 2));
 
-    // Build backend URL
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-    const uploadUrl = `${backendUrl}/api/studentresult`;
+    // Construct absolute URL for server-side fetch
+    const uploadUrl = getServerApiUrl(request, `/api/studentresult`);
 
     // Forward the request to backend
     const response = await fetch(uploadUrl, {

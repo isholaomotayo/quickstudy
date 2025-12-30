@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { getServerApiUrl } from '@/lib/server-api-url';
 
 export async function DELETE(
   request: NextRequest,
@@ -13,9 +14,8 @@ export async function DELETE(
     const cookieStore = await cookies();
     const cookieString = cookieStore.toString();
 
-    // Build backend URL
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-    const deleteUrl = `${backendUrl}/api/studentresult/${id}`;
+    // Construct absolute URL for server-side fetch
+    const deleteUrl = getServerApiUrl(request, `/api/studentresult/${id}`);
 
     // Forward the DELETE request to backend
     const response = await fetch(deleteUrl, {
@@ -63,9 +63,8 @@ export async function PUT(
     const cookieStore = await cookies();
     const cookieString = cookieStore.toString();
 
-    // Build backend URL
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-    const updateUrl = `${backendUrl}/api/studentresult/${id}`;
+    // Construct absolute URL for server-side fetch
+    const updateUrl = getServerApiUrl(request, `/api/studentresult/${id}`);
 
     // Forward the PUT request to backend
     const response = await fetch(updateUrl, {

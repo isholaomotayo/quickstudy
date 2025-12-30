@@ -139,10 +139,7 @@ function CoursePageContent() {
   const handleCreateModule = async (moduleData: any) => {
     setIsCreatingModule(true);
     try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
-      const response = await fetch(`${API_URL}/api/coursemodule`, {
+      const response = await fetch(`/api/coursemodule`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -170,11 +167,8 @@ function CoursePageContent() {
 
   const handleUpdateModule = async (moduleData: any) => {
     try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
       const response = await fetch(
-        `${API_URL}/api/coursemodule/${moduleData.id}`,
+        `/api/coursemodule/${moduleData.id}`,
         {
           method: "PUT",
           headers: {
@@ -210,10 +204,7 @@ function CoursePageContent() {
     }
 
     try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
-      const response = await fetch(`${API_URL}/api/coursemodule/${moduleId}`, {
+      const response = await fetch(`/api/coursemodule/${moduleId}`, {
         method: "DELETE",
         credentials: "include",
       });

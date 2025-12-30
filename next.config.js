@@ -21,8 +21,6 @@ module.exports = {
     ];
   },
   env: {
-    API_URL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080",
-
     PAYSTACK_KEY: "pk_live_8850c0e7c99deff4d48f4694e757d08f495bde2c",
     PAYSTACK_TEST_KEY: "pk_test_aec7d21e9a003310ce458551e79004d222ddb711",
 
@@ -45,7 +43,7 @@ module.exports = {
       // Handle node: protocol imports by replacing them with regular module names
       config.plugins.push(
         new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
-          resource.request = resource.request.replace(/^node:/, '');
+          resource.request = resource.request.replace(/^node:/, "");
         })
       );
       // Ignore mssql package resolution issues
@@ -60,23 +58,23 @@ module.exports = {
       // For server-side, mark Node.js built-in modules as external
       config.externals = config.externals || [];
       config.externals.push({
-        'net': 'commonjs net',
-        'fs': 'commonjs fs',
-        'console': 'commonjs console',
-        'path': 'commonjs path',
-        'os': 'commonjs os',
-        'crypto': 'commonjs crypto',
-        'stream': 'commonjs stream',
-        'util': 'commonjs util',
-        'buffer': 'commonjs buffer',
-        'url': 'commonjs url',
-        'http': 'commonjs http',
-        'https': 'commonjs https',
-        'http2': 'commonjs http2',
-        'zlib': 'commonjs zlib',
-        'querystring': 'commonjs querystring',
-        'child_process': 'commonjs child_process',
-        'tls': 'commonjs tls',
+        net: "commonjs net",
+        fs: "commonjs fs",
+        console: "commonjs console",
+        path: "commonjs path",
+        os: "commonjs os",
+        crypto: "commonjs crypto",
+        stream: "commonjs stream",
+        util: "commonjs util",
+        buffer: "commonjs buffer",
+        url: "commonjs url",
+        http: "commonjs http",
+        https: "commonjs https",
+        http2: "commonjs http2",
+        zlib: "commonjs zlib",
+        querystring: "commonjs querystring",
+        child_process: "commonjs child_process",
+        tls: "commonjs tls",
       });
     } else {
       // For client-side, provide fallbacks for Node.js modules

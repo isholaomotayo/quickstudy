@@ -68,7 +68,7 @@ export default function ApplyLayout({
   if (isLoading) {
     return (
       <ApplicantNavLayout
-        institutionName="quickStudy"
+        institutionName={undefined}
         institutionLogo={undefined}
       >
         {children}
@@ -78,7 +78,7 @@ export default function ApplyLayout({
 
   return (
     <ApplicantNavLayout
-      institutionName={institution?.name || "quickStudy"}
+      institutionName={institution?.name}
       institutionLogo={institution?.logo}
     >
       {children}

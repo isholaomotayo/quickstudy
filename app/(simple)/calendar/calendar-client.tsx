@@ -313,9 +313,7 @@ export function CalendarClient() {
 
         // Fire and forget - don't wait for response
         fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || process.env.API_URL
-          }/api/calendar/structure`,
+          `/api/calendar/structure`,
           {
             method: "POST",
             credentials: "include",

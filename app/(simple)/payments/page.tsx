@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PaymentClientWrapper from "./payment-client-wrapper";
 import StudentPaymentRecords from "@/components/StudentPaymentRecords";
 
-const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
+// Using relative URLs for API calls
 
 interface PaymentItem {
   id: string;
@@ -94,7 +94,7 @@ async function getPaymentServerData(searchParams: {
 
   try {
     // Fetch payments history (equivalent to getTableData("payment2"))
-    const paymentsUrl = `${API_URL}/api/payment2?${new URLSearchParams({
+    const paymentsUrl = `/api/payment2?${new URLSearchParams({
       pgsize: "50",
       pg: "1",
       ...Object.fromEntries(
@@ -152,7 +152,7 @@ async function getPaymentServerData(searchParams: {
     // Fetch payables for students
     let myPayables = { fixedDues: [], flexibleDues: {} };
     if (role === "STUDENT") {
-      const payablesUrl = `${API_URL}/api/payment2/payables`;
+      const payablesUrl = `/api/payment2/payables`;
       console.log("Fetching payables from:", payablesUrl);
 
       try {
@@ -181,7 +181,7 @@ async function getPaymentServerData(searchParams: {
     }
 
     // Fetch payment details (payment account configuration)
-    const paymentDetailsUrl = `${API_URL}/api/paymentaccount`;
+    const paymentDetailsUrl = `/api/paymentaccount`;
 
     const paymentDetailsResponse = await fetch(paymentDetailsUrl, {
       method: "GET",

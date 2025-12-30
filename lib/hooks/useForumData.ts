@@ -1,7 +1,5 @@
 import useSWR from "swr";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
 // Fetcher function for SWR
 const fetcher = async (url: string) => {
   try {
@@ -91,17 +89,17 @@ export function useForumPosts(scope: ForumScope) {
 
     switch (scope.type) {
       case "institution":
-        return `${API_BASE_URL}/api/forumTopic`;
+        return `/api/forumTopic`;
       case "course":
         // If no specific course is selected, get all course forums user can participate in
         return scope.course_id
-          ? `${API_BASE_URL}/api/courseForumTopic/${scope.course_id}`
-          : `${API_BASE_URL}/api/courseForumTopic`;
+          ? `/api/courseForumTopic/${scope.course_id}`
+          : `/api/courseForumTopic`;
       case "timed_discussion":
         // If no specific course is selected, get all course discussions user can participate in
         return scope.course_id
-          ? `${API_BASE_URL}/api/discussionTopic/${scope.course_id}`
-          : `${API_BASE_URL}/api/discussionTopic`;
+          ? `/api/discussionTopic/${scope.course_id}`
+          : `/api/discussionTopic`;
       default:
         console.warn("Unknown forum scope type:", scope.type);
         return null;
@@ -170,11 +168,11 @@ export function usePostComments(postId: number, scope: ForumScope) {
 
     switch (scope.type) {
       case "institution":
-        return `${API_BASE_URL}/api/forumThread/${postId}`;
+        return `/api/forumThread/${postId}`;
       case "course":
-        return `${API_BASE_URL}/api/courseForumThread/${postId}`;
+        return `/api/courseForumThread/${postId}`;
       case "timed_discussion":
-        return `${API_BASE_URL}/api/discussionTopic/${postId}/comments`;
+        return `/api/discussionTopic/${postId}/comments`;
       default:
         console.warn("Unknown forum scope type for comments:", scope.type);
         return null;
@@ -224,7 +222,7 @@ export function usePostComments(postId: number, scope: ForumScope) {
 // Hook for fetching forum statistics
 export function useForumStats() {
   const { data, error, isLoading, mutate } = useSWR(
-    `${API_BASE_URL}/api/forumStats`,
+    `/api/forumStats`,
     fetcher,
     {
       revalidateOnFocus: false,

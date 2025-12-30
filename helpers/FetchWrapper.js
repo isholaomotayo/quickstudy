@@ -38,7 +38,7 @@ export const generateRegNo = (studentId) => {
 // Function to login using email and password
 export const userLogin = async (props, req = {}) => {
   //endpoint to login
-  return await fetch(`${process.env.API_URL}/api/login`, {
+  return await fetch(`/api/login`, {
     method: "post",
     credentials: "include",
     headers:
@@ -55,7 +55,7 @@ export const userLogin = async (props, req = {}) => {
   });
 };
 export const getAllInstitutions = (req = {}) =>
-  fetch(`${process.env.API_URL}/api/institution`, {
+  fetch(`/api/institution`, {
     method: "get",
     credentials: "include",
     headers:
@@ -76,7 +76,7 @@ export const getAllInstitutions = (req = {}) =>
     });
 
 export const getInstitutionById = (institutionId, req = {}) =>
-  fetch(`${process.env.API_URL}/api/institution/${institutionId}`, {
+  fetch(`/api/institution/${institutionId}`, {
     method: "get",
     credentials: "include",
     headers:
@@ -97,7 +97,7 @@ export const getInstitutionById = (institutionId, req = {}) =>
     });
 //check that an enterred referral code exists
 export const verifyRefCode = (referralCode, req = {}) =>
-  fetch(`${process.env.API_URL}/api/user/username/${referralCode}`, {
+  fetch(`/api/user/username/${referralCode}`, {
     method: "get",
     credentials: "include",
     headers:
@@ -112,7 +112,7 @@ export const verifyRefCode = (referralCode, req = {}) =>
 export const updateInstitution = async (props, req = {}) => {
   const { id } = props;
   delete props.id;
-  return await fetch(`${process.env.API_URL}/api/institution/${id}`, {
+  return await fetch(`/api/institution/${id}`, {
     method: "put",
     credentials: "include",
     headers:
@@ -138,7 +138,7 @@ export const updateInstitution = async (props, req = {}) => {
 // Function to get all programmes
 export const getAllProgrammes = async (req = {}) =>
   //endpoint to fetch all programmes in the Institution
-  fetch(`${process.env.API_URL}/api/programme`, {
+  fetch(`/api/programme`, {
     method: "get",
     credentials: "include",
     headers:
@@ -161,7 +161,7 @@ export const getAllProgrammes = async (req = {}) =>
 // Function to get all levels
 export const getAllLevels = async (req = {}) =>
   //endpoint to fetch all levels in the Institution
-  fetch(`${process.env.API_URL}/api/level`, {
+  fetch(`/api/level`, {
     method: "get",
     credentials: "include",
     headers:
@@ -185,7 +185,7 @@ export const getAllLevels = async (req = {}) =>
 export const getAllApplications = (req = {}) =>
   //endpoint to fetch all applications currently running in the Institution
   // for now, we're using programmes
-  fetch(`${process.env.API_URL}/api/programme`, {
+  fetch(`/api/programme`, {
     method: "get",
     credentials: "include",
     headers:
@@ -207,7 +207,7 @@ export const getAllApplications = (req = {}) =>
 
 //fetch fee by id
 export const getFeeById = async (id, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/fee/${id}`, {
+  return await fetch(`/api/fee/${id}`, {
     method: "get",
     credentials: "include",
     headers:
@@ -230,7 +230,7 @@ export const getFeeById = async (id, req = {}) => {
 
 //fetch course by id
 export const getCourseById = async (id, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/course/${id}`, {
+  return await fetch(`/api/course/${id}`, {
     method: "get",
     credentials: "include",
     headers:
@@ -254,7 +254,7 @@ export const getCourseById = async (id, req = {}) => {
 // Function to get a Student by id
 export const getStudentById = async (studentId, req = {}) => {
   //endpoint to fetch all students using id
-  return await fetch(`${process.env.API_URL}/api/student/${studentId}`, {
+  return await fetch(`/api/student/${studentId}`, {
     method: "get",
     credentials: "include",
     headers:
@@ -278,7 +278,7 @@ export const getStudentById = async (studentId, req = {}) => {
 // Function to get a Student by user_id
 export const getStudentByUserId = async (userId, req = {}) => {
   //endpoint to fetch all students using user_id
-  return await fetch(`${process.env.API_URL}/api/student/userid/${userId}`, {
+  return await fetch(`/api/student/userid/${userId}`, {
     method: "get",
     credentials: "include",
     headers:
@@ -306,7 +306,7 @@ export const admitStudent = async (props, req = {}) => {
   delete props.semester;
   delete props.reg_no;
   //endpoint to update  a students using id
-  return await fetch(`${process.env.API_URL}/api/student/${props.id}`, {
+  return await fetch(`/api/student/${props.id}`, {
     method: "put",
     credentials: "include",
     headers:
@@ -325,7 +325,7 @@ export const admitStudent = async (props, req = {}) => {
 export const admitStudentOld = async (props, req = {}) => {
   //endpoint to fetch all students using id
 
-  return await fetch(`${process.env.API_URL}/api/student/${props.id}`, {
+  return await fetch(`/api/student/${props.id}`, {
     method: "put",
     credentials: "include",
     headers:
@@ -347,7 +347,7 @@ export const admitStudentOld = async (props, req = {}) => {
 export const getStudentResultsByParams = async (searchParams, req = {}) => {
   //endpoint to fetch all students using id
   return await fetch(
-    `${process.env.API_URL}/api/studentresult?${searchParams}`,
+    `/api/studentresult?${searchParams}`,
     {
       method: "get",
       credentials: "include",
@@ -366,7 +366,7 @@ export const getStudentResultsByParams = async (searchParams, req = {}) => {
 export const getStudentCoursesByParams = async (searchParams, req = {}) => {
   //endpoint to fetch all students using id
   return await fetch(
-    `${process.env.API_URL}/api/studentcourse?${searchParams}`,
+    `/api/studentcourse?${searchParams}`,
     {
       method: "get",
       credentials: "include",
@@ -384,7 +384,7 @@ export const getStudentCoursesByParams = async (searchParams, req = {}) => {
 // Function to get available semesters for a course (more efficient than fetching all student courses)
 export const getCourseSemesters = async (courseId, req = {}) => {
   return await fetch(
-    `${process.env.API_URL}/api/studentcourse/course/${courseId}/semesters`,
+    `/api/studentcourse/course/${courseId}/semesters`,
     {
       method: "get",
       credentials: "include",
@@ -403,7 +403,7 @@ export const getCourseSemesters = async (courseId, req = {}) => {
 export const getStudentGpasByStudentId = async (studentId, req = {}) => {
   //endpoint to fetch all students using id
   return await fetch(
-    `${process.env.API_URL}/api/studentgpa/studentid/${studentId}`,
+    `/api/studentgpa/studentid/${studentId}`,
     {
       method: "get",
       credentials: "include",
@@ -453,7 +453,7 @@ export const updateStudent = async (props, req = {}) => {
   if (props.student.entry_level_id)
     payload.entry_level_id = props.student.entry_level_id;
 
-  return await fetch(`${process.env.API_URL}/api/student/${props.student.id}`, {
+  return await fetch(`/api/student/${props.student.id}`, {
     //mode: "no-cors",
     method: "put",
     credentials: "include",
@@ -479,7 +479,7 @@ export const updateStudent = async (props, req = {}) => {
 // Function to change user role
 export const setUserRole = async (userId, userRole, req = {}) => {
   //endpoint to fetch all students using id
-  return await fetch(`${process.env.API_URL}/api/user/${userId}`, {
+  return await fetch(`/api/user/${userId}`, {
     method: "put",
     credentials: "include",
     headers:
@@ -498,7 +498,7 @@ export const setUserRole = async (userId, userRole, req = {}) => {
 // Function to get all applicants
 export const getApplicants = async (req = {}) => {
   //endpoint to fetch all students using user_id
-  return await fetch(`${process.env.API_URL}/api/user/applicant`, {
+  return await fetch(`/api/user/applicant`, {
     method: "get",
     credentials: "include",
     headers:
@@ -521,7 +521,7 @@ export const getApplicants = async (req = {}) => {
 // Function to get a Staff by user_id
 export const getStaffByUserId = async (userId, req = {}) => {
   //endpoint to fetch all students using user_id
-  return await fetch(`${process.env.API_URL}/api/staff?user_id=${userId}`, {
+  return await fetch(`/api/staff?user_id=${userId}`, {
     method: "get",
     credentials: "include",
     headers:
@@ -545,7 +545,7 @@ export const getStaffByUserId = async (userId, req = {}) => {
 // Function to get the current semester
 export const getCurrentSemester = async (req = {}) => {
   //endpoint to fetch all students using user_id
-  return await fetch(`${process.env.API_URL}/api/semester?is_active=true`, {
+  return await fetch(`/api/semester?is_active=true`, {
     method: "get",
     credentials: "include",
     headers:
@@ -575,7 +575,7 @@ export const getStudentLevelId = async (
   try {
     // Use the centralized backend API for level calculation
     const response = await fetch(
-      `${process.env.API_URL}/api/student/level/calculate?student_id=0&semester_admitted_id=${semesterAdmitted}&entry_level_id=${entryLevelId}`,
+      `/api/student/level/calculate?student_id=0&semester_admitted_id=${semesterAdmitted}&entry_level_id=${entryLevelId}`,
       {
         method: "get",
         credentials: "include",
@@ -604,7 +604,7 @@ export const getStudentLevelId = async (
 
 // Function to update user avatar
 export const updateUserAvatar = async (url, userId, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/user/${userId}`, {
+  return await fetch(`/api/user/${userId}`, {
     method: "put",
     credentials: "include",
     headers:
@@ -629,7 +629,7 @@ export const updateUserAvatar = async (url, userId, req = {}) => {
 };
 // Function to update student id card file
 export const updateStudentIdFile = async (url, studentId, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/student/${studentId}`, {
+  return await fetch(`/api/student/${studentId}`, {
     method: "put",
     credentials: "include",
     headers:
@@ -655,7 +655,7 @@ export const updateStudentIdFile = async (url, studentId, req = {}) => {
 
 // Function to update student cert file
 export const updateStudentCertFile = async (url, studentId, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/student/${studentId}`, {
+  return await fetch(`/api/student/${studentId}`, {
     method: "put",
     credentials: "include",
     headers:
@@ -680,7 +680,7 @@ export const updateStudentCertFile = async (url, studentId, req = {}) => {
 };
 // Function to send reset password link to email
 export const sendForgotPasswordLink = async (props, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/startPasswordReset`, {
+  return await fetch(`/api/startPasswordReset`, {
     method: "post",
     credentials: "include",
     headers:
@@ -698,7 +698,7 @@ export const sendForgotPasswordLink = async (props, req = {}) => {
 
 // Function to reset password using reset code
 export const resetPassword = async (props, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/resetPassword`, {
+  return await fetch(`/api/resetPassword`, {
     method: "post",
     credentials: "include",
     headers:
@@ -729,7 +729,7 @@ export const postUser = async (props, req = {}) => {
 
   if (props.role) postBody.role = props.role;
 
-  return await fetch(`${process.env.API_URL}/api/user`, {
+  return await fetch(`/api/user`, {
     method: "post",
     credentials: "include",
     headers:
@@ -754,7 +754,7 @@ export const postUser = async (props, req = {}) => {
 
 // delete user by id
 export const deleteUser = async (userId, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/user/${userId}`, {
+  return await fetch(`/api/user/${userId}`, {
     method: "delete",
     credentials: "include",
     headers:
@@ -801,7 +801,7 @@ export const saveStudentDraft = async (props, req = {}) => {
 
   // First, check if student already exists
   const existingStudentResponse = await fetch(
-    `${process.env.API_URL}/api/student/userid/${props.user_id}`,
+    `/api/student/userid/${props.user_id}`,
     {
       method: "GET",
       credentials: "include",
@@ -824,8 +824,8 @@ export const saveStudentDraft = async (props, req = {}) => {
   // Use PUT if student exists, POST if creating new
   const method = studentId ? "PUT" : "POST";
   const url = studentId
-    ? `${process.env.API_URL}/api/student/${studentId}`
-    : `${process.env.API_URL}/api/student`;
+    ? `/api/student/${studentId}`
+    : `/api/student`;
 
   return await fetch(url, {
     method: method,
@@ -883,7 +883,7 @@ export const postStudent = async (props, req = {}) => {
 
   // First, check if student already exists
   const existingStudentResponse = await fetch(
-    `${process.env.API_URL}/api/student/userid/${props.user_id}`,
+    `/api/student/userid/${props.user_id}`,
     {
       method: "GET",
       credentials: "include",
@@ -906,8 +906,8 @@ export const postStudent = async (props, req = {}) => {
   // Use PUT if student exists, POST if creating new
   const method = studentId ? "PUT" : "POST";
   const url = studentId
-    ? `${process.env.API_URL}/api/student/${studentId}`
-    : `${process.env.API_URL}/api/student`;
+    ? `/api/student/${studentId}`
+    : `/api/student`;
 
   return await fetch(url, {
     method: method,
@@ -938,7 +938,7 @@ export const postAffiliate = async (props, req = {}) => {
   if (props.bank) data.bank = props.bank;
   if (props.account_no) data.account_no = props.account_no;
 
-  let postURL = `${process.env.API_URL}/api/affiliate`;
+  let postURL = `/api/affiliate`;
   if (props.id) postURL += `/${props.id}`;
 
   return await fetch(postURL, {
@@ -963,7 +963,7 @@ export const postAffiliate = async (props, req = {}) => {
     });
 };
 export const postStaff = async (props, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/staff`, {
+  return await fetch(`/api/staff`, {
     method: "post",
     credentials: "include",
     headers:
@@ -992,7 +992,7 @@ export const postStaff = async (props, req = {}) => {
   });
 };
 export const postStaffCourse = async (props, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/staffcourse`, {
+  return await fetch(`/api/staffcourse`, {
     method: "post",
     credentials: "include",
     headers:
@@ -1009,7 +1009,7 @@ export const postStaffCourse = async (props, req = {}) => {
   });
 };
 export const postFeeStudent = async (props, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/feestudent`, {
+  return await fetch(`/api/feestudent`, {
     method: "post",
     credentials: "include",
     headers:
@@ -1122,16 +1122,11 @@ export async function DeleteFetch(url, req = {}) {
 }
 
 /**
- * Get API base URL - use relative URL for same-origin requests, or env var for external API
+ * Get API base URL - always use relative URLs for Next.js API routes
  */
 function getApiUrl() {
-  // In browser/client-side, always use relative URL for Next.js API routes
-  if (typeof window !== "undefined") {
-    return ""; // Relative URL - same origin
-  }
-  // Server-side: use environment variable or default
-  // Check NEXT_PUBLIC_API_URL first (available on client), then API_URL (server-only)
-  return process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "";
+  // Always return empty string for relative URLs
+  return "";
 }
 
 export async function getInstituionByParams(data, ctx) {
@@ -1185,7 +1180,7 @@ export async function getInstituionByParams(data, ctx) {
 
 // Function to add a student result
 export const addStudentResult = async (resultData, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/studentresult`, {
+  return await fetch(`/api/studentresult`, {
     method: "POST",
     credentials: "include",
     headers:
@@ -1204,7 +1199,7 @@ export const addStudentResult = async (resultData, req = {}) => {
 
 // Function to add multiple student results in batch (using same endpoint)
 export const addStudentResultsBatch = async (resultsData, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/studentresult`, {
+  return await fetch(`/api/studentresult`, {
     method: "POST",
     credentials: "include",
     headers:
@@ -1223,7 +1218,7 @@ export const addStudentResultsBatch = async (resultsData, req = {}) => {
 
 // Function to get all grades
 export const getGrades = async (req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/grade`, {
+  return await fetch(`/api/grade`, {
     method: "GET",
     credentials: "include",
     headers:
@@ -1238,7 +1233,7 @@ export const getGrades = async (req = {}) => {
 
 // Function to get courses by params
 export const getCoursesByParams = async (searchParams, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/course?${searchParams}`, {
+  return await fetch(`/api/course?${searchParams}`, {
     method: "GET",
     credentials: "include",
     headers:
@@ -1253,7 +1248,7 @@ export const getCoursesByParams = async (searchParams, req = {}) => {
 
 // Function to calculate student GPA
 export const calculateStudentGpa = async (gpaData, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/studentgpa/calculate`, {
+  return await fetch(`/api/studentgpa/calculate`, {
     method: "POST",
     credentials: "include",
     headers:
@@ -1272,7 +1267,7 @@ export const calculateStudentGpa = async (gpaData, req = {}) => {
 
 // Function to get students by params
 export const getStudentsByParams = async (searchParams, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/student?${searchParams}`, {
+  return await fetch(`/api/student?${searchParams}`, {
     method: "GET",
     credentials: "include",
     headers:
@@ -1287,7 +1282,7 @@ export const getStudentsByParams = async (searchParams, req = {}) => {
 
 // Function to get all levels
 export const getLevels = async (req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/level`, {
+  return await fetch(`/api/level`, {
     method: "GET",
     credentials: "include",
     headers:
@@ -1302,7 +1297,7 @@ export const getLevels = async (req = {}) => {
 
 // Function to get all semesters
 export const getSemesters = async (req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/semester`, {
+  return await fetch(`/api/semester`, {
     method: "GET",
     credentials: "include",
     headers:
@@ -1317,7 +1312,7 @@ export const getSemesters = async (req = {}) => {
 
 // Function to get all sessions
 export const getSessions = async (req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/session`, {
+  return await fetch(`/api/session`, {
     method: "GET",
     credentials: "include",
     headers:
@@ -1333,7 +1328,7 @@ export const getSessions = async (req = {}) => {
 // Function to get student GPAs by search params
 export const getStudentGpasBySearchParams = async (searchParams, req = {}) => {
   return await fetch(
-    `${process.env.API_URL}/api/studentgpa/search?${searchParams}`,
+    `/api/studentgpa/search?${searchParams}`,
     {
       method: "GET",
       credentials: "include",
@@ -1351,7 +1346,7 @@ export const getStudentGpasBySearchParams = async (searchParams, req = {}) => {
 // Function to download CSV template for result upload
 export const downloadResultTemplate = async (courseId, req = {}) => {
   const response = await fetch(
-    `${process.env.API_URL}/api/studentresult/template/${courseId}`,
+    `/api/studentresult/template/${courseId}`,
     {
       method: "GET",
       credentials: "include",
@@ -1410,7 +1405,7 @@ export const calculateGradeFromScore = (score, grades) => {
 
 // Function to calculate batch GPA
 export const calculateBatchGpa = async (data, req = {}) => {
-  return await fetch(`${process.env.API_URL}/api/studentgpa/batch`, {
+  return await fetch(`/api/studentgpa/batch`, {
     method: "POST",
     credentials: "include",
     headers: {

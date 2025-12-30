@@ -127,12 +127,9 @@ export function CgpaClient({
           "Content-Type": "application/json",
         };
 
-        const API_URL =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
         // Get student GPAs by student ID
         const gpaResponse = await fetch(
-          `${API_URL}/api/studentgpa/studentid/${studentId}`,
+          `/api/studentgpa/studentid/${studentId}`,
           { headers, credentials: "include" }
         );
 

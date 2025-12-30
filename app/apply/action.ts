@@ -566,10 +566,16 @@ export async function registerUser(
       });
       const supportEmail = institution?.support_mail || institution?.email || process.env.SUPPORT_EMAIL || "support.cdel@unn.edu.ng";
 
+      // Construct verification URL - use FRONTEND_URL for email links (needs full URL)
+      const frontendUrl = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_VERCEL_URL || "";
+      const activateUrl = frontendUrl 
+        ? `${frontendUrl}/api/verify?code=${verificationCode}-${result.newUser.id}`
+        : `/api/verify?code=${verificationCode}-${result.newUser.id}`;
+
       const emailTemplateParams = {
         subject: `Welcome to ${process.env.NAME || "quickStudy"}`,
         email: result.newUser.email,
-        activate: `${process.env.API_URL}/api/verify?code=${verificationCode}-${result.newUser.id}`,
+        activate: activateUrl,
         name: result.newUser.first_name,
         organization: process.env.NAME || "quickStudy",
       };

@@ -54,6 +54,7 @@ interface SigninState {
   showNewPassword: boolean;
   showConfirmPassword: boolean;
   isLoading: boolean;
+  isLoadingInstitution: boolean;
   error?: string;
   verificationDialogOpen: boolean;
   rememberMe: boolean;
@@ -119,6 +120,7 @@ function SigninComponent() {
     showNewPassword: false,
     showConfirmPassword: false,
     isLoading: false,
+    isLoadingInstitution: true,
     error: undefined,
     verificationDialogOpen: false,
     rememberMe: false,
@@ -165,8 +167,50 @@ function SigninComponent() {
 
       try {
         // Load institution data
-        const institution = await getInstituionByParams({ id: "1" }, {});
-        setState((prev) => ({ ...prev, institution }));
+        setState((prev) => ({ ...prev, isLoadingInstitution: true }));
+        
+        // Get current URL from window location
+        const currentUrl =
+          typeof window !== "undefined" ? window.location.origin : "";
+
+        // Try to fetch by URL first, fallback to ID if URL fails
+        let institution: any = null;
+        if (currentUrl) {
+          try {
+            institution = await getInstituionByParams({ url: currentUrl }, {});
+          } catch (urlError) {
+            console.warn(
+              "Failed to fetch institution by URL, trying ID:",
+              urlError
+            );
+          }
+        }
+
+        // Check if institution is valid (has id property)
+        const hasValidId =
+          institution &&
+          typeof institution === "object" &&
+          "id" in institution &&
+          institution.id;
+
+        // Fallback to ID if URL lookup failed or returned empty
+        if (!hasValidId) {
+          institution = await getInstituionByParams({ id: "1" }, {});
+        }
+
+        // Ensure we have a valid institution object
+        const isValidInstitution =
+          institution &&
+          typeof institution === "object" &&
+          "id" in institution &&
+          institution.id;
+
+        if (isValidInstitution) {
+          setState((prev) => ({ ...prev, institution, isLoadingInstitution: false }));
+        } else {
+          console.error("Invalid institution data received:", institution);
+          setState((prev) => ({ ...prev, isLoadingInstitution: false }));
+        }
 
         // Check if user is already authenticated
         const authData = await getAuthData(null);
@@ -191,6 +235,7 @@ function SigninComponent() {
         }
       } catch (error) {
         console.error("Error loading institution or checking auth:", error);
+        setState((prev) => ({ ...prev, isLoadingInstitution: false }));
       }
     };
 
@@ -397,23 +442,25 @@ function SigninComponent() {
       <div className="relative min-h-screen flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
           <div className="space-y-8">
-            <div className="flex items-center justify-center lg:justify-start gap-4">
-              {state.institution?.logo && (
-                <img
-                  className="h-14 w-auto"
-                  src={state.institution.logo}
-                  alt="Institution Logo"
-                />
-              )}
-              <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
-                  Campus Portal
-                </p>
-                <h1 className="text-3xl font-semibold text-slate-900">
-                  {state.institution?.name || "quickStudy"}
-                </h1>
+            {!state.isLoadingInstitution && state.institution && (
+              <div className="flex items-center justify-center lg:justify-start gap-4">
+                {state.institution?.logo && (
+                  <img
+                    className="h-14 w-auto"
+                    src={state.institution.logo}
+                    alt="Institution Logo"
+                  />
+                )}
+                <div>
+                  <p className="text-sm uppercase tracking-[0.3em] text-slate-500">
+                    Campus Portal
+                  </p>
+                  <h1 className="text-3xl font-semibold text-slate-900">
+                    {state.institution?.name}
+                  </h1>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-4">
               <h2 className="text-4xl lg:text-5xl font-semibold text-slate-900 leading-tight">

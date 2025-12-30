@@ -156,7 +156,7 @@ export const codeLogin = async (
 
   if (!(query && query.code)) bounceToPage(failBounceTo, res);
 
-  const svrResponse = await fetch(`${process.env.API_URL}/api/codelogin`, {
+  const svrResponse = await fetch(`/api/codelogin`, {
     method: "post",
     headers: {
       "Content-Type": "application/json",
@@ -272,7 +272,7 @@ export const getTableSchema = async (tableName, dataStateSetter) => {
   let schema = {};
 
   const svrResponse = await fetch(
-    `${process.env.API_URL}/api/schema/${tableName}`
+    `/api/schema/${tableName}`
   );
   if (svrResponse.status === 200) {
     schema = await svrResponse.json();
@@ -293,7 +293,7 @@ export const checkDataRowExists = async (
 
   if (!filterVal) return false;
 
-  let dataURL = `${process.env.API_URL}/api/${dbTable.replace(
+  let dataURL = `/api/${dbTable.replace(
     "_",
     ""
   )}/check/${filterCol}/${filterVal}`;
@@ -327,7 +327,7 @@ export const getTableData = async (
   viaRelated = true,
   req = {}
 ) => {
-  let dataURL = `${process.env.API_URL}/api/${dbTable.replace("_", "")}`,
+  let dataURL = `/api/${dbTable.replace("_", "")}`,
     dataRows = [],
     childrenField = "";
 
@@ -343,7 +343,7 @@ export const getTableData = async (
           : "";
 
       childrenField = pluralize(dbTable);
-      dataURL = `${process.env.API_URL}/api/${endPath}/${query[filterCol]}${queryString}`;
+      dataURL = `/api/${endPath}/${query[filterCol]}${queryString}`;
     } else {
       viaRelated = false;
       dataURL = `${dataURL}?filter=${filterCol}:${query[filterCol]}`;
@@ -437,7 +437,7 @@ export const getTableDataAndSchema = async (
   query = {},
   lineage = []
 ) => {
-  let dataURL = `${process.env.API_URL}/api/${dbTable.replace("_", "")}`,
+  let dataURL = `/api/${dbTable.replace("_", "")}`,
     dataRows = [],
     viaRelated = false,
     childrenField = "";
@@ -454,7 +454,7 @@ export const getTableDataAndSchema = async (
           : "";
 
       childrenField = pluralize(dbTable);
-      dataURL = `${process.env.API_URL}/api/${endPath}/${query[filterCol]}${queryString}`;
+      dataURL = `/api/${endPath}/${query[filterCol]}${queryString}`;
       viaRelated = true;
     } else {
       dataURL = `${dataURL}?filter=${filterCol}:${query[filterCol]}`;
@@ -477,7 +477,7 @@ export const getTableDataAndSchema = async (
 };
 
 export const deleteTableRow = async (dbTable, rowID) => {
-  const endpoint = `${process.env.API_URL}/api/${dbTable.replace(
+  const endpoint = `/api/${dbTable.replace(
     "_",
     ""
   )}/${+rowID}`;
@@ -738,7 +738,7 @@ export const getDataPoints = async (dates = {}, req = false) => {
   }
   try {
     dataReport = await fetch(
-      `${process.env.API_URL}/api/report/weekly${urlExt}`,
+      `/api/report/weekly${urlExt}`,
       {
         method: "get",
         credentials: "include",
@@ -763,7 +763,7 @@ export const getAffiliateReferrals = async (query, req = false) => {
   let data;
   try {
     data = await fetch(
-      `${process.env.API_URL}/api/affiliate/dashboard?username=${query.username}&user_id=${query.id}`,
+      `/api/affiliate/dashboard?username=${query.username}&user_id=${query.id}`,
       {
         method: "get",
         credentials: "include",
@@ -786,7 +786,7 @@ export const getAffiliateReferrals = async (query, req = false) => {
 export const confirmPayment = async (query, req = false) => {
   let data;
   try {
-    data = await fetch(`${process.env.API_URL}/api/affiliate/confirmpayment`, {
+    data = await fetch(`/api/affiliate/confirmpayment`, {
       method: "put",
       credentials: "include",
       headers: req
@@ -812,7 +812,7 @@ export const unconfirmPayment = async (query, req = false) => {
   let data;
   try {
     data = await fetch(
-      `${process.env.API_URL}/api/affiliate/unconfirmpayment`,
+      `/api/affiliate/unconfirmpayment`,
       {
         method: "put",
         credentials: "include",

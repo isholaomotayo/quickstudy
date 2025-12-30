@@ -249,9 +249,6 @@ export function AssignmentCreatorModal({
 
     setLoading(true);
     try {
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
       // Convert deadline to proper ISO format if it exists
       const requestData = {
         ...finalAssignment,
@@ -267,7 +264,7 @@ export function AssignmentCreatorModal({
 
       // Create assignment and questions in a single request using the bulk endpoint
       const response = await fetch(
-        `${API_URL}/api/coursetest/bulk-assignment`,
+        `/api/coursetest/bulk-assignment`,
         {
           method: "POST",
           headers: {

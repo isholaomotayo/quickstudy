@@ -4,7 +4,7 @@ import { Card, Form, Button, InputGroup } from "react-bootstrap";
 import TinyMCEEditor from "../components/ui/tinyEditor/TinyMCEEditor";
 import { getFieldTypeFromValue, getTableSchema, ucfirst } from "./utils";
 
-const API_URL = process.env.API_URL;
+// Using relative URLs for API calls
 
 const DBForm = (props) => {
   /**
@@ -124,11 +124,10 @@ const DBForm = (props) => {
       // Submit to endpoint for the tablename
       const saveMethod = isNewForm ? "POST" : "PUT";
       const endpoint =
-        API_URL +
-        (props.postTo ||
-          `/api/${props.tableName.replace("_", "")}${
-            isNewForm ? "" : "/" + rowData.id
-          }`);
+        props.postTo ||
+        `/api/${props.tableName.replace("_", "")}${
+          isNewForm ? "" : "/" + rowData.id
+        }`;
       if (isNewForm) delete postData["id"];
       //console.log(formState, postData)
       const response = await fetch(endpoint, {

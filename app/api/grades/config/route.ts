@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { getServerApiUrl } from '@/lib/server-api-url';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,9 +10,8 @@ export async function GET(request: NextRequest) {
     const cookieStore = await cookies();
     const cookieString = cookieStore.toString();
 
-    // Build backend URL for grade configuration
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
-    const gradesUrl = `${backendUrl}/api/grade`;
+    // Construct absolute URL for server-side fetch
+    const gradesUrl = getServerApiUrl(request, `/api/grade`);
 
     // Call the backend API
     const response = await fetch(gradesUrl, {
