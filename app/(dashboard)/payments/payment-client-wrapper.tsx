@@ -13,6 +13,16 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Receipt, Calendar, Trash2, ShoppingCart } from "lucide-react";
 import PaymentHistoryList from "./payment-history-list";
 
@@ -127,6 +137,17 @@ export default function PaymentClientWrapper({
   const [activePayPlan, setActivePayPlan] = useState(
     userData?.fee_plan || "full"
   );
+  const [localFixedDues, setLocalFixedDues] = useState(fixedDues);
+  const [localFlexibleDues, setLocalFlexibleDues] = useState(flexibleDues);
+  const [showPlanChangeDialog, setShowPlanChangeDialog] = useState(false);
+  const [pendingPlan, setPendingPlan] = useState<string | null>(null);
+  const [isUpdatingPlan, setIsUpdatingPlan] = useState(false);
+
+  // Update local payables when props change
+  useEffect(() => {
+    setLocalFixedDues(fixedDues);
+    setLocalFlexibleDues(flexibleDues);
+  }, [fixedDues, flexibleDues]);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -221,13 +242,83 @@ export default function PaymentClientWrapper({
     toast.success("Cart cleared");
   };
 
+  const refreshPayables = async () => {
+    try {
+      const response = await fetch("/api/payment2/payables", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data) {
+          setLocalFixedDues(data.data.fixedDues || []);
+          setLocalFlexibleDues(data.data.flexibleDues || {});
+        }
+      }
+    } catch (error) {
+      console.error("Error refreshing payables:", error);
+    }
+  };
+
   const handlePlanChange = (plan: string) => {
-    // Clear cart when plan changes
-    setCartState({});
-    setCartSum(0);
-    setActivePayPlan(plan);
-    clearCartFromStorage();
-    toast.success(`Switched to ${payment_plan_options[plan]?.title}`);
+    // If plan is the same, do nothing
+    if (plan === activePayPlan) {
+      return;
+    }
+
+    // Show confirmation dialog
+    setPendingPlan(plan);
+    setShowPlanChangeDialog(true);
+  };
+
+  const confirmPlanChange = async () => {
+    if (!pendingPlan) return;
+
+    setIsUpdatingPlan(true);
+    try {
+      const response = await fetch("/api/payment2/plan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          fee_plan: pendingPlan,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Update active plan
+        setActivePayPlan(pendingPlan);
+        
+        // Clear cart when plan changes
+        setCartState({});
+        setCartSum(0);
+        clearCartFromStorage();
+
+        // Refresh payables
+        await refreshPayables();
+
+        toast.success(
+          `Payment plan updated to ${payment_plan_options[pendingPlan]?.title}`
+        );
+      } else {
+        const errorData = await response.json();
+        toast.error(
+          errorData.error || "Failed to update payment plan. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error updating payment plan:", error);
+      toast.error("Failed to update payment plan. Please try again.");
+    } finally {
+      setIsUpdatingPlan(false);
+      setShowPlanChangeDialog(false);
+      setPendingPlan(null);
+    }
   };
 
   const rowInState = (feeID: string, rowID: string): boolean => {
@@ -370,28 +461,51 @@ export default function PaymentClientWrapper({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <div className="space-y-5">
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-          <Card className="bg-card border border-border shadow-lg">
-            <CardHeader className="space-y-1">
-              <CardTitle className="flex items-center gap-2">
-                <Receipt className="w-5 h-5 text-primary" />
-                Fixed Fees
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                One-time items that can be paid independently.
-              </p>
-            </CardHeader>
-            <CardContent>
-              {!fixedDues || fixedDues.length === 0 ? (
+    <>
+      <AlertDialog open={showPlanChangeDialog} onOpenChange={setShowPlanChangeDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Change Payment Plan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Changing your payment plan will recalculate all flexible fees based on the new plan.
+              Your existing payment history will remain unchanged, but future payments will use the
+              new plan. Your cart will be cleared. Continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isUpdatingPlan}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmPlanChange}
+              disabled={isUpdatingPlan}
+            >
+              {isUpdatingPlan ? "Updating..." : "Confirm"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+            <Card className="bg-card border border-border shadow-lg">
+              <CardHeader className="space-y-1">
+                <CardTitle className="flex items-center gap-2">
+                  <Receipt className="w-5 h-5 text-primary" />
+                  Fixed Fees
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  One-time items that can be paid independently.
+                </p>
+              </CardHeader>
+              <CardContent>
+                {!localFixedDues || localFixedDues.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Receipt className="w-10 h-10 mx-auto mb-2 opacity-30" />
                   <p className="text-sm">No fixed fees available</p>
                 </div>
               ) : (
                 <div className="grid gap-2 sm:grid-cols-2">
-                  {fixedDues.map((due, i) => {
+                  {localFixedDues.map((due, i) => {
                     const rowID = `i-${i}`;
                     const addedToCart = rowInState(due.id, rowID);
                     return (
@@ -449,8 +563,8 @@ export default function PaymentClientWrapper({
               </p>
             </CardHeader>
             <CardContent>
-              {!flexibleDues[activePayPlan] ||
-              flexibleDues[activePayPlan].length === 0 ? (
+              {!localFlexibleDues[activePayPlan] ||
+              localFlexibleDues[activePayPlan].length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Calendar className="w-10 h-10 mx-auto mb-2 opacity-30" />
                   <p className="text-sm">
@@ -462,7 +576,7 @@ export default function PaymentClientWrapper({
                 <div className="grid gap-2 sm:grid-cols-2">
                   {(() => {
                     let lastRowItem: PaymentItem | null = null;
-                    return flexibleDues[activePayPlan]?.map((due, i) => {
+                    return localFlexibleDues[activePayPlan]?.map((due, i) => {
                       const rowID = `j-${i}`;
                       const addedToCart = rowInState(due.id, rowID);
                       const buttonEnabled = getButtonEnabled(
@@ -609,5 +723,6 @@ export default function PaymentClientWrapper({
         </Card>
       </div>
     </div>
+    </>
   );
 }

@@ -179,7 +179,7 @@ export default function PaymentHistoryList({
                         </p>
                       ) : (
                         <div className="space-y-2">
-                          {cartEntries.map(([itemId, item]) => {
+                          {cartEntries.map(([itemId, item]: [string, any]) => {
                             const quantity = Number(item?.quantity || 1);
                             const unitPrice = Number(
                               item?.unit_price || item?.unitPrice || 0

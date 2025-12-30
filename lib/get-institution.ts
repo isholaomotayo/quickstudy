@@ -63,11 +63,11 @@ function safeJsonParse<T>(json: string, validator: (data: any) => T | null): T |
 /**
  * Get institution from cookies (server-side)
  */
-function getInstitutionFromServerCookies(
+async function getInstitutionFromServerCookies(
   cacheKey: string
-): InstitutionData | null {
+): Promise<InstitutionData | null> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const cookieValue = cookieStore.get(cacheKey)?.value;
     
     if (!cookieValue) return null;
@@ -259,7 +259,7 @@ export async function getInstitution(options: {
   
   // Check cache first
   if (cacheKey) {
-    const cached = getInstitutionFromServerCookies(cacheKey);
+    const cached = await getInstitutionFromServerCookies(cacheKey);
     if (cached) {
       return cached;
     }
@@ -299,7 +299,7 @@ export async function getInstitution(options: {
  */
 export async function getInstitutionForUser(): Promise<InstitutionData | null> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const userDataCookie = cookieStore.get("userData")?.value;
     
     if (userDataCookie) {

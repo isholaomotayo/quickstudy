@@ -147,9 +147,54 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    // Extract fee_plan from cart if present
+    let feePlanToUpdate: string | null = null;
+    if (body.cart && typeof body.cart === "object") {
+      // Find the first fee_plan in the cart
+      const cartItems = Object.values(body.cart) as any[];
+      for (const item of cartItems) {
+        if (item.fee_plan) {
+          feePlanToUpdate = item.fee_plan;
+          break; // Use the first fee_plan found
+        }
+      }
+    }
+
+    // Create the payment
     const newPayment = await prisma.payment2.create({
       data: body,
     });
+
+    // Update student's fee_plan if a plan was specified in the cart
+    // Only update if student doesn't have a plan set, or if the payment uses a different plan
+    const user = authResult.user;
+    if (feePlanToUpdate && user.role === "STUDENT") {
+      try {
+        const student = await prisma.student.findFirst({
+          where: {
+            user_id: BigInt(user.id),
+          },
+        });
+
+        if (student) {
+          // Update fee_plan if not set or if different from payment plan
+          if (!student.fee_plan || student.fee_plan !== feePlanToUpdate) {
+            await prisma.student.update({
+              where: {
+                id: student.id,
+              },
+              data: {
+                fee_plan: feePlanToUpdate,
+                updated_at: new Date(),
+              },
+            });
+          }
+        }
+      } catch (updateError) {
+        // Log error but don't fail the payment creation
+        console.error("Error updating student fee_plan:", updateError);
+      }
+    }
 
     return createJsonResponse(newPayment);
   } catch (error) {

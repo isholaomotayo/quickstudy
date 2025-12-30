@@ -17,6 +17,7 @@ import {
   getCurrentUrlOrigin,
   clearInstitutionCache,
   isLocalhost,
+  type InstitutionData,
 } from "@/lib/institution-cache";
 import { getInstituionByParams } from "@/helpers/FetchWrapper";
 
