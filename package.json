@@ -18,7 +18,8 @@
     "test:integration": "jest tests/integration/",
     "test:manual": "node tests/manual-test.js",
     "reset-db": "node backend/scripts/reset-db.js",
-    "reset-db:preview": "node backend/scripts/reset-db.js --dry-run"
+    "reset-db:preview": "node backend/scripts/reset-db.js --dry-run",
+    "check-and-build": "./check-and-build.sh"
   },
   "dependencies": {
     "@ai-sdk/groq": "^2.0.17",
