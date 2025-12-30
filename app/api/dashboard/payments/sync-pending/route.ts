@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db";
 import crypto from "crypto";
 import {
   authenticateUser,
@@ -9,7 +9,6 @@ import {
   hasInstitutionAccess,
 } from "@/lib/api-auth";
 
-const prisma = new PrismaClient();
 
 // Decrypt function for encrypted secret keys
 function decryptText(encryptedText: string): string {

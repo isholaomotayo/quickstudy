@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Get student info with only necessary fields
+    // Get student info with programme in one query (optimized)
     const student = await prisma.student.findFirst({
       where: {
         user_id: BigInt(user.id),
@@ -105,6 +105,11 @@ export async function GET(req: NextRequest) {
         semester_admitted_id: true,
         entry_level_id: true,
         session_admitted_id: true,
+        programme: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
@@ -112,15 +117,7 @@ export async function GET(req: NextRequest) {
       return createAuthErrorResponse("Student record not found", 404);
     }
 
-    // Get programme name separately
-    let programmeName: string | null = null;
-    if (student.programme_id) {
-      const programme = await prisma.programme.findFirst({
-        where: { id: student.programme_id },
-        select: { name: true },
-      });
-      programmeName = programme?.name || null;
-    }
+    const programmeName = student.programme?.name || null;
 
     // Return only the fields needed by frontend
     const studentData: {
@@ -176,15 +173,26 @@ export async function GET(req: NextRequest) {
     const studentGpa =
       studentGpas.length > 0 ? studentGpas[studentGpas.length - 1] : null;
 
-    // Get all student courses
+    // Get all student courses (removed unnecessary student include - we already have it)
     const allStudentCourses = await prisma.student_course.findMany({
       where: {
         student_id: student.id,
       },
       include: {
-        student: true,
-        course: true,
-        semester: true,
+        course: {
+          select: {
+            id: true,
+            code: true,
+            name: true,
+            units: true,
+          },
+        },
+        semester: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
@@ -259,22 +267,23 @@ export async function GET(req: NextRequest) {
       }));
     }
 
-    // Check if student is admitted to a future session
+    // Check if student is admitted to a future session (optimized - single query)
     let isFutureStudent = false;
     let admittedSession: any = null;
 
     if (student.session_admitted_id) {
       try {
-        const currentSession = await prisma.session.findFirst({
-          where: { is_active: true },
-        });
-
-        // Always fetch the student's admitted session details
-        const studentSession = await prisma.session.findFirst({
-          where: {
-            id: student.session_admitted_id,
-          },
-        });
+        // Fetch both sessions in parallel
+        const [currentSession, studentSession] = await Promise.all([
+          prisma.session.findFirst({
+            where: { is_active: true },
+          }),
+          prisma.session.findFirst({
+            where: {
+              id: student.session_admitted_id,
+            },
+          }),
+        ]);
 
         if (studentSession) {
           admittedSession = studentSession;

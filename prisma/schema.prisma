@@ -16,6 +16,8 @@ model affiliate {
   updated_at     DateTime @default(now()) @db.Timestamptz(6)
   affiliate_paid String[] @default([])
   user           user?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
 }
 
 model ai_conversations {
@@ -62,6 +64,11 @@ model announcements {
   announcement_reads announcement_reads[]
   institution        institution          @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user               user                 @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([institution_id])
+  @@index([user_id])
+  @@index([created_at])
+  @@index([institution_id, created_at])
 }
 
 model class_degree {
@@ -73,6 +80,8 @@ model class_degree {
   institution_id Int?
   institution    institution?  @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student_gpa    student_gpa[]
+
+  @@index([institution_id])
 }
 
 model course {
@@ -101,6 +110,12 @@ model course {
   programme_course        programme_course[]
   staff_course            staff_course[]
   student_course          student_course[]
+
+  @@index([programme_id])
+  @@index([level_id])
+  @@index([department_id])
+  @@index([published])
+  @@index([department_id, published])
 }
 
 model course_announcement {
@@ -113,6 +128,10 @@ model course_announcement {
   updated_at DateTime? @db.Timestamptz(6)
   course     course    @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user       user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+  @@index([course_id])
+  @@index([created_at])
 }
 
 model course_discussion_comment {
@@ -124,6 +143,10 @@ model course_discussion_comment {
   updated_at                 DateTime?               @db.Timestamptz(6)
   course_discussion_topic    course_discussion_topic @relation(fields: [course_discussion_topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user                       user                    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+  @@index([course_discussion_topic_id])
+  @@index([created_at])
 }
 
 model course_discussion_topic {
@@ -139,6 +162,10 @@ model course_discussion_topic {
   course_discussion_comment course_discussion_comment[]
   course                    course                      @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user                      user                        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+  @@index([course_id])
+  @@index([start_date])
 }
 
 model course_forum_thread {
@@ -150,6 +177,10 @@ model course_forum_thread {
   updated_at            DateTime?          @db.Timestamptz(6)
   course_forum_topic    course_forum_topic @relation(fields: [course_forum_topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user                  user               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+  @@index([course_forum_topic_id])
+  @@index([created_at])
 }
 
 model course_forum_topic {
@@ -163,6 +194,10 @@ model course_forum_topic {
   course_forum_thread course_forum_thread[]
   course              course                @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user                user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+  @@index([course_id])
+  @@index([created_at])
 }
 
 model course_lesson {
@@ -182,6 +217,9 @@ model course_lesson {
   // New relations for practice questions
   practice_questions practice_question[]
   practice_sessions  practice_session[]
+
+  @@index([course_module_id])
+  @@index([course_module_id, order])
 }
 
 model course_meetings {
@@ -218,6 +256,10 @@ model course_module {
   course          course?           @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   course_progress course_progress[]
   course_test     course_test[]
+
+  @@index([course_id])
+  @@index([published])
+  @@index([course_id, published, order])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -269,6 +311,8 @@ model course_question {
   created_at     DateTime     @default(now()) @db.Timestamptz(6)
   updated_at     DateTime     @default(now()) @db.Timestamptz(6)
   course_test    course_test? @relation(fields: [course_test_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([course_test_id])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -292,6 +336,11 @@ model course_test {
   course_lesson    course_lesson?    @relation(fields: [course_lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   course_module    course_module?    @relation(fields: [course_module_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student_test     student_test[]
+
+  @@index([course_id])
+  @@index([course_module_id])
+  @@index([course_lesson_id])
+  @@index([published])
 }
 
 model department {
@@ -311,6 +360,8 @@ model department {
   programme    programme[]
   staff        staff[]
   student_test student_test[]
+
+  @@index([faculty_id])
 }
 
 model faculty {
@@ -325,6 +376,8 @@ model faculty {
   department     department[]
   institution    institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   fee            fee[]
+
+  @@index([institution_id])
 }
 
 model fee {
@@ -360,6 +413,12 @@ model fee {
   programme                 programme?   @relation(fields: [programme_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   session                   session?     @relation(fields: [session_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_fee_updated_byTouser user?        @relation("fee_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([institution_id])
+  @@index([session_id])
+  @@index([programme_id])
+  @@index([level_id])
+  @@index([active])
 }
 
 model grade {
@@ -372,6 +431,8 @@ model grade {
   point          Decimal?         @default(0) @db.Decimal(3, 2)
   institution    institution?     @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student_result student_result[]
+
+  @@index([institution_id])
 }
 
 model institution {
@@ -397,6 +458,12 @@ model institution {
   admission_mail                        String?              @db.VarChar(255)
   school_calendar                       String?              @db.VarChar(255)
   director_signature                    String?              @db.VarChar(255)
+  vice_chancellor_name                  String?              @db.VarChar(255)
+  director_name                         String?              @db.VarChar(255)
+  director_credentials                  String?              @db.VarChar(255)
+  secretary_name                        String?              @db.VarChar(255)
+  secretary_signature                   String?              @db.VarChar(255)
+  secondary_logo                        String?              @db.VarChar(255)
   paywall_on                            Boolean?             @default(false)
   id_card                               Json?                @db.Json
   token                                 String?
@@ -467,6 +534,13 @@ model payment2 {
   department         department?  @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   institution        institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student            student      @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([student_id])
+  @@index([institution_id])
+  @@index([status])
+  @@index([reference])
+  @@index([created_at])
+  @@index([status, created_at])
 }
 
 model payment_account {
@@ -481,6 +555,8 @@ model payment_account {
   test_secret_key String?      @db.VarChar(255)
   test_public_key String?      @db.VarChar(255)
   institution     institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([institution_id])
 }
 
 model programme {
@@ -498,6 +574,8 @@ model programme {
   department       department?        @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   programme_course programme_course[]
   student          student[]
+
+  @@index([department_id])
 }
 
 model programme_course {
@@ -512,6 +590,11 @@ model programme_course {
   course            course?    @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   level             level?     @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   programme         programme? @relation(fields: [programme_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([programme_id])
+  @@index([course_id])
+  @@index([level_id])
+  @@index([programme_id, level_id])
 }
 
 model school_forum_category {
@@ -521,6 +604,8 @@ model school_forum_category {
   updated_at         DateTime?            @db.Timestamptz(6)
   institution_id     String?              @default("1") @db.VarChar(255)
   school_forum_topic school_forum_topic[]
+
+  @@index([institution_id])
 }
 
 model school_forum_thread {
@@ -533,6 +618,10 @@ model school_forum_thread {
   institution_id        String?            @default("1") @db.VarChar(255)
   school_forum_topic    school_forum_topic @relation(fields: [school_forum_topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user                  user               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+  @@index([school_forum_topic_id])
+  @@index([created_at])
 }
 
 model school_forum_topic {
@@ -547,6 +636,10 @@ model school_forum_topic {
   school_forum_thread      school_forum_thread[]
   school_forum_category    school_forum_category? @relation(fields: [school_forum_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user                     user                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([school_forum_category_id])
+  @@index([user_id])
+  @@index([created_at])
 }
 
 model semester {
@@ -569,6 +662,11 @@ model semester {
   student                        student[]
   student_course                 student_course[]
   student_gpa                    student_gpa[]
+
+  @@index([session_id])
+  @@index([institution_id])
+  @@index([is_active])
+  @@index([institution_id, is_active])
 }
 
 model session {
@@ -584,6 +682,10 @@ model session {
   semester       semester[]
   institution    institution? @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student        student[]
+
+  @@index([institution_id])
+  @@index([is_active])
+  @@index([institution_id, is_active])
 }
 
 model staff {
@@ -611,6 +713,10 @@ model staff {
   user_staff_updated_byTouser user?          @relation("staff_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_staff_user_idTouser    user?          @relation("staff_user_idTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   staff_course                staff_course[]
+
+  @@index([user_id])
+  @@index([department_id])
+  @@index([is_deleted])
 }
 
 model staff_course {
@@ -625,6 +731,9 @@ model staff_course {
   user_staff_course_created_byTouser user?    @relation("staff_course_created_byTouser", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   staff                              staff?   @relation(fields: [staff_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_staff_course_updated_byTouser user?    @relation("staff_course_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([staff_id])
+  @@index([course_id])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -710,6 +819,13 @@ model student_course {
   student                              student?         @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_student_course_updated_byTouser user?            @relation("student_course_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student_result                       student_result[]
+
+  @@index([student_id])
+  @@index([course_id])
+  @@index([semester_id])
+  @@index([level_id])
+  @@index([approval_status])
+  @@index([student_id, semester_id])
 }
 
 model student_gpa {
@@ -737,6 +853,11 @@ model student_gpa {
   semester                          semester?     @relation(fields: [semester_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student                           student?      @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_student_gpa_updated_byTouser user?         @relation("student_gpa_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([student_id])
+  @@index([semester_id])
+  @@index([level_id])
+  @@index([student_id, semester_id])
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -759,6 +880,12 @@ model student_result {
   grade                                grade?          @relation(fields: [grade_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student_course                       student_course? @relation(fields: [student_course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_student_result_updated_byTouser user?           @relation("student_result_updated_byTouser", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([student_course_id])
+  @@index([grade_id])
+  @@index([publish])
+  @@index([approved])
+  @@index([publish, approved])
 }
 
 model student_test {
@@ -788,6 +915,11 @@ model student_test {
   institution                       institution @relation(fields: [institution_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_student_test_marked_byTouser user?       @relation("student_test_marked_byTouser", fields: [marked_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_student_test_user_idTouser   user        @relation("student_test_user_idTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([user_id])
+  @@index([course_test_id])
+  @@index([institution_id])
+  @@index([user_id, course_test_id])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -903,4 +1035,10 @@ model user {
   // New relations for practice questions
   practice_questions_generated practice_question[] @relation("practice_question_generated_by")
   practice_sessions            practice_session[]  @relation("practice_session_user")
+
+  @@index([institution_id])
+  @@index([role])
+  @@index([email])
+  @@index([active])
+  @@index([institution_id, role, active])
 }

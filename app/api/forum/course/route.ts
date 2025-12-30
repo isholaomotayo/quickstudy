@@ -53,20 +53,20 @@ export async function GET(request: NextRequest) {
             code: true,
           },
         },
-        course_forum_thread: {
+        _count: {
           select: {
-            id: true,
+            course_forum_thread: true,
           },
         },
       },
       orderBy: { created_at: "desc" },
     });
 
-    // Add thread count
+    // Add thread count using _count
     const topicsWithCount = topics.map((topic) => ({
       ...topic,
-      thread_count: topic.course_forum_thread.length,
-      course_forum_thread: undefined,
+      thread_count: topic._count.course_forum_thread,
+      _count: undefined,
     }));
 
     return createSuccessResponse(topicsWithCount, user);

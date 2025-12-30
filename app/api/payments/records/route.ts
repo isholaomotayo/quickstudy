@@ -30,12 +30,25 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch student payments and information
+    // Optimization: Limit fields to only what's needed and add pagination
     const [payments, studentInfo] = await Promise.all([
       prisma.payment2.findMany({
         where: whereClause,
-        include: {
+        select: {
+          id: true,
+          reference: true,
+          amount: true,
+          status: true,
+          processor: true,
+          processor_currency: true,
+          created_at: true,
+          updated_at: true,
+          paid_at: true,
+          cart: true,
+          student_id: true,
           student: {
-            include: {
+            select: {
+              id: true,
               user_student_user_idTouser: {
                 select: {
                   id: true,
@@ -75,6 +88,7 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: { created_at: 'desc' },
+        take: 100, // Pagination: limit to 100 most recent payments
       }),
       // Get student info if using userId
       userId ? prisma.student.findFirst({
@@ -83,7 +97,8 @@ export async function GET(request: NextRequest) {
             id: BigInt(userId)
           }
         },
-        include: {
+        select: {
+          id: true,
           user_student_user_idTouser: {
             select: {
               id: true,

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const user = authResult.user!;
     const { searchParams } = new URL(request.url);
 
-    const pgsize = parseInt(searchParams.get("pgsize") || "500");
+    const pgsize = parseInt(searchParams.get("pgsize") || "50");
     const pg = parseInt(searchParams.get("pg") || "1");
 
     // Get announcements for user's institution

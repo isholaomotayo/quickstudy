@@ -1084,74 +1084,96 @@ export async function getDepartmentsWithUserCounts(institutionId?: number) {
       },
     });
 
-    const departmentsWithCounts = await Promise.all(
-      departments.map(async (dept) => {
-        try {
-          const [staffCount, programmes] = await Promise.all([
-            prisma.staff.count({
+    // Optimized: Fetch all data in batch queries instead of N queries per department
+    const departmentIds = departments.map(d => d.id);
+
+    // Batch fetch staff counts
+    const staffCountsByDept = await prisma.staff.groupBy({
+      by: ['department_id'],
+      where: {
+        department_id: { in: departmentIds },
+        is_deleted: false,
+      },
+      _count: { id: true },
+    });
+
+    const staffCountMap = new Map(
+      staffCountsByDept.map(item => [item.department_id, item._count.id])
+    );
+
+    // Batch fetch programmes with student counts
+    const allProgrammes = await prisma.programme.findMany({
+      where: {
+        department_id: { in: departmentIds },
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        years: true,
+        department_id: true,
+        _count: {
+          select: {
+            student: {
               where: {
-                department_id: dept.id,
                 is_deleted: false,
               },
-            }),
-            prisma.programme.findMany({
-              where: {
-                department_id: dept.id,
-              },
-              select: {
-                id: true,
-                name: true,
-                description: true,
-                years: true,
-                _count: {
-                  select: {
-                    student: {
-                      where: {
-                        is_deleted: false,
-                      },
-                    },
-                  },
-                },
-              },
-            }),
-          ]);
+            },
+          },
+        },
+      },
+    });
 
-          const studentCount = programmes.reduce(
-            (acc, prog) => acc + (prog._count?.student || 0),
-            0
-          );
+    // Group programmes by department
+    const programmesByDept = allProgrammes.reduce((acc, prog) => {
+      if (!acc[prog.department_id!]) {
+        acc[prog.department_id!] = [];
+      }
+      acc[prog.department_id!].push(prog);
+      return acc;
+    }, {} as Record<number, typeof allProgrammes>);
 
-          return {
-            id: dept.id,
-            name: dept.name,
-            code: dept.code,
-            description: dept.description,
-            faculty_id: dept.faculty_id,
-            faculty: dept.faculty,
-            programme: programmes,
-            userCount: staffCount + studentCount,
-            staffCount: staffCount,
-            studentCount: studentCount,
-            programmeCount: programmes.length,
-          };
-        } catch (error) {
-          console.error(`Error processing department ${dept.name}:`, error);
-          return {
-            id: dept.id,
-            name: dept.name,
-            code: dept.code,
-            description: dept.description,
-            faculty_id: dept.faculty_id,
-            faculty: dept.faculty,
-            programme: [],
-            userCount: 0,
-            staffCount: 0,
-            studentCount: 0,
-            programmeCount: 0,
-          };
-        }
-      })
-    );
+    // Build final result
+    const departmentsWithCounts = departments.map(dept => {
+      try {
+        const staffCount = staffCountMap.get(dept.id) || 0;
+        const programmes = programmesByDept[dept.id] || [];
+
+        const studentCount = programmes.reduce(
+          (acc, prog) => acc + (prog._count?.student || 0),
+          0
+        );
+
+        return {
+          id: dept.id,
+          name: dept.name,
+          code: dept.code,
+          description: dept.description,
+          faculty_id: dept.faculty_id,
+          faculty: dept.faculty,
+          programme: programmes,
+          userCount: staffCount + studentCount,
+          staffCount: staffCount,
+          studentCount: studentCount,
+          programmeCount: programmes.length,
+        };
+      } catch (error) {
+        console.error(`Error processing department ${dept.name}:`, error);
+        return {
+          id: dept.id,
+          name: dept.name,
+          code: dept.code,
+          description: dept.description,
+          faculty_id: dept.faculty_id,
+          faculty: dept.faculty,
+          programme: [],
+          userCount: 0,
+          staffCount: 0,
+          studentCount: 0,
+          programmeCount: 0,
+        };
+      }
+    });
 
     return departmentsWithCounts;
   } catch (error) {
@@ -1167,6 +1189,7 @@ export async function getDepartmentsWithUserCounts(institutionId?: number) {
 // Faculty Data with User Counts
 export async function getFacultiesWithUserCounts(institutionId?: number) {
   try {
+    // Optimized: Use _count instead of fetching all IDs
     const faculties = await prisma.faculty.findMany({
       where: {
         institution_id: institutionId,
@@ -1174,16 +1197,24 @@ export async function getFacultiesWithUserCounts(institutionId?: number) {
       include: {
         department: {
           include: {
-            staff: {
+            _count: {
               select: {
-                id: true,
+                staff: {
+                  where: {
+                    is_deleted: false,
+                  },
+                },
               },
             },
             programme: {
               include: {
-                student: {
+                _count: {
                   select: {
-                    id: true,
+                    student: {
+                      where: {
+                        is_deleted: false,
+                      },
+                    },
                   },
                 },
               },
@@ -1193,34 +1224,30 @@ export async function getFacultiesWithUserCounts(institutionId?: number) {
       },
     });
 
-    return faculties.map((faculty) => ({
-      id: faculty.id,
-      name: faculty.name,
-      departmentCount: faculty.department.length,
-      userCount: faculty.department.reduce(
-        (acc, dept) =>
-          acc +
-          dept.staff.length +
-          dept.programme.reduce(
-            (progAcc, prog) => progAcc + prog.student.length,
-            0
-          ),
+    return faculties.map((faculty) => {
+      const staffCount = faculty.department.reduce(
+        (acc, dept) => acc + (dept._count?.staff || 0),
         0
-      ),
-      staffCount: faculty.department.reduce(
-        (acc, dept) => acc + dept.staff.length,
-        0
-      ),
-      studentCount: faculty.department.reduce(
+      );
+      const studentCount = faculty.department.reduce(
         (acc, dept) =>
           acc +
           dept.programme.reduce(
-            (progAcc, prog) => progAcc + prog.student.length,
+            (progAcc, prog) => progAcc + (prog._count?.student || 0),
             0
           ),
         0
-      ),
-    }));
+      );
+
+      return {
+        id: faculty.id,
+        name: faculty.name,
+        departmentCount: faculty.department.length,
+        userCount: staffCount + studentCount,
+        staffCount,
+        studentCount,
+      };
+    });
   } catch (error) {
     console.error("Error fetching faculties with user counts:", error);
     throw new Error("Failed to fetch faculties data");

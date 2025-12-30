@@ -226,6 +226,34 @@ export async function POST(
       return updatedUser;
     });
 
+    // Send admission letter email (non-blocking)
+    try {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_URL ||
+        process.env.FRONTEND_URL ||
+        "http://localhost:3000";
+      
+      // Get the student ID for the send-letter route
+      const studentRecord = await prisma.student.findFirst({
+        where: { user_id: BigInt(id) },
+      });
+
+      if (studentRecord) {
+        // Call send-letter route asynchronously (don't wait for it)
+        fetch(`${baseUrl}/api/dashboard/applications/${id}/admit/send-letter`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ studentId: studentRecord.id.toString() }),
+        }).catch((emailError) => {
+          console.error("Failed to send admission letter:", emailError);
+          // Don't fail the admission if email fails
+        });
+      }
+    } catch (emailError) {
+      console.error("Error triggering admission letter email:", emailError);
+      // Don't fail the admission if email fails
+    }
+
     return NextResponse.json({
       success: true,
       message: "Applicant admitted successfully",

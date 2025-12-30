@@ -141,7 +141,7 @@ export function CgpaClient({
 
         // Get student course registrations
         const coursesResponse = await fetch(
-          `${API_URL}/api/studentcourse?student_id=${studentId}`,
+          `/api/studentcourse?student_id=${studentId}`,
           { headers, credentials: "include" }
         );
 
@@ -154,7 +154,7 @@ export function CgpaClient({
         // Get student results using the student-specific endpoint
         let studentResults = [];
         const resultsResponse = await fetch(
-          `${API_URL}/api/studentresult/${studentId}`,
+          `/api/studentresult/${studentId}`,
           { headers, credentials: "include" }
         );
 

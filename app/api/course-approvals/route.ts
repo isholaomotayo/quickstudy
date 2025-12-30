@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db";
 import { hasAnyRole, UserRole, ROLE_GROUPS } from "@/lib/roles";
 
-const prisma = new PrismaClient();
 
 async function getUserRole(): Promise<UserRole | null> {
   try {

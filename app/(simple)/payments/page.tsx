@@ -17,8 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PaymentClientWrapper from "./payment-client-wrapper";
 import StudentPaymentRecords from "@/components/StudentPaymentRecords";
-
-// Using relative URLs for API calls
+import { getServerComponentApiUrl } from "@/lib/server-api-url";
 
 interface PaymentItem {
   id: string;
@@ -94,7 +93,7 @@ async function getPaymentServerData(searchParams: {
 
   try {
     // Fetch payments history (equivalent to getTableData("payment2"))
-    const paymentsUrl = `/api/payment2?${new URLSearchParams({
+    const paymentsEndpoint = `/api/payment2?${new URLSearchParams({
       pgsize: "50",
       pg: "1",
       ...Object.fromEntries(
@@ -105,6 +104,7 @@ async function getPaymentServerData(searchParams: {
       ),
     })}`;
 
+    const paymentsUrl = await getServerComponentApiUrl(paymentsEndpoint);
     console.log("Fetching payments from:", paymentsUrl);
 
     const paymentsResponse = await fetch(paymentsUrl, {
@@ -152,7 +152,7 @@ async function getPaymentServerData(searchParams: {
     // Fetch payables for students
     let myPayables = { fixedDues: [], flexibleDues: {} };
     if (role === "STUDENT") {
-      const payablesUrl = `/api/payment2/payables`;
+      const payablesUrl = await getServerComponentApiUrl(`/api/payment2/payables`);
       console.log("Fetching payables from:", payablesUrl);
 
       try {
@@ -181,7 +181,7 @@ async function getPaymentServerData(searchParams: {
     }
 
     // Fetch payment details (payment account configuration)
-    const paymentDetailsUrl = `/api/paymentaccount`;
+    const paymentDetailsUrl = await getServerComponentApiUrl(`/api/paymentaccount`);
 
     const paymentDetailsResponse = await fetch(paymentDetailsUrl, {
       method: "GET",

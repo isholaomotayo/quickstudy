@@ -39,9 +39,9 @@ export async function GET(request: NextRequest) {
               email: true,
             },
           },
-          school_forum_thread: {
+          _count: {
             select: {
-              id: true,
+              school_forum_thread: true,
             },
           },
         },
@@ -56,11 +56,11 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    // Add thread count to each topic
+    // Add thread count to each topic using _count
     const topicsWithCount = topics.map((topic) => ({
       ...topic,
-      thread_count: topic.school_forum_thread.length,
-      school_forum_thread: undefined, // Remove the array, keep count only
+      thread_count: topic._count.school_forum_thread,
+      _count: undefined, // Remove _count object from response
     }));
 
     return createSuccessResponse(

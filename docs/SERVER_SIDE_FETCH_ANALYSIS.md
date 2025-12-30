@@ -46,6 +46,15 @@
 9. `app/api/courses/[courseId]/template/route.ts` - 1 fetch call
    - GET `/api/studentresult/template/${courseId}`
 
+### Server Components with Fetch
+
+**Total: 1 server component with fetch calls**
+
+1. `app/(simple)/payments/page.tsx` - 3 fetch calls ✅ **FIXED**
+   - GET `/api/payment2?${queryString}` - Uses `getServerComponentApiUrl()`
+   - GET `/api/payment2/payables` - Uses `getServerComponentApiUrl()`
+   - GET `/api/paymentaccount` - Uses `getServerComponentApiUrl()`
+
 ### Server Actions with Fetch
 
 **Total: 1 server action with fetch**
@@ -57,7 +66,7 @@
 
 ### Pattern Used
 
-All server-side fetch calls currently use:
+**For API Routes (with Request object):**
 
 ```typescript
 import { getServerApiUrl } from "@/lib/server-api-url";
@@ -67,6 +76,21 @@ const response = await fetch(getServerApiUrl(request, `/api/endpoint`), {
   headers: {
     "Content-Type": "application/json",
     Cookie: request.headers.get("cookie") || "",
+  },
+});
+```
+
+**For Server Components (no Request object):**
+
+```typescript
+import { getServerComponentApiUrl } from "@/lib/server-api-url";
+
+const url = await getServerComponentApiUrl(`/api/endpoint`);
+const response = await fetch(url, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    Cookie: cookieString,
   },
 });
 ```

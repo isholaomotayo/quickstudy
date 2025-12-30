@@ -114,17 +114,31 @@ export async function GET(request: NextRequest) {
         take: 100, // Limit to prevent performance issues
       });
 
+      // Fetch all payments upfront for all students (optimized - single query instead of N queries)
+      const allStudentIds = allStudents.map(s => s.id);
+      const allPayments = await prisma.payment2.findMany({
+        where: { student_id: { in: allStudentIds } },
+        select: {
+          id: true,
+          student_id: true,
+          amount: true,
+          status: true,
+          created_at: true,
+        },
+      });
+
+      // Group payments by student_id for O(1) lookup
+      const paymentsByStudent = allPayments.reduce((acc, payment) => {
+        if (!acc[payment.student_id.toString()]) {
+          acc[payment.student_id.toString()] = [];
+        }
+        acc[payment.student_id.toString()].push(payment);
+        return acc;
+      }, {} as Record<string, typeof allPayments>);
+
       // Find matching student by recreating verification data and hash
       for (const potentialStudent of allStudents) {
-        const potentialPayments = await prisma.payment2.findMany({
-          where: { student_id: potentialStudent.id },
-          select: {
-            id: true,
-            amount: true,
-            status: true,
-            created_at: true,
-          },
-        });
+        const potentialPayments = paymentsByStudent[potentialStudent.id.toString()] || [];
 
         const summary = {
           totalPayments: potentialPayments.length,
