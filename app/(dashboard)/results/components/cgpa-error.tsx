@@ -33,3 +33,4 @@ export function CgpaError({ error }: CgpaErrorProps) {
   );
 }
 
+

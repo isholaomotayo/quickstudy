@@ -1,5 +1,6 @@
 import useSWR, { mutate } from "swr";
 import { useState, useCallback } from "react";
+import { api } from "@/lib/api-wrapper";
 
 interface Message {
   id: string;
@@ -22,13 +23,22 @@ interface ChatHistoryData {
   totalCount: number;
 }
 
-// SWR fetcher function
+// SWR fetcher function - uses api client to ensure cookies are sent
 const chatHistoryFetcher = async (url: string): Promise<ChatHistoryData> => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch chat history: ${response.status}`);
+  try {
+    // api.get() automatically includes credentials and handles errors
+    const data = await api.get<{ conversations: Conversation[]; total: number }>(url);
+    
+    // Transform API response to match ChatHistoryData interface
+    return {
+      conversations: data.conversations || [],
+      totalCount: data.total || 0,
+    };
+  } catch (error: any) {
+    // Re-throw with a more descriptive error message
+    const status = error?.status || error?.statusCode || "unknown";
+    throw new Error(`Failed to fetch chat history: ${status}`);
   }
-  return response.json();
 };
 
 // Convert conversations to messages format
@@ -189,11 +199,7 @@ export function useChatHistory(
     if (!userId || !cacheKey) return;
 
     try {
-      const response = await fetch("/api/ai-chat", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      await api.delete("/api/ai-chat", {
         body: JSON.stringify({
           userId: userId.toString(),
           lessonId: lessonId || null,
@@ -201,10 +207,8 @@ export function useChatHistory(
         }),
       });
 
-      if (response.ok) {
-        // Clear the cache
-        mutate(cacheKey, undefined);
-      }
+      // Clear the cache
+      mutate(cacheKey, undefined);
     } catch (err) {
       console.error("Failed to clear history:", err);
     }

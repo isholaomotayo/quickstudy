@@ -353,3 +353,4 @@ export async function GET(request: NextRequest) {
 - [ ] Automatic request batching
 - [ ] GraphQL support
 
+

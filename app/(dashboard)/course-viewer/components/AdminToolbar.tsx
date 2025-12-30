@@ -101,8 +101,9 @@ export function AdminToolbar({
     onLessonsUpdate(updatedLessons);
 
     try {
+      // api.post() already returns unwrapped data from Next.js API
       const response = await api.post("/api/courselesson", lessonData);
-      const createdLesson = response.data.data;
+      const createdLesson = response;
 
       // Update with the real lesson data from the server
       const finalLessons = updatedLessons.map((lesson) =>
@@ -131,11 +132,12 @@ export function AdminToolbar({
     onLessonsUpdate(updatedLessons);
 
     try {
+      // api.put() already returns unwrapped data from Next.js API
       const response = await api.put(
         `/api/courselesson/${lessonData.id}`,
         lessonData
       );
-      const updatedLesson = response.data.data;
+      const updatedLesson = response;
 
       // Update with the real lesson data from the server
       const finalLessons = updatedLessons.map((lesson) =>
@@ -211,12 +213,11 @@ export function AdminToolbar({
 
       // Debug logging
       console.log("Full testResponse:", testResponse);
-      console.log("testResponse.data:", testResponse.data);
 
-      // Extract the test data from the API response
+      // api.post() already returns unwrapped data from Next.js API
       // The API returns { success: true, data: testObject, user: ... }
-      // So we need testResponse.data.data to get the actual test object
-      const test = testResponse.data.data || testResponse.data;
+      // api-client unwraps this to just the testObject
+      const test = testResponse;
       console.log("Extracted test object:", test);
       console.log("Test ID:", test?.id);
 

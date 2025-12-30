@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
 
       // Verify all registrations are for this student only
       const allForSelf = registrations.every(
-        (reg) => parseInt(reg.student_id) === Number(studentRecord.id)
+        (reg) => BigInt(reg.student_id) === studentRecord.id
       );
 
       if (!allForSelf) {
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
       registrations.map(async (reg) => {
         const existing = await prisma.student_course.findFirst({
           where: {
-            student_id: parseInt(reg.student_id),
+            student_id: BigInt(reg.student_id),
             course_id: parseInt(reg.course_id),
             semester_id: reg.semester_id
               ? parseInt(reg.semester_id)
@@ -218,15 +218,15 @@ export async function POST(request: NextRequest) {
       registrations.map((reg) =>
         prisma.student_course.create({
           data: {
-            student_id: parseInt(reg.student_id),
+            student_id: BigInt(reg.student_id),
             course_id: parseInt(reg.course_id),
             semester_id: reg.semester_id ? parseInt(reg.semester_id) : null,
             level_id: reg.level_id ? parseInt(reg.level_id) : null,
             units: reg.units ? parseInt(reg.units) : 0,
             cleared: reg.cleared ?? false,
             approval_status: reg.approval_status ?? false,
-            created_by: parseInt(user.id),
-            updated_by: parseInt(user.id),
+            created_by: BigInt(user.id),
+            updated_by: BigInt(user.id),
           },
           include: {
             course: {

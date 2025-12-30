@@ -136,7 +136,7 @@ export async function PUT(request: NextRequest, context: RouteParams) {
         ...(units !== undefined && { units: parseInt(units) }),
         ...(cleared !== undefined && { cleared }),
         ...(approval_status !== undefined && { approval_status }),
-        updated_by: parseInt(user.id),
+        updated_by: BigInt(user.id),
         updated_at: new Date(),
       },
       include: {

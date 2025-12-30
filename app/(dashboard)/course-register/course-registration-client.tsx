@@ -237,14 +237,15 @@ export function CourseRegistrationClient() {
       const results = await Promise.allSettled(registrationPromises);
 
       // Extract successful registrations
+      // api.post() already returns unwrapped data from Next.js API response
+      // Next.js API returns { success: true, data: registration, user: {...} }
+      // api-client unwraps this to just the registration object
       const successfulRegistrations = results
         .filter((result) => result.status === "fulfilled")
         .map((result) => {
           if (result.status === "fulfilled") {
-            const response = result.value;
-            // api-wrapper returns { data: { success, data, user } }
-            const apiResponse = response.data || response;
-            return apiResponse.data || apiResponse;
+            // api.post() returns the unwrapped data directly
+            return result.value;
           }
           return null;
         })
