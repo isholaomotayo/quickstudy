@@ -879,6 +879,8 @@ export default function UserProfile() {
             backImage: institutionData?.id_card?.back,
             institutionLogo: institutionData?.logo,
             institutionEmail: institutionData?.support_mail || institutionData?.email,
+            institutionName: institutionData?.name,
+            institutionAbbreviation: institutionData?.code,
           })}
         </div>
       )}

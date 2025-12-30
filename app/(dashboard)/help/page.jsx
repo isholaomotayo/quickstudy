@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import KnowledgeBaseData from "./data";
 import { useUser } from "@/contexts/AppContext";
+import { api } from "@/lib/api-wrapper";
 
 export default function HelpSupportPage() {
 	const [mounted, setMounted] = useState(false);
@@ -34,6 +35,7 @@ export default function HelpSupportPage() {
 		KnowledgeBaseData.getByRole("student"),
 	);
 	const [filteredKnowledge, setFilteredKnowledge] = useState([]);
+	const [institutionData, setInstitutionData] = useState(null);
 	const { userData, isLoading } = useUser();
 
 	useEffect(() => {
@@ -45,6 +47,19 @@ export default function HelpSupportPage() {
 			const data = KnowledgeBaseData.getByRole(currentRole);
 			setRoleData(data);
 			setFilteredKnowledge(data.knowledgeBase);
+
+			// Fetch institution data if we have institution_id
+			if (userData.institution_id) {
+				api.post("/api/institution/params", { id: userData.institution_id })
+					.then((result) => {
+						const institutionApiResponse = result.data || result;
+						const institution = institutionApiResponse.data || institutionApiResponse;
+						setInstitutionData(institution);
+					})
+					.catch((err) => {
+						console.error("Error fetching institution data:", err);
+					});
+			}
 		}
 	}, [userData, isLoading]);
 
@@ -66,7 +81,9 @@ export default function HelpSupportPage() {
 
 	const supportPhone = "+2348167667864";
 	const supportEmail =
-		process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@quickstudy.ng";
+		institutionData?.support_mail ||
+		institutionData?.email ||
+		"support@quickstudy.ng";
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-emerald-50">

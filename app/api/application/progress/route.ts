@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { getServerApiUrl } from "@/lib/server-api-url";
+import { prisma } from "@/lib/db";
+import {
+  authenticateUser,
+  createAuthErrorResponse,
+} from "@/lib/api-auth";
 
 // Simple in-memory storage for demo (use database in production)
 const applicationStorage = new Map();
@@ -17,16 +20,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user ID from cookies
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("userId")?.value;
+    // Authenticate user
+    const authResult = await authenticateUser();
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "User not authenticated" },
-        { status: 401 }
-      );
+    if (!authResult.success) {
+      return createAuthErrorResponse(authResult.error!, authResult.statusCode!);
     }
+
+    const user = authResult.user!;
+    const userId = BigInt(user.id);
 
     // Save progress with timestamp in memory storage
     applicationStorage.set(sessionId, {
@@ -36,18 +38,19 @@ export async function POST(request: NextRequest) {
 
     // Also save to student table as draft (status: false)
     try {
-      // Only send fields that have valid data
+      // Prepare student data - only include fields that have valid values
       const studentData: any = {
-        user_id: parseInt(userId),
+        user_id: userId,
         status: false, // Set to false for draft/progress saving
+        updated_by: userId,
       };
 
       // Only add fields that have valid values
       if (formData.gender && formData.gender.trim() !== "") {
-        studentData.gender = formData.gender.toLowerCase();
+        studentData.gender = formData.gender.toUpperCase();
       }
       if (formData.dateOfBirth && formData.dateOfBirth.trim() !== "") {
-        studentData.dob = formData.dateOfBirth;
+        studentData.dob = new Date(formData.dateOfBirth);
       }
       if (formData.address && formData.address.trim() !== "") {
         studentData.address = formData.address;
@@ -65,7 +68,7 @@ export async function POST(request: NextRequest) {
         studentData.lga_residence = formData.city;
       }
       if (formData.maritalStatus && formData.maritalStatus.trim() !== "") {
-        studentData.marital_status = formData.maritalStatus;
+        studentData.marital_status = formData.maritalStatus.toUpperCase();
       }
       if (
         formData.employmentStatus &&
@@ -127,80 +130,37 @@ export async function POST(request: NextRequest) {
         studentData.ref_address = formData.ref_address;
       }
 
-      // First, get the existing student record to get the student ID
-      const existingStudentResponse = await fetch(
-        getServerApiUrl(request, `/api/student/userid/${userId}`),
-        {
-          method: "GET",
-          headers: {
-            Cookie: request.headers.get("cookie") || "",
-          },
-        }
-      );
+      // Check if student record already exists
+      const existingStudent = await prisma.student.findFirst({
+        where: {
+          user_id: userId,
+          is_deleted: false,
+        },
+      });
 
-      let studentId = null;
-      if (existingStudentResponse.ok) {
-        const existingStudent = await existingStudentResponse.json();
-        studentId = existingStudent.id;
-      }
-
-      let backendResponse;
-      if (studentId) {
-        // Update existing student record using PUT
-        backendResponse = await fetch(
-          getServerApiUrl(request, `/api/student/${studentId}`),
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*",
-              Cookie: request.headers.get("cookie") || "",
-            },
-            body: JSON.stringify(studentData),
-          }
-        );
-      } else {
-        // Create new student record using POST
-        backendResponse = await fetch(getServerApiUrl(request, `/api/student`), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            Cookie: request.headers.get("cookie") || "",
-          },
-          body: JSON.stringify(studentData),
+      if (existingStudent) {
+        // Update existing student record
+        await prisma.student.update({
+          where: { id: existingStudent.id },
+          data: studentData,
         });
-      }
-
-      if (!backendResponse.ok) {
-        console.error(`Student creation failed: ${backendResponse.status}`);
-        throw new Error(`Backend API error: ${backendResponse.status}`);
+      } else {
+        // Create new student record
+        studentData.created_by = userId;
+        await prisma.student.create({
+          data: studentData,
+        });
       }
 
       // Update user avatar if passport photo is provided
       if (formData.passportPhoto && formData.passportPhoto.trim() !== "") {
-        // Add a small delay to prevent race conditions
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
         try {
-          const avatarResponse = await fetch(
-            getServerApiUrl(request, `/api/user/${userId}`),
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                Cookie: request.headers.get("cookie") || "",
-              },
-              body: JSON.stringify({
-                avatar: formData.passportPhoto,
-              }),
-            }
-          );
-
-          if (!avatarResponse.ok) {
-            console.error(`Avatar update failed: ${avatarResponse.status}`);
-          }
+          await prisma.user.update({
+            where: { id: parseInt(user.id) },
+            data: {
+              avatar: formData.passportPhoto,
+            },
+          });
         } catch (avatarError) {
           console.error("Error updating user avatar:", avatarError);
           // Continue even if avatar update fails
@@ -208,7 +168,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (studentError) {
       console.error("Error saving to student table:", studentError);
-      // Continue with memory storage even if student table save fails
+      // Continue even if student table save fails
     }
 
     return NextResponse.json({

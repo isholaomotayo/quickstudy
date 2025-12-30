@@ -228,10 +228,9 @@ export async function POST(
 
     // Send admission letter email (non-blocking)
     try {
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_URL ||
-        process.env.FRONTEND_URL ||
-        "http://localhost:3000";
+      // Get the base URL from the request
+      const url = new URL(request.url);
+      const baseUrl = `${url.protocol}//${url.host}`;
       
       // Get the student ID for the send-letter route
       const studentRecord = await prisma.student.findFirst({

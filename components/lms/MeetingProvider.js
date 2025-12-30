@@ -16,7 +16,7 @@ const JaaSMeeting = dynamic(
  */
 export default function MeetingProvider({
   roomName = "Live Classroom",
-  userInfo = "University Of Nigeria Nsukka",
+  userInfo = "Student",
   courseCode,
   courseName,
   preferredProvider = "googlemeet", // 'googlemeet' or 'jitsi'

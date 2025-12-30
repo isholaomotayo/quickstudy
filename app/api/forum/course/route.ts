@@ -6,6 +6,7 @@ import {
   createSuccessResponse,
 } from "@/lib/api-auth";
 import { hasPermission } from "@/lib/permissions-config";
+import { cacheGet, cacheSet, cacheInvalidate, routeCacheKey, CACHE_TTL, CACHE_PREFIX } from "@/lib/route-cache";
 
 /**
  * GET /api/forum/course
@@ -32,6 +33,15 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Check cache first
+    const cacheKey = routeCacheKey(CACHE_PREFIX.FORUM, {
+      type: 'course',
+      course_id,
+    });
+
+    const cachedResponse = await cacheGet(cacheKey);
+    if (cachedResponse) return cachedResponse;
 
     const topics = await prisma.course_forum_topic.findMany({
       where: {
@@ -69,7 +79,12 @@ export async function GET(request: NextRequest) {
       _count: undefined,
     }));
 
-    return createSuccessResponse(topicsWithCount, user);
+    // Cache the response
+    const response = createSuccessResponse(topicsWithCount, user);
+    const responseJson = await response.clone().json();
+    await cacheSet(cacheKey, responseJson, CACHE_TTL.FORUM_TOPICS);
+
+    return response;
   } catch (error) {
     console.error("Error fetching course forum topics:", error);
     return NextResponse.json(
@@ -145,6 +160,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Invalidate forum cache
+    await cacheInvalidate(CACHE_PREFIX.FORUM);
 
     return createSuccessResponse(topic, user);
   } catch (error) {

@@ -1,48 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { getServerApiUrl } from '@/lib/server-api-url';
+import { prisma } from '@/lib/db';
+import {
+  authenticateUser,
+  createAuthErrorResponse,
+} from '@/lib/api-auth';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('Fetching grade configuration from backend API');
+    console.log('Fetching grade configuration from database');
 
-    // Get cookies for authentication
-    const cookieStore = await cookies();
-    const cookieString = cookieStore.toString();
+    // Authenticate user
+    const authResult = await authenticateUser();
 
-    // Construct absolute URL for server-side fetch
-    const gradesUrl = getServerApiUrl(request, `/api/grade`);
+    if (!authResult.success) {
+      return createAuthErrorResponse(authResult.error!, authResult.statusCode!);
+    }
 
-    // Call the backend API
-    const response = await fetch(gradesUrl, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        ...(cookieString && { Cookie: cookieString }),
+    // Fetch all grades from database
+    const grades = await prisma.grade.findMany({
+      orderBy: {
+        min_score: 'asc',
       },
     });
 
-    if (!response.ok) {
-      console.error(`Backend API error: ${response.status}`);
-      const errorText = await response.text();
+    if (!grades || grades.length === 0) {
+      console.log('No grades found in database');
       return NextResponse.json(
-        { error: 'Failed to fetch grade configuration', details: errorText, status: response.status },
-        { status: response.status }
+        { 
+          error: 'No grades configured in the system. Please contact administrator to set up grades.',
+          grades: []
+        },
+        { status: 404 }
       );
     }
 
-    const grades = await response.json();
     console.log(`Successfully fetched ${grades.length} grade configurations`);
 
     // Transform the grades to match the frontend interface
-    const transformedGrades = grades.map((grade: any) => ({
+    const transformedGrades = grades.map((grade) => ({
       id: grade.id,
-      letter: grade.name, // backend uses 'name' for grade letter
+      letter: grade.name, // grade uses 'name' for grade letter
       min_score: grade.min_score,
       max_score: grade.max_score,
-      point: grade.point
+      point: grade.point ? Number(grade.point) : 0,
     }));
 
     return NextResponse.json(transformedGrades);

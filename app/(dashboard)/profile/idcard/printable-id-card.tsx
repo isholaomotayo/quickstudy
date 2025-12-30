@@ -24,6 +24,8 @@ interface StudentData {
   photoUrl?: string;
   institutionLogo?: string;
   institutionEmail?: string;
+  institutionName?: string;
+  institutionAbbreviation?: string;
 }
 
 interface PrintableIdCardProps {
@@ -322,16 +324,18 @@ export function PrintableIdCard({ student }: PrintableIdCardProps) {
                   </div>
                   <div>
                     <h1 className="text-[10px] font-bold tracking-wide leading-tight">
-                      UNIVERSITY OF NIGERIA, NSUKKA
+                      {student.institutionName?.toUpperCase() || "INSTITUTION NAME"}
                     </h1>
                     <p className="text-[8px] opacity-90 font-medium">
-                      CENTRE FOR DISTANCE & e-LEARNING
+                      {student.institutionAbbreviation?.toUpperCase() || "INSTITUTION"}
                     </p>
                   </div>
                 </div>
-                <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-[8px]">CDeL</span>
-                </div>
+                  <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-[8px]">
+                      {student.institutionAbbreviation?.substring(0, 4).toUpperCase() || "INST"}
+                    </span>
+                  </div>
               </div>
             </div>
 
@@ -419,9 +423,9 @@ export function PrintableIdCard({ student }: PrintableIdCardProps) {
                 <div className="flex items-center justify-between">
                   <div className="text-[7px] text-gray-600 flex-1 leading-tight">
                     <p className="font-medium">
-                      Property of Centre for Distance & e-Learning, UNN
+                      Property of {student.institutionAbbreviation || student.institutionName || "Institution"}
                     </p>
-                    <p>If found please return to CDeL UNN</p>
+                    <p>If found please return to {student.institutionAbbreviation || student.institutionName || "Institution"}</p>
                   </div>
                   <div className="w-6 h-6 bg-gray-100 border border-gray-200 rounded flex items-center justify-center flex-shrink-0 ml-1">
                     <div className="w-3 h-3 bg-gray-200 rounded grid grid-cols-3 gap-px">
@@ -474,9 +478,9 @@ export function PrintableIdCard({ student }: PrintableIdCardProps) {
                   </h3>
                 </div>
                 <div className="text-[7px] text-gray-600 space-y-0.5 leading-tight">
-                  <p>• Property of University of Nigeria, Nsukka</p>
+                  <p>• Property of {student.institutionName || "Institution"}</p>
                   <p>• Must be carried on university premises</p>
-                  <p>• Report loss to CDeL immediately</p>
+                  <p>• Report loss to {student.institutionAbbreviation || student.institutionName || "Institution"} immediately</p>
                   <p>• Unauthorized use prohibited</p>
                 </div>
               </div>
@@ -541,10 +545,10 @@ export function PrintableIdCard({ student }: PrintableIdCardProps) {
               {/* Footer */}
               <div className="text-center pt-0.5 border-t border-gray-200">
                 <p className="text-[6px] text-gray-500 leading-tight">
-                  Centre for Distance & e-Learning, UNN
+                  {student.institutionAbbreviation || student.institutionName || "Institution"}
                 </p>
                 <p className="text-[6px] text-gray-500">
-                  www.unn.edu.ng | {new Date().getFullYear()}
+                  {student.institutionName || "Institution"} | {new Date().getFullYear()}
                 </p>
               </div>
             </div>

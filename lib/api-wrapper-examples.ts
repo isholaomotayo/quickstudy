@@ -222,12 +222,11 @@ async function createLesson(lessonData: {
 // Example 10: Check Which Backend is Used
 // ============================================
 
-import { getAPIBackend } from "@/lib/api-wrapper";
-
+// Note: getAPIBackend function is not available in the current api-wrapper
+// This functionality would need to be implemented if needed
 function checkBackend() {
-  console.log("Profile API:", getAPIBackend("/api/profile")); // "nextjs" or "fastify"
-  console.log("Course API:", getAPIBackend("/api/course")); // "nextjs" or "fastify"
-  console.log("Forum API:", getAPIBackend("/api/forum")); // "nextjs" or "fastify"
+  // This is a placeholder - implement based on your routing logic
+  console.log("Backend check functionality not available");
 }
 
 // ============================================

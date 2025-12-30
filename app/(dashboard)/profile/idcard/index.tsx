@@ -17,6 +17,8 @@ interface StudentIdCardProps {
   backImage?: string
   institutionLogo?: string
   institutionEmail?: string
+  institutionName?: string
+  institutionAbbreviation?: string
 }
 
 // Modern ID Card Component with flip functionality
@@ -51,6 +53,8 @@ const PrintableStudentIdCard = forwardRef<HTMLDivElement, StudentIdCardProps>((p
     avatar,
     institutionLogo,
     institutionEmail,
+    institutionName,
+    institutionAbbreviation,
   } = props
 
   const student = {
@@ -64,6 +68,8 @@ const PrintableStudentIdCard = forwardRef<HTMLDivElement, StudentIdCardProps>((p
     photoUrl: avatar || "",
     institutionLogo: institutionLogo || "",
     institutionEmail: institutionEmail || "",
+    institutionName: institutionName || "",
+    institutionAbbreviation: institutionAbbreviation || "",
   }
 
   return (

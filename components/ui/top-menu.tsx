@@ -5,17 +5,13 @@ import { usePathname } from "next/navigation";
 import {
   Award,
   BookOpen,
-  Calendar,
   CreditCard,
-  LogOut,
   NotebookTabs,
-  Users,
-  Bell,
   LucideIcon,
   TrendingUp,
   MessageSquare,
-  Globe,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface NavigationItem {
   href: string;
@@ -26,6 +22,7 @@ export interface NavigationItem {
 interface TopMenuProps {
   navigation?: NavigationItem[];
 }
+
 const defaultNavigation: NavigationItem[] = [
   {
     href: "/courses",
@@ -33,9 +30,9 @@ const defaultNavigation: NavigationItem[] = [
     icon: BookOpen,
   },
   {
-    href: "/notifications",
-    label: "Notifications",
-    icon: Bell,
+    href: "/cgpa",
+    label: "CGPA",
+    icon: TrendingUp,
   },
   {
     href: "/results",
@@ -43,9 +40,9 @@ const defaultNavigation: NavigationItem[] = [
     icon: Award,
   },
   {
-    href: "/cgpa",
-    label: "CGPA",
-    icon: TrendingUp,
+    href: "/course-register",
+    label: "Registration",
+    icon: NotebookTabs,
   },
   {
     href: "/payments",
@@ -53,41 +50,13 @@ const defaultNavigation: NavigationItem[] = [
     icon: CreditCard,
   },
   {
-    href: "/calendar",
-    label: "Calendar",
-    icon: Calendar,
-  },
-  {
-    href: "/course-register",
-    label: "Course Registration",
-    icon: NotebookTabs,
-  },
-  {
     href: "/connect",
     label: "Connect",
     icon: MessageSquare,
   },
-  {
-    href: "/oer",
-    label: "OER",
-    icon: Globe,
-  },
-  {
-    href: "/profile",
-    label: "Profile",
-    icon: Users,
-  },
-  {
-    href: "/signin?logout=1",
-    label: "Logout",
-    icon: LogOut,
-  },
 ];
-export function TopMenu(
-  { navigation = defaultNavigation }: TopMenuProps = {
-    navigation: defaultNavigation,
-  }
-) {
+
+export function TopMenu({ navigation = defaultNavigation }: TopMenuProps) {
   const pathname = usePathname();
 
   // Find the best matching navigation item
@@ -154,7 +123,7 @@ export function TopMenu(
   return (
     <div className="border-b border-border bg-card/80 backdrop-blur">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex items-center gap-6 overflow-x-auto">
+        <div className="flex items-center gap-4 overflow-x-auto">
           {navigation.map((item) => {
             const IconComponent = item.icon;
             const active = isActive(item.href);
@@ -163,11 +132,12 @@ export function TopMenu(
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors ${
+                className={cn(
+                  "flex items-center gap-2 text-sm font-medium whitespace-nowrap transition-colors",
                   active
                     ? "text-primary border-b-2 border-primary pb-1"
                     : "text-muted-foreground hover:text-primary"
-                }`}
+                )}
               >
                 <IconComponent className="w-4 h-4" />
                 {item.label}

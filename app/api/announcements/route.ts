@@ -6,6 +6,7 @@ import {
   createSuccessResponse,
 } from "@/lib/api-auth";
 import { hasPermission } from "@/lib/permissions-config";
+import { cacheGet, cacheSet, cacheInvalidate, routeCacheKey, CACHE_TTL, CACHE_PREFIX } from "@/lib/route-cache";
 
 /**
  * GET /api/announcements
@@ -24,6 +25,17 @@ export async function GET(request: NextRequest) {
 
     const pgsize = parseInt(searchParams.get("pgsize") || "50");
     const pg = parseInt(searchParams.get("pg") || "1");
+
+    // Check cache first
+    const cacheKey = routeCacheKey(CACHE_PREFIX.ANNOUNCEMENT, {
+      institution_id: user.institution_id,
+      user_id: user.id,
+      pgsize,
+      pg,
+    });
+
+    const cachedResponse = await cacheGet(cacheKey);
+    if (cachedResponse) return cachedResponse;
 
     // Get announcements for user's institution
     const [announcements, total] = await Promise.all([
@@ -60,18 +72,22 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    return createSuccessResponse(
-      {
-        announcements,
-        pagination: {
-          total,
-          page: pg,
-          pageSize: pgsize,
-          totalPages: Math.ceil(total / pgsize),
-        },
+    const responseData = {
+      announcements,
+      pagination: {
+        total,
+        page: pg,
+        pageSize: pgsize,
+        totalPages: Math.ceil(total / pgsize),
       },
-      user
-    );
+    };
+
+    // Cache the response
+    const response = createSuccessResponse(responseData, user);
+    const responseJson = await response.clone().json();
+    await cacheSet(cacheKey, responseJson, CACHE_TTL.ANNOUNCEMENTS);
+
+    return response;
   } catch (error) {
     console.error("Error fetching announcements:", error);
     return NextResponse.json(
@@ -140,6 +156,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Invalidate announcement cache for this institution
+    await cacheInvalidate(CACHE_PREFIX.ANNOUNCEMENT, user.institution_id);
 
     return createSuccessResponse(announcement, user);
   } catch (error) {

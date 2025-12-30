@@ -6,6 +6,7 @@ import {
   createSuccessResponse,
 } from "@/lib/api-auth";
 import { hasPermission } from "@/lib/permissions-config";
+import { cacheGet, cacheSet, cacheInvalidate, routeCacheKey, CACHE_TTL, CACHE_PREFIX } from "@/lib/route-cache";
 
 /**
  * GET /api/forum/topics
@@ -24,6 +25,17 @@ export async function GET(request: NextRequest) {
 
     const pgsize = parseInt(searchParams.get("pgsize") || "50");
     const pg = parseInt(searchParams.get("pg") || "1");
+
+    // Check cache first
+    const cacheKey = routeCacheKey(CACHE_PREFIX.FORUM, {
+      institution_id: user.institution_id,
+      type: 'school',
+      pgsize,
+      pg,
+    });
+
+    const cachedResponse = await cacheGet(cacheKey);
+    if (cachedResponse) return cachedResponse;
 
     const [topics, total] = await Promise.all([
       prisma.school_forum_topic.findMany({
@@ -63,18 +75,22 @@ export async function GET(request: NextRequest) {
       _count: undefined, // Remove _count object from response
     }));
 
-    return createSuccessResponse(
-      {
-        topics: topicsWithCount,
-        pagination: {
-          total,
-          page: pg,
-          pageSize: pgsize,
-          totalPages: Math.ceil(total / pgsize),
-        },
+    const responseData = {
+      topics: topicsWithCount,
+      pagination: {
+        total,
+        page: pg,
+        pageSize: pgsize,
+        totalPages: Math.ceil(total / pgsize),
       },
-      user
-    );
+    };
+
+    // Cache the response
+    const response = createSuccessResponse(responseData, user);
+    const responseJson = await response.clone().json();
+    await cacheSet(cacheKey, responseJson, CACHE_TTL.FORUM_TOPICS);
+
+    return response;
   } catch (error) {
     console.error("Error fetching forum topics:", error);
     return NextResponse.json(
@@ -143,6 +159,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Invalidate forum cache for this institution
+    await cacheInvalidate(CACHE_PREFIX.FORUM, user.institution_id);
 
     return createSuccessResponse(topic, user);
   } catch (error) {

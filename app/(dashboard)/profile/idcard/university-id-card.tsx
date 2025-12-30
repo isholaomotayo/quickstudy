@@ -17,6 +17,8 @@ interface StudentData {
   photoUrl?: string
   institutionLogo?: string
   institutionEmail?: string
+  institutionName?: string
+  institutionAbbreviation?: string
 }
 
 interface UniversityIdCardProps {
@@ -49,9 +51,9 @@ export function UniversityIdCard({ student, showBack = false }: UniversityIdCard
               <h3 className="font-semibold text-sm text-gray-900">TERMS AND CONDITIONS</h3>
             </div>
             <div className="text-xs text-gray-600 space-y-2 leading-relaxed">
-              <p>• This card remains the property of the University of Nigeria, Nsukka</p>
+              <p>• This card remains the property of {student.institutionName || "the Institution"}</p>
               <p>• Must be carried at all times while on university premises</p>
-              <p>• Report loss or damage immediately to the Centre for Distance & e-Learning</p>
+              <p>• Report loss or damage immediately to {student.institutionAbbreviation || student.institutionName || "the Institution"}</p>
               <p>• Unauthorized use, alteration, or duplication is strictly prohibited</p>
               <p>• Valid only for the academic session indicated</p>
             </div>
@@ -108,8 +110,8 @@ export function UniversityIdCard({ student, showBack = false }: UniversityIdCard
 
           {/* Footer */}
           <div className="text-center pt-4 border-t border-gray-200">
-            <p className="text-xs text-gray-500">Centre for Distance & e-Learning, University of Nigeria, Nsukka</p>
-            <p className="text-xs text-gray-500 mt-1">www.unn.edu.ng | Issued: {new Date().getFullYear()}</p>
+            <p className="text-xs text-gray-500">{student.institutionAbbreviation || student.institutionName || "Institution"}</p>
+            <p className="text-xs text-gray-500 mt-1">{student.institutionName || "Institution"} | Issued: {new Date().getFullYear()}</p>
           </div>
         </div>
 
@@ -201,12 +203,14 @@ export function UniversityIdCard({ student, showBack = false }: UniversityIdCard
               />
             </div>
             <div>
-              <h1 className="text-lg font-bold tracking-wide">UNIVERSITY OF NIGERIA, NSUKKA</h1>
-              <p className="text-sm opacity-90 font-medium">CENTRE FOR DISTANCE & e-LEARNING</p>
+              <h1 className="text-lg font-bold tracking-wide">{student.institutionName?.toUpperCase() || "INSTITUTION NAME"}</h1>
+              <p className="text-sm opacity-90 font-medium">{student.institutionAbbreviation?.toUpperCase() || "INSTITUTION"}</p>
             </div>
           </div>
           <div className="w-16 h-16 bg-yellow-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xs">CDeL</span>
+            <span className="text-white font-bold text-xs">
+              {student.institutionAbbreviation?.substring(0, 4).toUpperCase() || "INST"}
+            </span>
           </div>
         </div>
       </div>
@@ -278,9 +282,9 @@ export function UniversityIdCard({ student, showBack = false }: UniversityIdCard
         <div className="mt-6 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <div className="text-xs text-gray-600">
-              <p>This card is the property of Centre for Distance & e-Learning</p>
-              <p>University of Nigeria, Nsukka</p>
-              <p className="mt-1">If found please return to Centre for distance & e-Learning UNN</p>
+              <p>This card is the property of {student.institutionAbbreviation || student.institutionName || "Institution"}</p>
+              <p>{student.institutionName || "Institution"}</p>
+              <p className="mt-1">If found please return to {student.institutionAbbreviation || student.institutionName || "Institution"}</p>
             </div>
             <div className="w-16 h-16 bg-gray-100 border border-gray-200 rounded flex items-center justify-center">
               <div className="w-12 h-12 bg-gray-200 rounded grid grid-cols-4 gap-px">

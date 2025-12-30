@@ -1,43 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { getServerApiUrl } from '@/lib/server-api-url';
+import { prisma } from '@/lib/db';
+import {
+  authenticateUser,
+  createAuthErrorResponse,
+  createSuccessResponse,
+} from '@/lib/api-auth';
 
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ courseId: string }> }
 ) {
   try {
+    const authResult = await authenticateUser();
+
+    if (!authResult.success) {
+      return createAuthErrorResponse(authResult.error!, authResult.statusCode!);
+    }
+
+    const user = authResult.user!;
     const { courseId } = await context.params;
+    const courseIdNum = parseInt(courseId);
     
     console.log(`Getting semesters for course ${courseId}`);
 
-    // Get cookies for authentication
-    const cookieStore = await cookies();
-    const cookieString = cookieStore.toString();
-
-    // Call the backend API
-    const response = await fetch(getServerApiUrl(request, `/api/studentcourse/course/${courseId}/semesters`), {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        ...(cookieString && { Cookie: cookieString }),
+    // Get distinct semesters for students enrolled in this course
+    const studentCourses = await prisma.student_course.findMany({
+      where: {
+        course_id: courseIdNum,
       },
+      select: {
+        semester_id: true,
+        semester: {
+          select: {
+            id: true,
+            name: true,
+            position: true,
+          },
+        },
+      },
+      distinct: ['semester_id'],
     });
 
-    if (!response.ok) {
-      console.error(`Backend API error: ${response.status}`);
-      return NextResponse.json(
-        { error: 'Failed to fetch course semesters', status: response.status },
-        { status: response.status }
+    // Extract unique semesters
+    const semesters = studentCourses
+      .filter((sc) => sc.semester !== null)
+      .map((sc) => sc.semester)
+      .filter((semester, index, self) => 
+        index === self.findIndex((s) => s?.id === semester?.id)
       );
-    }
 
-    const semesters = await response.json();
     console.log(`Found ${semesters.length} semesters for course ${courseId}`);
     
-    return NextResponse.json(semesters);
+    return createSuccessResponse(semesters, user);
   } catch (error) {
     console.error('Error in course semesters API:', error);
     return NextResponse.json(

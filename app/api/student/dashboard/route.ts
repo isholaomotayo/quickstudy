@@ -5,6 +5,7 @@ import {
   authenticateUser,
 } from "@/lib/api-auth";
 import { prisma } from "@/lib/db";
+import { cacheGet, cacheSet, routeCacheKey, CACHE_TTL, CACHE_PREFIX } from "@/lib/route-cache";
 
 // Helper function to calculate student current level
 async function calculateStudentCurrentLevel(
@@ -94,6 +95,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Check cache first
+    const cacheKey = routeCacheKey(CACHE_PREFIX.STUDENT, {
+      user_id: user.id,
+      type: 'dashboard',
+    });
+
+    const cachedResponse = await cacheGet(cacheKey);
+    if (cachedResponse) return cachedResponse;
+
     // Get student info with programme in one query (optimized)
     const student = await prisma.student.findFirst({
       where: {
@@ -298,7 +308,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Return dashboard data without duplicating student in userData
-    return createJsonResponse({
+    const dashboardData = {
       student: studentData,
       studentGpa,
       allStudentResult,
@@ -315,7 +325,14 @@ export async function GET(req: NextRequest) {
       },
       isFutureStudent,
       admittedSession,
-    });
+    };
+
+    // Cache the response
+    const response = createJsonResponse(dashboardData);
+    const responseJson = await response.clone().json();
+    await cacheSet(cacheKey, responseJson, CACHE_TTL.STUDENT_DASHBOARD);
+
+    return response;
   } catch (error) {
     console.error("Error fetching student dashboard:", error);
     return createAuthErrorResponse("Failed to fetch dashboard data", 500);

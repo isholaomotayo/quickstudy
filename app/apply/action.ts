@@ -564,7 +564,7 @@ export async function registerUser(
         where: { id: institutionId },
         select: { support_mail: true, email: true },
       });
-      const supportEmail = institution?.support_mail || institution?.email || process.env.SUPPORT_EMAIL || "support.cdel@unn.edu.ng";
+      const supportEmail = institution?.support_mail || institution?.email || "support@quickstudy.ng";
 
       // Construct verification URL - use FRONTEND_URL for email links (needs full URL)
       const frontendUrl = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_VERCEL_URL || "";

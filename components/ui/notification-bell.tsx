@@ -130,18 +130,15 @@ export function NotificationBell() {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="relative p-2 h-10 w-10 rounded-full hover:bg-gray-100/80 hover:shadow-md transition-all duration-200 border border-gray-200/50 bg-white/60 backdrop-blur-sm shadow-sm"
+        <button
+          className="relative p-2 rounded-full hover:bg-muted/70 dark:hover:bg-muted/50 transition-colors"
+          aria-label="Notifications"
         >
-          <Bell className="w-5 h-5 text-gray-700 drop-shadow-sm" />
+          <Bell className="w-4 h-4 text-foreground" />
           {unreadCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-6 min-w-6 text-xs flex items-center justify-center p-0 bg-gradient-to-r from-red-500 to-red-600 text-white border-2 border-white shadow-lg drop-shadow-md font-semibold animate-pulse">
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </Badge>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border-2 border-background dark:border-card" />
           )}
-        </Button>
+        </button>
       </PopoverTrigger>
 
       <PopoverContent

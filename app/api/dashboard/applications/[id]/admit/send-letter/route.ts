@@ -64,7 +64,7 @@ export async function POST(
       include: {
         user_student_user_idTouser: {
           include: {
-            user_institution_idToinstitution: true,
+            institution_user_institution_idToinstitution: true,
           },
         },
         programme: {
@@ -96,7 +96,7 @@ export async function POST(
       );
     }
 
-    const institution = user.user_institution_idToinstitution;
+    const institution = user.institution_user_institution_idToinstitution;
     if (!institution) {
       return NextResponse.json(
         { error: "Institution not found for user" },
@@ -113,7 +113,7 @@ export async function POST(
         programme: student.programme?.name || "Programme",
         session: student.session?.name || "Session",
         fieldOfStudy: student.programme?.name || undefined,
-        entryLevelId: student.entry_level_id || 0,
+        entryLevelId: student.entry_level_id ?? 0,
         loginCode: user.code || undefined,
       },
       institution: {
