@@ -44,7 +44,9 @@ import {
     Trash2,
     Plus,
     Users, CheckCircle,
-    XCircle
+    XCircle,
+    Upload,
+    FileDown
 } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
 import {
@@ -66,6 +68,9 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CourseImport from "./CourseImport";
+import CourseExport from "./CourseExport";
 
 // Define types for course objects
 interface Course {
@@ -1163,6 +1168,36 @@ export default function CourseManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Tabs for Import/Export */}
+      <Tabs defaultValue="manage" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="manage">Manage Courses</TabsTrigger>
+          <TabsTrigger value="import">
+            <Upload className="h-4 w-4 mr-2" />
+            Import
+          </TabsTrigger>
+          <TabsTrigger value="export">
+            <FileDown className="h-4 w-4 mr-2" />
+            Export
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="manage" className="space-y-6">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Stats cards will be rendered here - they're already in the component above */}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="import" className="space-y-6">
+          <CourseImport onImportSuccess={handleRefresh} />
+        </TabsContent>
+
+        <TabsContent value="export" className="space-y-6">
+          <CourseExport />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

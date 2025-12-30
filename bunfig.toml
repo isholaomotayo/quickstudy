@@ -1,0 +1,28 @@
+# Bun configuration file
+# https://bun.sh/docs/cli/bunfig
+
+[install]
+# Use production dependencies by default
+production = false
+
+# Auto-install peer dependencies
+peer = true
+
+# Lockfile to use
+lockfile = "bun.lockb"
+
+[test]
+# Test timeout in milliseconds
+timeout = 10000
+
+# Preload file before running tests
+preload = ["./tests/setup-bun.ts"]
+
+# Coverage settings
+coverage = true
+coverageDir = "./coverage"
+
+# Test file patterns - exclude Cypress tests
+# Exclude cypress directory from test runs
+# testNamePattern = ""
+

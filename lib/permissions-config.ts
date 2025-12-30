@@ -45,6 +45,7 @@ export type Permission =
 
   // LMS Access
   | "lms.access"
+  | "lms.content.read"
   | "lms.content.create"
   | "lms.content.edit"
 
@@ -314,6 +315,20 @@ export const PERMISSIONS_CONFIG: Record<
       "ETUTOR",
     ],
     description: "Access to Learning Management System",
+    category: "LMS",
+  },
+  "lms.content.read": {
+    roles: [
+      "SUPERADMIN",
+      "ADMIN",
+      "PROGRAMME_COORDINATOR",
+      "HOD",
+      "FACILITATOR",
+      "ETUTOR",
+      "LECTURER",
+      "STUDENT",
+    ],
+    description: "Read LMS content",
     category: "LMS",
   },
   "lms.content.create": {

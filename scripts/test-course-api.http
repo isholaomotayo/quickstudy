@@ -1,0 +1,64 @@
+### Course Import/Export API Tests
+### Use with REST Client extension in VS Code or similar HTTP client
+
+@baseUrl = http://localhost:8080
+@authToken = YOUR_AUTH_TOKEN_HERE
+
+### Test 1: Import Course from Markdown File
+POST {{baseUrl}}/api/course/import
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="sample-course.md"
+Content-Type: text/markdown
+
+< ../docs/examples/sample-course.md
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="department_id"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Test 2: Import Course from Markdown Text
+POST {{baseUrl}}/api/course/import
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="markdown"
+
+<!-- @course: {"code": "TEST101", "name": "Test Course", "description": "A test course", "units": 3} -->
+
+## Module: Test Module
+<!-- @module: {"order": 1, "description": "Test module"} -->
+
+### Lesson: Test Lesson
+<!-- @lesson: {"order": 1, "description": "Test lesson"} -->
+
+This is a test lesson.
+
+#### Test: Test Quiz
+<!-- @test: {"name": "Test Quiz", "duration_mins": 30, "max_attempts": 2} -->
+
+**Q1:** What is a variable?
+- [ ] Option A
+- [x] Option B (correct)
+- [ ] Option C
+
+**Explanation:** Variables store data.
+**Marks:** 2
+**Order:** 1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="department_id"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Test 3: Export Course (replace COURSE_ID with actual course ID)
+GET {{baseUrl}}/api/course/export?course_id=1&include_unpublished=false&include_practice_questions=true
+
+### Test 4: Export Course with Unpublished Content
+GET {{baseUrl}}/api/course/export?course_id=1&include_unpublished=true&include_practice_questions=true
+
+### Test 5: Export Course without Practice Questions
+GET {{baseUrl}}/api/course/export?course_id=1&include_unpublished=false&include_practice_questions=false
+
