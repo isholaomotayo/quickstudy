@@ -62,3 +62,4 @@ GET {{baseUrl}}/api/course/export?course_id=1&include_unpublished=true&include_p
 ### Test 5: Export Course without Practice Questions
 GET {{baseUrl}}/api/course/export?course_id=1&include_unpublished=false&include_practice_questions=false
 
+
