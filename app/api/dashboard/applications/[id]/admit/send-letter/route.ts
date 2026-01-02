@@ -1,3 +1,4 @@
+import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { generateAdmissionLetterHTML, type AdmissionLetterData } from "@/lib/admission-letter-template";
@@ -135,7 +136,7 @@ export async function POST(
         department: student.programme?.department?.name || null,
         faculty: student.programme?.department?.faculty?.name || null,
       },
-      frontendUrl: process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || "",
+      frontendUrl: process.env.FRONTEND_URL || "",
     };
 
     // Generate HTML email

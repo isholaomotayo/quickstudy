@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { AlertCircle, RefreshCw } from 'lucide-react'
@@ -12,6 +13,7 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const router = useRouter();
   useEffect(() => {
     console.error('Course registration error:', error)
   }, [error])
@@ -37,7 +39,7 @@ export default function Error({
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = '/student/student-courses'}
+              onClick={() => router.push('/student/student-courses')}
               className="w-full"
             >
               Go back to courses

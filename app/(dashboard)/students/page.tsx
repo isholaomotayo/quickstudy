@@ -213,7 +213,7 @@ export default function StudentDashboard() {
             <p className="text-destructive font-medium">
               {error || "Failed to load dashboard"}
             </p>
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            <Button onClick={() => router.refresh()}>Retry</Button>
           </div>
         </Card>
       </div>

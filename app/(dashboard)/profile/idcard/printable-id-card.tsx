@@ -39,6 +39,7 @@ export function PrintableIdCard({ student }: PrintableIdCardProps) {
 
   return (
     <div className="space-y-6">
+      {/* Static CSS - safe, not user-generated content */}
       <style
         dangerouslySetInnerHTML={{
           __html: `

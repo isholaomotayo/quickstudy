@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useApp } from "@/contexts/AppContext";
 import { useInstitutionData } from "@/hooks/useDashboardData";
 import {
@@ -83,6 +84,7 @@ interface Institution {
 }
 
 export default function SettingsConfiguration() {
+  const router = useRouter();
   const { userData } = useApp();
   const { data: institution, isLoading, error, mutate } = useInstitutionData(userData?.institution_id);
   const [institutionLocal, setInstitutionLocal] = useState<Institution | null>(null);
@@ -206,7 +208,7 @@ export default function SettingsConfiguration() {
             <p className="text-gray-600 mb-4">
               {error || "Unable to load institution data"}
             </p>
-            <Button onClick={() => window.location.reload()}>
+            <Button onClick={() => router.refresh()}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
             </Button>

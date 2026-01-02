@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ interface LearningResult {
 }
 
 export function ResultsClient() {
+  const router = useRouter();
   // Map API response to LearningResult interface
   const mapLearningResults = (results: any[]): LearningResult[] => {
     if (!Array.isArray(results)) return [];
@@ -93,65 +95,103 @@ export function ResultsClient() {
         return;
       }
 
-      // Fetch course results for the specific student
-      const courseResultsResponse = await fetch(
-        `/api/studentresult/${userData.student_id}`,
-        {
+      // Parallelize all independent fetch calls with proper error handling
+      const [courseResult, gpaResult, learningResult] = await Promise.allSettled([
+        fetch(`/api/studentresult/${userData.student_id}`, {
           credentials: "include",
-        }
-      );
+        }),
+        fetch(`/api/studentgpa/studentid/${userData.student_id}`, {
+          credentials: "include",
+        }),
+        fetch("/api/studenttest/new", {
+          credentials: "include",
+        }),
+      ]);
 
-      if (courseResultsResponse.ok) {
-        const courseData = await courseResultsResponse.json();
-        setCourseResults(courseData || []);
+      // Process each result independently to handle partial failures gracefully
+      const errors: string[] = [];
+      let hasAuthError = false;
+
+      // Handle course results
+      if (courseResult.status === "fulfilled" && courseResult.value.ok) {
+        try {
+          const data = await courseResult.value.json();
+          setCourseResults(data || []);
+        } catch (parseError) {
+          console.error("Failed to parse course results:", parseError);
+          errors.push("Failed to load course results");
+        }
       } else {
-        console.error(
-          "Course results response not ok:",
-          courseResultsResponse.status
-        );
-        if (courseResultsResponse.status === 401) {
-          setError("Authentication required. Please sign in again.");
+        const status = courseResult.status === "fulfilled" 
+          ? courseResult.value.status 
+          : 500;
+        if (status === 401) {
+          hasAuthError = true;
         } else {
-          setError("Failed to load course results");
+          console.error("Course results fetch failed:", {
+            status,
+            studentId: userData.student_id,
+            error: courseResult.status === "rejected" ? courseResult.reason : undefined,
+          });
+          errors.push("Failed to load course results");
         }
       }
 
-      // Fetch student GPAs for the specific student
-      const gpasResponse = await fetch(
-        `/api/studentgpa/studentid/${userData.student_id}`,
-        {
-          credentials: "include",
+      // Handle GPA data
+      if (gpaResult.status === "fulfilled" && gpaResult.value.ok) {
+        try {
+          const data = await gpaResult.value.json();
+          setStudentGpas(data || []);
+        } catch (parseError) {
+          console.error("Failed to parse GPA data:", parseError);
+          errors.push("Failed to load GPA data");
         }
-      );
-
-      if (gpasResponse.ok) {
-        const gpasData = await gpasResponse.json();
-        setStudentGpas(gpasData || []);
       } else {
-        console.error("GPAs response not ok:", gpasResponse.status);
-        if (gpasResponse.status === 401) {
-          setError("Authentication required. Please sign in again.");
+        const status = gpaResult.status === "fulfilled" 
+          ? gpaResult.value.status 
+          : 500;
+        if (status === 401) {
+          hasAuthError = true;
         } else {
-          setError("Failed to load GPA data");
+          console.error("GPA fetch failed:", {
+            status,
+            studentId: userData.student_id,
+            error: gpaResult.status === "rejected" ? gpaResult.reason : undefined,
+          });
+          errors.push("Failed to load GPA data");
         }
       }
 
-      // Fetch learning results
-      const learningResultsResponse = await fetch("/api/studenttest/new", {
-        credentials: "include",
-      });
-
-      if (learningResultsResponse.ok) {
-        const learningData = await learningResultsResponse.json();
-        setLearningResults(mapLearningResults(learningData));
-      } else {
-        console.error(
-          "Learning results response not ok:",
-          learningResultsResponse.status
-        );
-        if (learningResultsResponse.status === 401) {
-          setError("Authentication required. Please sign in again.");
+      // Handle learning results
+      if (learningResult.status === "fulfilled" && learningResult.value.ok) {
+        try {
+          const data = await learningResult.value.json();
+          setLearningResults(mapLearningResults(data));
+        } catch (parseError) {
+          console.error("Failed to parse learning results:", parseError);
+          errors.push("Failed to load learning results");
         }
+      } else {
+        const status = learningResult.status === "fulfilled" 
+          ? learningResult.value.status 
+          : 500;
+        if (status === 401) {
+          hasAuthError = true;
+        } else {
+          console.error("Learning results fetch failed:", {
+            status,
+            error: learningResult.status === "rejected" ? learningResult.reason : undefined,
+          });
+          errors.push("Failed to load learning results");
+        }
+      }
+
+      // Set error state appropriately
+      if (hasAuthError) {
+        setError("Authentication required. Please sign in again.");
+        return;
+      } else if (errors.length > 0) {
+        setError(errors.join("; "));
       }
     } catch (err) {
       setError("Failed to load results. Please try again.");
@@ -235,7 +275,7 @@ export function ResultsClient() {
               Please log in to view your academic results.
             </p>
             <Button
-              onClick={() => (window.location.href = "/signin")}
+              onClick={() => router.push("/signin")}
               variant="outline"
             >
               Go to Sign In

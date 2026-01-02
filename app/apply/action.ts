@@ -1,11 +1,14 @@
 "use server";
 
+import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
+import { requireAuth } from "@/lib/server-action-auth";
 
 // Create a singleton Prisma client for serverless environments
 const globalForPrisma = globalThis as unknown as {
@@ -567,7 +570,8 @@ export async function registerUser(
       const supportEmail = institution?.support_mail || institution?.email || "support@quickstudy.ng";
 
       // Construct verification URL - use FRONTEND_URL for email links (needs full URL)
-      const frontendUrl = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_VERCEL_URL || "";
+      // Note: Using server-only env var, not NEXT_PUBLIC_ (which is exposed to browser)
+      const frontendUrl = process.env.FRONTEND_URL || "";
       const activateUrl = frontendUrl 
         ? `${frontendUrl}/api/verify?code=${verificationCode}-${result.newUser.id}`
         : `/api/verify?code=${verificationCode}-${result.newUser.id}`;
@@ -599,6 +603,11 @@ export async function registerUser(
       console.error("Failed to send welcome email:", emailError);
       // Don't fail the registration if email fails
     }
+
+    // Revalidate paths after successful registration
+    revalidatePath("/apply");
+    revalidatePath("/get-started");
+    revalidatePath("/dashboard");
 
     // Create JWT token just like the backend login system
     const userWithToken = {
@@ -718,4 +727,106 @@ export async function registerAndRedirect(formData: RegisterFormData) {
     // Return error to be handled by the form
     return result;
   }
+}
+
+// Server Action for submitting additional program application
+export async function submitAdditionalApplication(
+  programmeId: number
+): Promise<{ success: boolean; error?: string; student?: any }> {
+  try {
+    // Authenticate user
+    const authCheck = await requireAuth();
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
+    const userId = BigInt(authCheck.user!.id);
+
+    // Import helper functions
+    const {
+      canApplyForAdditionalProgram,
+      createAdditionalProgramApplication,
+    } = await import("@/helpers/studentContext");
+
+    // Check if user can apply for additional programs
+    const canApply = await canApplyForAdditionalProgram(userId);
+    if (!canApply) {
+      return {
+        success: false,
+        error:
+          "You must be admitted to at least one program before applying for additional programs",
+      };
+    }
+
+    // Create additional program application
+    const newStudentProfile = await createAdditionalProgramApplication(
+      userId,
+      programmeId
+    );
+
+    if (newStudentProfile) {
+      // Convert BigInt fields to strings for JSON serialization
+      const serializedStudentProfile = {
+        ...newStudentProfile,
+        id: newStudentProfile.id.toString(),
+        user_id: newStudentProfile.user_id.toString(),
+        user: newStudentProfile.user
+          ? {
+              ...newStudentProfile.user,
+              id: newStudentProfile.user.id.toString(),
+            }
+          : undefined,
+      };
+
+      revalidatePath("/profile/programs");
+      revalidatePath("/get-started");
+
+      return {
+        success: true,
+        student: serializedStudentProfile,
+      };
+    } else {
+      return {
+        success: false,
+        error: "Failed to create additional program application",
+      };
+    }
+  } catch (error: any) {
+    console.error("Additional application error:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      programmeId,
+      timestamp: new Date().toISOString(),
+    });
+
+    if (error.message?.includes("already has an application")) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Failed to create additional program application",
+    };
+  }
+}
+
+// Server Action for submitting new application
+// Note: This function is currently not used - new applications go through registerUser flow
+// Keeping for potential future use but marking as deprecated
+/**
+ * @deprecated New applications should use registerUser flow. This function is kept for backward compatibility.
+ */
+export async function submitNewApplication(
+  applicationData: unknown
+): Promise<{ success: boolean; error?: string }> {
+  // Explicitly reject calls to prevent accidental use
+  return {
+    success: false,
+    error: "New application submission is not implemented. Please use the registration flow.",
+  };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { 
@@ -18,6 +19,7 @@ interface ErrorPageProps {
 }
 
 export default function ForumError({ error, reset }: ErrorPageProps) {
+  const router = useRouter();
   useEffect(() => {
     // Log the error to monitoring service
     console.error("Forum error:", error);
@@ -109,7 +111,7 @@ export default function ForumError({ error, reset }: ErrorPageProps) {
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                onClick={() => window.location.href = "/"}
+                onClick={() => router.push("/")}
                 className="flex-1 bg-white/70 border-white/30"
               >
                 <Home className="w-4 h-4 mr-2" />
@@ -118,7 +120,7 @@ export default function ForumError({ error, reset }: ErrorPageProps) {
               
               <Button
                 variant="outline"
-                onClick={() => window.location.reload()}
+                onClick={() => router.refresh()}
                 className="flex-1 bg-white/70 border-white/30"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />

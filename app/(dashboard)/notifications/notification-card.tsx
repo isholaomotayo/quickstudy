@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { format, formatDistanceToNow } from "date-fns";
 import { useUser } from "@/contexts/AppContext";
+import { sanitizeHTML } from "@/lib/sanitize-html";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -234,7 +235,7 @@ export function NotificationCard({ notification, onMarkAsRead, onDelete, onEdit 
       <div className="mb-4">
         <div 
           className="text-muted-foreground leading-relaxed whitespace-pre-wrap"
-          dangerouslySetInnerHTML={{ __html: displayBody }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHTML(displayBody) }}
         />
         
         {shouldShowExpand && (

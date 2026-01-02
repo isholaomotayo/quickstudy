@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { sanitizeQuestionContent } from "@/lib/sanitize-html";
 import {
   Clock,
   CheckSquare,
@@ -465,8 +466,8 @@ export default function ImmersiveTestClient({
         setIsQuizComplete(true);
         setCurrentScreen("final-results");
         toast.success("Test submitted successfully!");
-        // Reload page to get updated results
-        setTimeout(() => window.location.reload(), 2000);
+        // Refresh page to get updated results
+        setTimeout(() => router.refresh(), 2000);
       } else if (result && result.pageNotif) {
         toast.error(result.pageNotif);
       }
@@ -884,7 +885,7 @@ export default function ImmersiveTestClient({
 
             <div className="flex justify-center gap-4">
               <Button
-                onClick={() => window.location.reload()}
+                onClick={() => router.refresh()}
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
@@ -983,7 +984,7 @@ export default function ImmersiveTestClient({
               <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: questions[currentQuestion].details,
+                    __html: sanitizeQuestionContent(questions[currentQuestion].details),
                   }}
                 />
               </div>

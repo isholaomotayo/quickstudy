@@ -143,6 +143,32 @@ function checkRouteAccess(
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Protect sensitive API routes
+  const protectedApiRoutes = [
+    "/api/admin",
+    "/api/student",
+    "/api/staff",
+    "/api/dashboard",
+    "/api/manage",
+  ];
+
+  const isProtectedApiRoute = protectedApiRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  if (isProtectedApiRoute) {
+    const userRole = getUserRoleFromCookies(request);
+    if (!userRole) {
+      // Return 401 JSON response for unauthenticated API requests
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+    // Note: Individual API routes should still verify permissions
+    // This middleware only checks for authentication, not authorization
+  }
+
   // Skip middleware for public routes
   const publicRoutes = [
     "/signin",
@@ -156,7 +182,12 @@ export function middleware(request: NextRequest) {
     "/sitemap.xml",
   ];
 
-  if (publicRoutes.some((route) => pathname.startsWith(route))) {
+  // Don't skip protected API routes
+  const publicRoutesToCheck = publicRoutes.filter(
+    (route) => route !== "/api/" || !isProtectedApiRoute
+  );
+
+  if (publicRoutesToCheck.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 

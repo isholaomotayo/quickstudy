@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { EmbeddedForum } from "./embedded-forum";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,7 @@ export function CourseForumWidget({
   showHeader = true,
   maxItems = 5,
 }: CourseForumWidgetProps) {
+  const router = useRouter();
   const [summary, setSummary] = useState<ForumSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -189,7 +191,7 @@ export function CourseForumWidget({
               variant="ghost"
               size="sm"
               onClick={() =>
-                (window.location.href = `/connect?course=${courseId}&courseName=${encodeURIComponent(courseName)}`)
+                router.push(`/connect?course=${courseId}&courseName=${encodeURIComponent(courseName)}`)
               }
               className="text-blue-600 hover:text-blue-700"
             >
@@ -253,7 +255,7 @@ export function CourseForumWidget({
                       key={discussion.id}
                       className="p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 cursor-pointer transition-colors"
                       onClick={() =>
-                        (window.location.href = `/connect?course=${courseId}&discussion=${discussion.id}&courseName=${encodeURIComponent(courseName)}`)
+                        router.push(`/connect?course=${courseId}&discussion=${discussion.id}&courseName=${encodeURIComponent(courseName)}`)
                       }
                     >
                       <div className="flex items-center justify-between">
@@ -294,7 +296,7 @@ export function CourseForumWidget({
                       key={`${activity.type}-${activity.id}`}
                       className="p-3 bg-white/50 border border-white/30 rounded-lg hover:bg-white/70 cursor-pointer transition-colors"
                       onClick={() =>
-                        (window.location.href = `/connect?course=${courseId}&${activity.type}=${activity.id}&courseName=${encodeURIComponent(courseName)}`)
+                        router.push(`/connect?course=${courseId}&${activity.type}=${activity.id}&courseName=${encodeURIComponent(courseName)}`)
                       }
                     >
                       <div className="flex items-start gap-3">

@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { sanitizeHTML } from "@/lib/sanitize-html";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -510,8 +511,8 @@ export default function AIAssistantV2({
                               dangerouslySetInnerHTML={{
                                 __html:
                                   message.role === "assistant"
-                                    ? renderMarkdown(message.content)
-                                    : message.content,
+                                    ? sanitizeHTML(renderMarkdown(message.content))
+                                    : sanitizeHTML(message.content),
                               }}
                             />
 

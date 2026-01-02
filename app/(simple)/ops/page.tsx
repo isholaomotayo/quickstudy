@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { useApp } from "@/contexts/AppContext";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useOverviewData } from "@/hooks/useDashboardData";
@@ -51,6 +52,7 @@ import SettingsConfiguration from "./components/SettingsConfiguration";
 import CourseApprovalManagement from "./components/CourseApprovalManagement";
 
 function AdminDashboardContent() {
+  const router = useRouter();
   const { userData, isLoading } = useApp();
   const { can } = usePermissions();
   const {
@@ -88,7 +90,7 @@ function AdminDashboardContent() {
             Error Loading Dashboard
           </h2>
           <p className="text-gray-600 mb-4">{dataError}</p>
-          <Button onClick={() => window.location.reload()}>Retry</Button>
+          <Button onClick={() => router.refresh()}>Retry</Button>
         </div>
       </div>
     );

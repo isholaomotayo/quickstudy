@@ -1,3 +1,5 @@
+import "server-only";
+
 export interface AdmissionLetterData {
   student: {
     name: string;
@@ -36,7 +38,7 @@ export function generateAdmissionLetterHTML(data: AdmissionLetterData): string {
     student,
     institution,
     programme,
-    frontendUrl = process.env.FRONTEND_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || "",
+    frontendUrl = process.env.FRONTEND_URL || "",
   } = data;
 
   const isPreMBA = student.entryLevelId === 1;

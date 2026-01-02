@@ -2,6 +2,7 @@
 
 import { forwardRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { sanitizeLessonContent } from "@/lib/sanitize-html";
 
 interface LessonContentProps {
   content: string;
@@ -122,7 +123,7 @@ const LessonContent = forwardRef<HTMLDivElement, LessonContentProps>(
           className
         )}
         style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: sanitizeLessonContent(content) }}
       />
     );
   }

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Download, Eye, Save, CheckCircle, FileText } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { translateCode } from "@/helpers/language/translate";
+import { sanitizeQuestionContent } from "@/lib/sanitize-html";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -333,12 +334,12 @@ export function AssignmentGrader({
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <div
                       className="font-medium text-gray-900"
-                      dangerouslySetInnerHTML={{ __html: question.question }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeQuestionContent(question.question) }}
                     />
                     {question.details && (
                       <div
                         className="text-sm text-gray-600 mt-1"
-                        dangerouslySetInnerHTML={{ __html: question.details }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeQuestionContent(question.details) }}
                       />
                     )}
                   </div>

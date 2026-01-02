@@ -10,6 +10,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ interface StudentProfile {
 }
 
 export default function ProgramsManagement() {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [studentProfiles, setStudentProfiles] = useState<StudentProfile[]>([]);
@@ -141,7 +143,7 @@ export default function ProgramsManagement() {
     toast.success(`Redirecting to application for ${selectedProgram.name}...`);
 
     // Redirect to modern application process with additional application flag and preselected program
-    window.location.href = `/get-started?additional=true&programme=${selectedProgram.id}`;
+    router.push(`/get-started?additional=true&programme=${selectedProgram.id}`);
   };
 
   const getStatusBadge = (student: StudentProfile) => {
@@ -291,7 +293,7 @@ export default function ProgramsManagement() {
                 <div className="flex items-center justify-end">
                   <Button
                     variant="outline"
-                    onClick={() => (window.location.href = "/student")}
+                    onClick={() => router.push("/student")}
                   >
                     <Eye className="w-4 h-4 mr-2" />
                     View Dashboard

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/AppContext";
 import { toast } from "sonner";
 import { ForumPost } from "./forum-post";
@@ -47,6 +48,7 @@ export function EmbeddedForum({
   showCreateButton = true,
   compact = false,
 }: EmbeddedForumProps) {
+  const router = useRouter();
   const { userData } = useUser();
   const [activeTab, setActiveTab] = useState<"forum" | "discussions">(
     defaultTab
@@ -238,7 +240,7 @@ export function EmbeddedForum({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => (window.location.href = "/connect")}
+              onClick={() => router.push("/connect")}
             >
               View All
             </Button>

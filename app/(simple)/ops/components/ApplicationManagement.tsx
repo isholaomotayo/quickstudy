@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -72,13 +73,60 @@ interface Application {
   documents: string[];
 }
 
+// Constants for default values
+const DEFAULT_PAGE = 1;
+const DEFAULT_PER_PAGE = 10;
+const DEFAULT_FILTER = "all";
+
 export default function ApplicationManagement() {
   const { userData } = useApp();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [programFilter, setProgramFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Read filters from URL params with defaults - these are now the source of truth
+  const searchTerm = searchParams.get("search") || "";
+  const statusFilter = searchParams.get("status") || DEFAULT_FILTER;
+  const programFilter = searchParams.get("program") || DEFAULT_FILTER;
+  const currentPage = Number(searchParams.get("page")) || DEFAULT_PAGE;
+  const itemsPerPage = Number(searchParams.get("perPage")) || DEFAULT_PER_PAGE;
+  
+  // Update URL when filters change (debounced to avoid excessive navigation)
+  const updateFilters = useCallback((updates: Record<string, string | number>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      const isDefault = 
+        (key === "page" && value === DEFAULT_PAGE) ||
+        (key === "perPage" && value === DEFAULT_PER_PAGE) ||
+        value === "" ||
+        value === DEFAULT_FILTER;
+      
+      if (isDefault) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+    router.push(`?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
+  
+  // Debounced version for search input
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  
+  // Sync debounced search with URL when URL changes externally
+  useEffect(() => {
+    setDebouncedSearchTerm(searchTerm);
+  }, [searchTerm]);
+  
+  // Update URL when debounced search term changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (debouncedSearchTerm !== searchTerm) {
+        updateFilters({ search: debouncedSearchTerm, page: DEFAULT_PAGE });
+      }
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [debouncedSearchTerm, searchTerm, updateFilters]);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedApplicationId, setSelectedApplicationId] = useState<
     string | null
@@ -140,10 +188,7 @@ export default function ApplicationManagement() {
     endIndex
   );
 
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, programFilter]);
+  // Note: Page reset is handled in onChange handlers for filters
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -351,13 +396,17 @@ export default function ApplicationManagement() {
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by name, email, or program..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={debouncedSearchTerm}
+                  onChange={(e) => {
+                    setDebouncedSearchTerm(e.target.value);
+                  }}
                   className="pl-10"
                 />
               </div>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(value) => {
+              updateFilters({ status: value, page: DEFAULT_PAGE });
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -369,7 +418,9 @@ export default function ApplicationManagement() {
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={programFilter} onValueChange={setProgramFilter}>
+            <Select value={programFilter} onValueChange={(value) => {
+              updateFilters({ program: value, page: DEFAULT_PAGE });
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Filter by program" />
               </SelectTrigger>
@@ -420,7 +471,9 @@ export default function ApplicationManagement() {
                   </span>
                   <Select
                     value={itemsPerPage.toString()}
-                    onValueChange={(value) => setItemsPerPage(Number(value))}
+                    onValueChange={(value) => {
+                      updateFilters({ perPage: Number(value), page: DEFAULT_PAGE });
+                    }}
                   >
                     <SelectTrigger className="w-20">
                       <SelectValue />
@@ -567,7 +620,9 @@ export default function ApplicationManagement() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setCurrentPage(1)}
+                      onClick={() => {
+                        updateFilters({ page: DEFAULT_PAGE });
+                      }}
                       disabled={currentPage === 1}
                     >
                       First
@@ -575,7 +630,9 @@ export default function ApplicationManagement() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setCurrentPage(currentPage - 1)}
+                      onClick={() => {
+                        updateFilters({ page: currentPage - 1 });
+                      }}
                       disabled={currentPage === 1}
                     >
                       Previous
@@ -597,7 +654,9 @@ export default function ApplicationManagement() {
                                 currentPage === pageNum ? "default" : "outline"
                               }
                               size="sm"
-                              onClick={() => setCurrentPage(pageNum)}
+                              onClick={() => {
+                                updateFilters({ page: pageNum });
+                              }}
                               className="w-8 h-8 p-0"
                             >
                               {pageNum}
@@ -609,7 +668,9 @@ export default function ApplicationManagement() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setCurrentPage(currentPage + 1)}
+                      onClick={() => {
+                        updateFilters({ page: currentPage + 1 });
+                      }}
                       disabled={currentPage === totalPages}
                     >
                       Next
@@ -617,7 +678,9 @@ export default function ApplicationManagement() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setCurrentPage(totalPages)}
+                      onClick={() => {
+                        updateFilters({ page: totalPages });
+                      }}
                       disabled={currentPage === totalPages}
                     >
                       Last

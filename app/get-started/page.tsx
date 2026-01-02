@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { toast } from 'react-hot-toast';
+import { submitAdditionalApplication, submitNewApplication } from '@/app/apply/action';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -203,38 +204,26 @@ function ApplicationProcessContent() {
       setSubmitting(true);
       
       if (applicationData.isAdditionalApplication) {
-        // For additional applications, create new student record
-        const response = await fetch('/api/student/additional-application', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            programmeId: applicationData.programme_id,
-            applicationData: applicationData
-          }),
-        });
+        // For additional applications, use Server Action
+        if (!applicationData.programme_id) {
+          toast.error('Please select a program');
+          setSubmitting(false);
+          return;
+        }
 
-        if (response.ok) {
+        const result = await submitAdditionalApplication(applicationData.programme_id);
+
+        if (result.success) {
           toast.success('Additional program application submitted successfully!');
           router.push('/profile/programs?success=additional-application');
         } else {
-          const errorData = await response.json();
-          toast.error(errorData.error || 'Failed to submit application');
+          toast.error(result.error || 'Failed to submit application');
         }
       } else {
-        // For new applications, use existing flow
-        const response = await fetch('/api/student/application', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(applicationData),
-        });
-
-        if (response.ok) {
-          toast.success('Application submitted successfully!');
-          router.push('/dashboard?success=new-application');
-        } else {
-          const errorData = await response.json();
-          toast.error(errorData.error || 'Failed to submit application');
-        }
+        // For new applications, redirect to registration flow
+        // New applications should go through the registerUser flow in apply/action.ts
+        toast.error('Please use the registration flow for new applications');
+        router.push('/apply');
       }
     } catch (error) {
       console.error('Error submitting application:', error);

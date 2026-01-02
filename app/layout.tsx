@@ -23,6 +23,10 @@ export default function RootLayout({
           src="https://js.paystack.co/v2/inline.js"
           strategy="beforeInteractive"
         />
+        <Script
+          src="/tinymce/tinymce.min.js"
+          strategy="lazyOnload"
+        />
       </head>
       <body>
         <ThemeProvider>

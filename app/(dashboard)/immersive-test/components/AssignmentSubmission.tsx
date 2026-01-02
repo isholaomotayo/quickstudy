@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import { Paperclip, Upload, X, FileText, Download } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { translateCode } from "@/helpers/language/translate";
+import { sanitizeQuestionContent } from "@/lib/sanitize-html";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -192,12 +193,12 @@ export function AssignmentSubmission({
           <div className="p-4 bg-gray-50 rounded-lg">
             <div
               className="text-gray-900"
-              dangerouslySetInnerHTML={{ __html: question }}
+              dangerouslySetInnerHTML={{ __html: sanitizeQuestionContent(question) }}
             />
             {details && (
               <div
                 className="text-sm text-gray-600 mt-2"
-                dangerouslySetInnerHTML={{ __html: details }}
+                dangerouslySetInnerHTML={{ __html: sanitizeQuestionContent(details) }}
               />
             )}
           </div>

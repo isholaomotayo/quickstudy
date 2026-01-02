@@ -1,30 +1,23 @@
-"use client";
-
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
-import MeetingProvider from "@/components/lms/MeetingProvider";
+import WebinarContentClient from "./webinar-content-client";
 
-// Dynamically import MeetingProvider to avoid SSR issues with Jitsi
-const MeetingProviderClient = dynamic(() => Promise.resolve(MeetingProvider), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center min-h-[600px]">
-      <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-        <p className="text-muted-foreground">Loading webinar...</p>
-      </div>
-    </div>
-  ),
-});
-
-function WebinarContent() {
-  const searchParams = useSearchParams();
-  const roomName = searchParams.get("roomName") || undefined;
-  const userInfo = searchParams.get("userInfo") || undefined;
-  const courseCode = searchParams.get("courseCode") || undefined;
-  const courseName = searchParams.get("courseName") || undefined;
-  const provider = searchParams.get("provider") || "googlemeet";
+// Server Component - reads searchParams
+export default async function WebinarPage({
+  searchParams,
+}: {
+  searchParams: {
+    roomName?: string;
+    userInfo?: string;
+    courseCode?: string;
+    courseName?: string;
+    provider?: string;
+  };
+}) {
+  const roomName = searchParams.roomName;
+  const userInfo = searchParams.userInfo;
+  const courseCode = searchParams.courseCode;
+  const courseName = searchParams.courseName;
+  const provider = searchParams.provider || "googlemeet";
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,33 +33,25 @@ function WebinarContent() {
           </p>
         </div>
 
-        <div className="bg-card rounded-lg border border-border p-6">
-          <MeetingProviderClient
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center min-h-[600px]">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+                <p className="text-muted-foreground">Loading webinar...</p>
+              </div>
+            </div>
+          }
+        >
+          <WebinarContentClient
             roomName={roomName}
             userInfo={userInfo}
             courseCode={courseCode}
             courseName={courseName}
-            preferredProvider={provider}
+            provider={provider}
           />
-        </div>
+        </Suspense>
       </div>
     </div>
-  );
-}
-
-export default function WebinarPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-            <p className="text-muted-foreground">Loading webinar...</p>
-          </div>
-        </div>
-      }
-    >
-      <WebinarContent />
-    </Suspense>
   );
 }

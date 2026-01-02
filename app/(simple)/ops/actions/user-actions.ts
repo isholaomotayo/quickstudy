@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { requireAuth } from "@/lib/server-action-auth";
+import { canCreateUsers } from "@/lib/roles";
 
 const prisma = new PrismaClient();
 
@@ -269,6 +271,19 @@ async function generateStaffNumber(institutionId: number): Promise<string> {
 
 export async function createUser(formData: CreateUserFormData) {
   try {
+    // Authenticate and verify permissions
+    const authCheck = await requireAuth({
+      customCheck: (user) => canCreateUsers(user.role),
+      errorMessage: "Insufficient permissions to create users",
+    });
+
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
     // Validate form data
     const validatedData = createUserSchema.parse(formData);
 
@@ -376,6 +391,19 @@ export async function createUser(formData: CreateUserFormData) {
 
 export async function updateUser(formData: UpdateUserFormData) {
   try {
+    // Authenticate and verify permissions
+    const authCheck = await requireAuth({
+      customCheck: (user) => canCreateUsers(user.role),
+      errorMessage: "Insufficient permissions to update users",
+    });
+
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
     // Validate form data
     const validatedData = updateUserSchema.parse(formData);
 
@@ -428,7 +456,10 @@ export async function updateUser(formData: UpdateUserFormData) {
       },
     };
   } catch (error) {
-    console.error("Error updating user:", error);
+    console.error("Error updating user:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
 
     if (error instanceof z.ZodError) {
       return {
@@ -447,6 +478,19 @@ export async function updateUser(formData: UpdateUserFormData) {
 
 export async function permanentlyDeleteUser(userId: string) {
   try {
+    // Authenticate and verify permissions (only SUPERADMIN can delete)
+    const authCheck = await requireAuth({
+      requiredRoles: ["SUPERADMIN"],
+      errorMessage: "Insufficient permissions to delete users",
+    });
+
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
     const userIdBigInt = BigInt(userId);
 
     // Check if user has any child records that would prevent deletion
@@ -530,7 +574,10 @@ export async function permanentlyDeleteUser(userId: string) {
       message: "User deleted successfully",
     };
   } catch (error) {
-    console.error("Error deleting user:", error);
+    console.error("Error deleting user:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
     return {
       success: false,
       error: "Failed to delete user",
@@ -542,6 +589,19 @@ export async function permanentlyDeleteUser(userId: string) {
 
 export async function deactivateUser(userId: string) {
   try {
+    // Authenticate and verify permissions
+    const authCheck = await requireAuth({
+      customCheck: (user) => canCreateUsers(user.role),
+      errorMessage: "Insufficient permissions to deactivate users",
+    });
+
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
     await prisma.user.update({
       where: { id: BigInt(userId) },
       data: {
@@ -556,7 +616,10 @@ export async function deactivateUser(userId: string) {
       message: "User deactivated successfully",
     };
   } catch (error) {
-    console.error("Error deactivating user:", error);
+    console.error("Error deactivating user:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
     return {
       success: false,
       error: "Failed to deactivate user. Please try again.",
@@ -566,6 +629,19 @@ export async function deactivateUser(userId: string) {
 
 export async function toggleUserStatus(userId: string, active: boolean) {
   try {
+    // Authenticate and verify permissions
+    const authCheck = await requireAuth({
+      customCheck: (user) => canCreateUsers(user.role),
+      errorMessage: "Insufficient permissions to update user status",
+    });
+
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
     await prisma.user.update({
       where: { id: BigInt(userId) },
       data: {
@@ -580,7 +656,10 @@ export async function toggleUserStatus(userId: string, active: boolean) {
       message: `User ${active ? "activated" : "deactivated"} successfully`,
     };
   } catch (error) {
-    console.error("Error toggling user status:", error);
+    console.error("Error toggling user status:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
     return {
       success: false,
       error: "Failed to update user status. Please try again.",
@@ -590,6 +669,15 @@ export async function toggleUserStatus(userId: string, active: boolean) {
 
 export async function getUserById(userId: string) {
   try {
+    // Authenticate user
+    const authCheck = await requireAuth();
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: BigInt(userId) },
       include: {
@@ -639,7 +727,11 @@ export async function getUserById(userId: string) {
       },
     };
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching user:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      userId,
+      timestamp: new Date().toISOString(),
+    });
     return {
       success: false,
       error: "Failed to fetch user data",
@@ -672,6 +764,19 @@ export type UpdateStudentFormData = z.infer<typeof updateStudentSchema>;
 
 export async function updateStudentProfile(formData: UpdateStudentFormData) {
   try {
+    // Authenticate and verify permissions
+    const authCheck = await requireAuth({
+      requiredRoles: ["SUPERADMIN", "SYSADMIN", "ADMIN", "PROGRAMME_COORDINATOR", "HOD", "PROGRAMME_EXAM_OFFICER"],
+      errorMessage: "Insufficient permissions to update student profiles",
+    });
+
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
     const validatedData = updateStudentSchema.parse(formData);
 
     // Check if registration number is being changed and if it already exists
@@ -741,7 +846,12 @@ export async function updateStudentProfile(formData: UpdateStudentFormData) {
       },
     };
   } catch (error) {
-    console.error("Error updating student profile:", error);
+    const studentId = formData.studentId || "unknown";
+    console.error("Error updating student profile:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      studentId,
+      timestamp: new Date().toISOString(),
+    });
 
     if (error instanceof z.ZodError) {
       return {
@@ -763,6 +873,19 @@ export async function generateNewRegistrationNumber(
   institutionId: number
 ) {
   try {
+    // Authenticate and verify permissions
+    const authCheck = await requireAuth({
+      requiredRoles: ["SUPERADMIN", "SYSADMIN", "ADMIN", "PROGRAMME_COORDINATOR", "HOD", "PROGRAMME_EXAM_OFFICER"],
+      errorMessage: "Insufficient permissions to generate registration numbers",
+    });
+
+    if (!authCheck.success) {
+      return {
+        success: false,
+        error: authCheck.error,
+      };
+    }
+
     const student = await prisma.student.findUnique({
       where: { id: BigInt(studentId) },
       include: {
@@ -916,7 +1039,12 @@ export async function generateNewRegistrationNumber(
       registration_number: newRegNo,
     };
   } catch (error) {
-    console.error("Error generating new registration number:", error);
+    console.error("Error generating new registration number:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      studentId,
+      institutionId,
+      timestamp: new Date().toISOString(),
+    });
     return {
       success: false,
       error: "Failed to generate new registration number. Please try again.",

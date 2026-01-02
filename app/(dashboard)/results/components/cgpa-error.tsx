@@ -3,12 +3,14 @@
 import { AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface CgpaErrorProps {
   error: string | Error;
 }
 
 export function CgpaError({ error }: CgpaErrorProps) {
+  const router = useRouter();
   const errorMessage = error instanceof Error ? error.message : error;
 
   return (
@@ -21,7 +23,7 @@ export function CgpaError({ error }: CgpaErrorProps) {
           </h3>
           <p className="text-sm text-destructive">{errorMessage}</p>
           <Button
-            onClick={() => window.location.reload()}
+            onClick={() => router.refresh()}
             variant="outline"
             size="sm"
           >

@@ -38,43 +38,26 @@ export default function TinyMCEEditor({
   const [isClient, setIsClient] = useState(false);
   const [isTinyMCELoaded, setIsTinyMCELoaded] = useState(false);
 
-  // Load TinyMCE only on client side
+  // Check for TinyMCE loaded via next/script
   useEffect(() => {
-    const loadTinyMCE = () => {
-      // Check if TinyMCE is already loaded
-      if ((window as any).tinymce) {
-        setIsTinyMCELoaded(true);
-        return;
-      }
-
-      // Load TinyMCE from public folder
-      const script = document.createElement("script");
-      script.src = "/tinymce/tinymce.min.js";
-      script.async = true;
-      
-      script.onload = () => {
-        console.log("TinyMCE loaded successfully");
-        setIsTinyMCELoaded(true);
-      };
-      
-      script.onerror = (error) => {
-        console.error("Failed to load TinyMCE:", error);
-      };
-
-      document.head.appendChild(script);
-
-      return () => {
-        // Cleanup: remove script if component unmounts before loading
-        if (script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-      };
-    };
-
     setIsClient(true);
-    const cleanup = loadTinyMCE();
     
-    return cleanup;
+    // Check if TinyMCE is already loaded
+    if ((window as any).tinymce) {
+      setIsTinyMCELoaded(true);
+      return;
+    }
+
+    // Poll for TinyMCE loaded via next/script
+    const checkInterval = setInterval(() => {
+      if ((window as any).tinymce || (window as any).__TINYMCE_LOADED__) {
+        setIsTinyMCELoaded(true);
+        clearInterval(checkInterval);
+      }
+    }, 100);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(checkInterval);
   }, []);
 
   // Cloudinary upload handler
